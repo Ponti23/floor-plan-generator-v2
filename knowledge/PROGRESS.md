@@ -7,10 +7,10 @@ tags: [progress, resume]
 
 ## Resume here
 
-- **Current focus:** Execute the approved Milestone 0 mathematical feasibility spike; buckets 0.1–0.3 are complete and bucket 0.4 is active.
+- **Current focus:** Execute the approved Milestone 0 mathematical feasibility spike; buckets 0.1–0.4 are complete and bucket 0.5 independent review is active.
 - **Open threads / waiting on user:** None until the architect usefulness hard gate at bucket 0.6.
-- **Next step:** Run the 10-seed canonical feasibility benchmark and impossible fixtures, record the evidence, then proceed to independent technical review.
-- **In-flight branches:** `main` contains the approved planning checkpoint `01507d8`; `stage0-planlab-spike` contains bucket 0.3 at `88f88eb` and is active for bucket 0.4.
+- **Next step:** Complete the independent technical review, fix only Stage 0 defects, and prepare the evidence for the bucket 0.6 architect usefulness hard gate.
+- **In-flight branches:** `main` contains the approved planning checkpoint `01507d8`; `stage0-planlab-spike` contains the benchmark at `4d40d48` and is active for bucket 0.5.
 - **Deferred:** All PlanLab application scaffolding and implementation beyond the explicitly approved Milestone 0 feasibility spike; architect usefulness review remains the hard gate at bucket 0.6.
 
 _(This block is rewritten by the `save-progress` skill. Everything below is the append-only timeline.)_

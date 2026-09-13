@@ -2,16 +2,16 @@
 
 **Active plan:** [`DELEGATION-PLAN.md`](./DELEGATION-PLAN.md) · **Live queue:** [`knowledge/BOARD.md`](./knowledge/BOARD.md) · **Planning package:** [`knowledge/planlab/README.md`](./knowledge/planlab/README.md)
 
-**Status:** Stage 0 is active on `stage0-planlab-spike`; buckets 0.1–0.3 are complete and bucket 0.4 is in progress.
+**Status:** Stage 0 is active on `stage0-planlab-spike`; buckets 0.1–0.4 are complete and bucket 0.5 is in progress.
 
 ## Last checkpoint
 
-- Bucket 0.3 metrics, scoring, diversity, and diagnostics completed as `88f88eb`; all 25 tests pass.
+- Bucket 0.4 seed-suite feasibility benchmark completed as `4d40d48`; all technical gates pass and all 25 tests remain green.
 
 ## Next step
 
-1. Run and verify bucket 0.4, the 10-seed canonical feasibility benchmark plus impossible fixtures.
-2. Record validity, diversity, determinism, expansion counts, timings, and failure diagnostics; tune only centralized prototype constants within the approved model.
+1. Perform bucket 0.5 independent technical review of the Stage 0 spike and benchmark evidence.
+2. Fix only verified Stage 0 defects, record review evidence, then stop at the bucket 0.6 architect usefulness hard gate.
 
 ## Constraints
 
