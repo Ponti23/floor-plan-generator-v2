@@ -2,16 +2,16 @@
 
 **Active plan:** [`DELEGATION-PLAN.md`](./DELEGATION-PLAN.md) · **Live queue:** [`knowledge/BOARD.md`](./knowledge/BOARD.md) · **Planning package:** [`knowledge/planlab/README.md`](./knowledge/planlab/README.md)
 
-**Status:** Stage 0 is active on `stage0-planlab-spike`; buckets 0.1–0.2 are complete and bucket 0.3 is in progress.
+**Status:** Stage 0 is active on `stage0-planlab-spike`; buckets 0.1–0.3 are complete and bucket 0.4 is in progress.
 
 ## Last checkpoint
 
-- Bucket 0.2 constructive generator completed as `e15d97e`; all 17 tests pass.
+- Bucket 0.3 metrics, scoring, diversity, and diagnostics completed as `88f88eb`; all 25 tests pass.
 
 ## Next step
 
-1. Complete and verify bucket 0.3, Metrics, scoring, diversity, and diagnostics.
-2. Record the executor commit, mark bucket 0.3 done, and proceed to bucket 0.4.
+1. Run and verify bucket 0.4, the 10-seed canonical feasibility benchmark plus impossible fixtures.
+2. Record validity, diversity, determinism, expansion counts, timings, and failure diagnostics; tune only centralized prototype constants within the approved model.
 
 ## Constraints
 
