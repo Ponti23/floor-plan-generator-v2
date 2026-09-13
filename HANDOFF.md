@@ -2,21 +2,19 @@
 
 **Active plan:** [`DELEGATION-PLAN.md`](./DELEGATION-PLAN.md) · **Live queue:** [`knowledge/BOARD.md`](./knowledge/BOARD.md) · **Planning package:** [`knowledge/planlab/README.md`](./knowledge/planlab/README.md)
 
-**Status:** Plan approved; Stage 0 has not started because Git author identity is not configured.
+**Status:** Stage 0 is active on `stage0-planlab-spike`; bucket 0.1 is in progress.
 
 ## Last checkpoint
 
-- Planning package approved by user on 2026-09-13; repository initially had no commits.
+- Planning package approved, committed, and pushed to `main` as `01507d8` on 2026-09-13.
 
 ## Next step
 
-1. Configure repository-local Git `user.name` and `user.email` using values supplied by the user.
-2. Checkpoint the planning package, create `stage0-planlab-spike`, mark bucket 0.1 `in-progress`, and dispatch it to a fresh Luna@Max executor.
+1. Complete and verify bucket 0.1, Domain harness and canonical fixtures.
+2. Record the executor commit, mark bucket 0.1 done, and proceed to bucket 0.2.
 
 ## Constraints
 
 - Milestone 0 only: mathematical feasibility spike, no product application scaffolding or polished UI.
 - Approved assumptions are recorded in `DELEGATION-PLAN.md`.
 - Stop at bucket 0.6 for explicit architect go/no-go approval.
-
-<!-- Blocked on: user-supplied Git author name and email for repository-local configuration. -->
