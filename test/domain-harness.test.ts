@@ -7,6 +7,7 @@ import {
   GRID_MM,
   IMPOSSIBLE_FIXTURES,
   MIN_MEANINGFUL_SHARED_WALL_UNITS,
+  MIN_PORTAL_WIDTH_UNITS,
   area,
   boundaryDistance,
   containsRect,
@@ -34,6 +35,7 @@ test("approved prototype constants are centralized", () => {
   assert.equal(APPROVED_CONSTANTS.MAX_GFA_M2, 200);
   assert.equal(APPROVED_CONSTANTS.MAX_UNALLOCATED_INTERIOR_RATIO, 0.05);
   assert.equal(APPROVED_CONSTANTS.MIN_MEANINGFUL_SHARED_WALL_UNITS, 4);
+  assert.equal(MIN_PORTAL_WIDTH_UNITS, 4);
   assert.equal(APPROVED_CONSTANTS.GARAGE_MIN_WIDTH_UNITS, 24);
   assert.equal(APPROVED_CONSTANTS.GARAGE_MIN_DEPTH_UNITS, 24);
   assert.equal(APPROVED_CONSTANTS.GARAGE_FRONT_SIDE, "south");

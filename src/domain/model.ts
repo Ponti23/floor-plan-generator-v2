@@ -138,3 +138,19 @@ export interface NormalizedProject {
   };
   generation: { seed: string };
 }
+
+// Layout/access shapes are kept in their behaviour-owning module, while these
+// type re-exports keep the domain model convenient for callers that import all
+// persisted shapes from one module.
+export type {
+  AccessPortal,
+  CirculationSkeleton,
+  CirculationSkeletonKind,
+  FootprintVariant,
+  Layout,
+  LayoutReproducibilityMetadata,
+  PlacedSpace,
+  PortalKind,
+  SpaceOrExteriorRef,
+  SpaceRole,
+} from "./layout.ts";
