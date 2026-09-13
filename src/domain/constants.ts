@@ -1,0 +1,65 @@
+/**
+ * Constants approved for the PlanLab mathematical feasibility spike.
+ *
+ * Geometry is persisted in millimetres at the project boundary and is
+ * normalized to these fixed planning-grid units before any solver work.
+ */
+
+export const GRID_MM = 250;
+export const GRID_UNIT_METRES = GRID_MM / 1_000;
+export const GRID_M2 = GRID_UNIT_METRES * GRID_UNIT_METRES;
+export const GRID_MM2 = GRID_MM * GRID_MM;
+
+export const TARGET_GFA_M2 = 180;
+export const MAX_GFA_M2 = 200;
+export const MAX_UNALLOCATED_INTERIOR_RATIO = 0.05;
+
+export const MIN_MEANINGFUL_SHARED_WALL_M = 1;
+export const MIN_MEANINGFUL_SHARED_WALL_UNITS =
+  MIN_MEANINGFUL_SHARED_WALL_M / GRID_UNIT_METRES;
+
+export const GARAGE_MIN_WIDTH_M = 6;
+export const GARAGE_MIN_DEPTH_M = 6;
+export const GARAGE_MIN_WIDTH_MM = GARAGE_MIN_WIDTH_M * 1_000;
+export const GARAGE_MIN_DEPTH_MM = GARAGE_MIN_DEPTH_M * 1_000;
+export const GARAGE_MIN_WIDTH_UNITS = GARAGE_MIN_WIDTH_MM / GRID_MM;
+export const GARAGE_MIN_DEPTH_UNITS = GARAGE_MIN_DEPTH_MM / GRID_MM;
+export const GARAGE_FRONT_SIDE = "south" as const;
+export const MIRRORED_LAYOUTS_COUNT_AS_DISTINCT = false;
+
+export const CANONICAL_SITE_WIDTH_M = 20;
+export const CANONICAL_SITE_DEPTH_M = 30;
+export const CANONICAL_SITE_WIDTH_MM = CANONICAL_SITE_WIDTH_M * 1_000;
+export const CANONICAL_SITE_DEPTH_MM = CANONICAL_SITE_DEPTH_M * 1_000;
+export const CANONICAL_SITE_WIDTH_UNITS = CANONICAL_SITE_WIDTH_MM / GRID_MM;
+export const CANONICAL_SITE_DEPTH_UNITS = CANONICAL_SITE_DEPTH_MM / GRID_MM;
+
+export const CANONICAL_OFFSET_NORTH_M = 2;
+export const CANONICAL_OFFSET_EAST_M = 1.5;
+export const CANONICAL_OFFSET_SOUTH_M = 6;
+export const CANONICAL_OFFSET_WEST_M = 1.5;
+export const CANONICAL_OFFSET_NORTH_MM = CANONICAL_OFFSET_NORTH_M * 1_000;
+export const CANONICAL_OFFSET_EAST_MM = CANONICAL_OFFSET_EAST_M * 1_000;
+export const CANONICAL_OFFSET_SOUTH_MM = CANONICAL_OFFSET_SOUTH_M * 1_000;
+export const CANONICAL_OFFSET_WEST_MM = CANONICAL_OFFSET_WEST_M * 1_000;
+
+export const APPROVED_CONSTANTS = Object.freeze({
+  GRID_MM,
+  GRID_UNIT_METRES,
+  GRID_M2,
+  TARGET_GFA_M2,
+  MAX_GFA_M2,
+  MAX_UNALLOCATED_INTERIOR_RATIO,
+  MIN_MEANINGFUL_SHARED_WALL_M,
+  MIN_MEANINGFUL_SHARED_WALL_UNITS,
+  GARAGE_MIN_WIDTH_M,
+  GARAGE_MIN_DEPTH_M,
+  GARAGE_MIN_WIDTH_MM,
+  GARAGE_MIN_DEPTH_MM,
+  GARAGE_MIN_WIDTH_UNITS,
+  GARAGE_MIN_DEPTH_UNITS,
+  GARAGE_FRONT_SIDE,
+  MIRRORED_LAYOUTS_COUNT_AS_DISTINCT,
+  FRONT_SIDE: "south" as const,
+  FOOTPRINT_CLASS: "rectangle" as const,
+});
