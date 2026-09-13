@@ -101,6 +101,7 @@ export interface GenerationResult {
     seed: string;
     budget: GenerationBudget;
     expandedStates: number;
+    topologyExpansions: Record<CirculationSkeletonKind, number>;
     topologyCounts: Record<CirculationSkeletonKind, number>;
   };
 }
@@ -1170,6 +1171,7 @@ export function generateLayouts(
     seed,
     budget,
     expandedStates: 0,
+    topologyExpansions: { straight: 0, L: 0, T: 0 } as Record<CirculationSkeletonKind, number>,
     topologyCounts: { straight: 0, L: 0, T: 0 } as Record<CirculationSkeletonKind, number>,
   };
   if (!normalized.project) {
@@ -1264,6 +1266,7 @@ export function generateLayouts(
       if (layouts.length >= budget.maxTotalCandidates) break;
     }
     emptyMetadata.topologyCounts[topology] = topologyCandidates.length;
+    emptyMetadata.topologyExpansions[topology] = topologyExpanded;
   }
   if (layouts.length === 0) {
     diagnostics.push({ code: "NO_VALID_LAYOUT", message: "bounded search found no hard-valid layout" });

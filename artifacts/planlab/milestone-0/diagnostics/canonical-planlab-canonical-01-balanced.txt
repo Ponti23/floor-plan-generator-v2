@@ -1,0 +1,39 @@
+PlanLab diagnostic layout-L-footprint-48x60-164
+Validity: PASS (0 hard findings)
+Footprint: 12.00 × 15.00 (180.00 m²)
+Site: 600.00 m² | Buildable: 374.00 m²
+Programmed usable: 124.00 m² | Garage: 36.00 m² | Circulation: 20.00 m²
+GFA: 180.00 m² | target Δ 0.00 m² | max Δ -20.00 m²
+Unallocated interior: 0.00 m² (0.0%) | Planning efficiency: 86.1%
+Reachability: 8/8 required rooms | Dead ends: 0
+Portals: 13
+Spaces:
+- Garage [room] @ 16,58 6.00 × 6.00 (36.00 m²)
+- circulation-L-1 [circulation] @ 40,22 1.00 × 7.00 (7.00 m²)
+- circulation-L-2 [circulation] @ 40,54 1.00 × 6.00 (6.00 m²)
+- circulation-L-3 [circulation] @ 40,50 6.00 × 1.00 (6.00 m²)
+- entry-L [entry] @ 40,78 1.00 × 1.00 (1.00 m²)
+- Living Room [room] @ 28,22 3.00 × 9.00 (27.00 m²)
+- Bedroom 1 [room] @ 44,22 5.00 × 7.00 (35.00 m²)
+- Bedroom 2 [room] @ 16,22 3.00 × 9.00 (27.00 m²)
+- Bedroom 3 [room] @ 44,54 3.25 × 3.25 (10.56 m²)
+- Kitchen [room] @ 44,67 3.25 × 3.75 (12.19 m²)
+- Bathroom [room] @ 57,54 1.75 × 3.50 (6.13 m²)
+- Laundry [room] @ 57,68 1.75 × 3.50 (6.13 m²)
+Score model: planlab-scoring-0.3
+Scores:
+- Compact Efficiency: 86/100 | programSpace 93, flow 98, relationships 57, liveability 71, servicesSite 88
+  + validation.hard.pass [validation:hard]
+  + programSpace.minimumArea.strong [program:minimumArea]
+  + programSpace.targetFootprint.strong [footprint:targetGfa]
+  + programSpace.unallocatedInterior.strong [footprint:unallocated]
+- Best Flow: 83/100 | programSpace 93, flow 98, relationships 57, liveability 71, servicesSite 88
+  + validation.hard.pass [validation:hard]
+  + programSpace.minimumArea.strong [program:minimumArea]
+  + programSpace.targetFootprint.strong [footprint:targetGfa]
+  + programSpace.unallocatedInterior.strong [footprint:unallocated]
+- Balanced: 82/100 | programSpace 93, flow 98, relationships 57, liveability 71, servicesSite 88
+  + validation.hard.pass [validation:hard]
+  + programSpace.minimumArea.strong [program:minimumArea]
+  + programSpace.targetFootprint.strong [footprint:targetGfa]
+  + programSpace.unallocatedInterior.strong [footprint:unallocated]
