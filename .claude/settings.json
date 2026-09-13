@@ -1,0 +1,41 @@
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "compact|clear",
+        "hooks": [
+          {
+            "type": "command",
+            "shell": "bash",
+            "command": "node -e \"try{const h=require('fs').readFileSync('HANDOFF.md','utf8');process.stdout.write('You are resuming after a context compaction/clear. Read this HANDOFF and continue the active plan per its resume ritual.\n\n'+h)}catch(e){}\"",
+            "statusMessage": "Loading HANDOFF for resume"
+          }
+        ]
+      }
+    ],
+    "PreCompact": [
+      {
+        "matcher": "auto|manual",
+        "hooks": [
+          {
+            "type": "command",
+            "shell": "bash",
+            "command": "node -e \"process.stdout.write('Before compacting: preserve the pointer to HANDOFF.md as the source of truth. The post-compaction session must re-read HANDOFF.md and continue the active plan.')\""
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "shell": "bash",
+            "command": "node -e \"process.stdout.write('Standing rule: Sol@Max orchestrates by default; Astra@Max handles architecture, ambiguity, and escalations. Luna@Max executes scoped work by default; Terra@Max handles difficult cross-cutting implementation, integration, and independent review. Route per knowledge/patterns/delegation-playbook.md. Human hard-gates per AGENTS.md. Never ask the user to switch models.')\""
+          }
+        ]
+      }
+    ]
+  }
+}
+
