@@ -7,8 +7,8 @@ Active design: [`planlab/README.md`](./planlab/README.md) · staged plan: [`../D
 | # | Bucket | Best agent | Owner | Status | Branch |
 |---|---|---|---|---|---|
 | 0.1 | Domain harness and canonical fixtures | luna-max | luna-max | done | `stage0-planlab-spike` (`4e045d9`) |
-| 0.2 | Constructive circulation-aware generator | luna-max | luna-max | in-progress | `stage0-planlab-spike` |
-| 0.3 | Metrics, scoring, diversity, diagnostics | luna-max | — | todo | `stage0-planlab-spike` |
+| 0.2 | Constructive circulation-aware generator | luna-max | luna-max | done | `stage0-planlab-spike` (`e15d97e`) |
+| 0.3 | Metrics, scoring, diversity, diagnostics | luna-max | luna-max | in-progress | `stage0-planlab-spike` |
 | 0.4 | Seed-suite feasibility benchmark | luna-max | — | todo | `stage0-planlab-spike` |
 | 0.5 | Independent technical review | terra-max | — | todo | `stage0-planlab-spike` |
 | 0.6 | Architect usefulness review **(HARD GATE)** | astra-plan | — | needs-human | `stage0-planlab-spike` |
