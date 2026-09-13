@@ -31,6 +31,16 @@ import {
 } from "./layout.ts";
 import { createSeededPrng, hashSeed, type SeededPrng } from "./prng.ts";
 import { validateLayout, type ValidationResult } from "./validation.ts";
+import {
+  scoreCandidates,
+  type ScoredLayoutCandidate,
+} from "./scoring.ts";
+import {
+  DEFAULT_DIVERSITY_THRESHOLD,
+  selectDiverseTriplet,
+  type SelectedLayout,
+  type TripletSelection,
+} from "./diversity.ts";
 
 export const GENERATOR_ENGINE_VERSION = "planlab-generator-0.2";
 export const GENERATOR_RULE_VERSION = "planlab-core-1";
@@ -60,7 +70,9 @@ export interface GenerationDiagnostic {
     | "NO_FOOTPRINT_VARIANT"
     | "SEARCH_BUDGET_EXCEEDED"
     | "NO_VALID_LAYOUT"
-    | "VALIDATION_REJECTED";
+    | "VALIDATION_REJECTED"
+    | "INSUFFICIENT_CANDIDATES"
+    | "INSUFFICIENT_DIVERSITY";
   message: string;
   topology?: CirculationSkeletonKind;
   footprintVariant?: string;
@@ -74,6 +86,15 @@ export interface GenerationResult {
   /** Alias retained for callers that call the pool “candidates”. */
   candidates: Layout[];
   diagnostics: GenerationDiagnostic[];
+  /** One shared facts/metrics pass plus all three strategy scorecards. */
+  analyses: ScoredLayoutCandidate[];
+  /** Compatibility alias for callers that use “scorecards” for analyses. */
+  scorecards: ScoredLayoutCandidate[];
+  /** Joint strategy selection; it may honestly contain fewer than three options. */
+  selection: TripletSelection;
+  selected: SelectedLayout[];
+  selectedLayouts: Layout[];
+  options: SelectedLayout[];
   metadata: {
     engineVersion: string;
     ruleVersion: string;
@@ -1096,6 +1117,40 @@ function normalizeInput(
   }
 }
 
+function emptyTripletSelection(
+  code: "NO_VALID_CANDIDATES" | "INSUFFICIENT_CANDIDATES" = "NO_VALID_CANDIDATES",
+): TripletSelection {
+  return {
+    version: "planlab-diversity-0.3",
+    status: "partial",
+    complete: false,
+    partial: true,
+    threshold: DEFAULT_DIVERSITY_THRESHOLD,
+    selected: [],
+    layouts: [],
+    pairwiseDistances: [],
+    diagnostics: [{
+      code,
+      message: code === "NO_VALID_CANDIDATES"
+        ? "no hard-valid candidates are available for strategy selection"
+        : "fewer than three hard-valid candidates are available",
+      candidateCount: 0,
+      threshold: DEFAULT_DIVERSITY_THRESHOLD,
+    }],
+    reason: code,
+  };
+}
+
+function appendSelectionDiagnostics(
+  diagnostics: GenerationDiagnostic[],
+  selection: TripletSelection,
+): void {
+  for (const diagnostic of selection.diagnostics) {
+    if (diagnostics.some((existing) => existing.code === diagnostic.code)) continue;
+    diagnostics.push({ code: diagnostic.code, message: diagnostic.message });
+  }
+}
+
 /**
  * Deterministic topology-first constructive beam search.  All candidates are
  * independently revalidated before they enter the returned pool.
@@ -1118,22 +1173,36 @@ export function generateLayouts(
     topologyCounts: { straight: 0, L: 0, T: 0 } as Record<CirculationSkeletonKind, number>,
   };
   if (!normalized.project) {
+    const selection = emptyTripletSelection();
     return {
       ok: false,
       layouts: [],
       candidates: [],
       diagnostics: normalized.normalizationDiagnostics,
+      analyses: [],
+      scorecards: [],
+      selection,
+      selected: [],
+      selectedLayouts: [],
+      options: [],
       metadata: emptyMetadata,
     };
   }
   const project = normalized.project;
   const variants = deriveFootprintVariants(project, seed);
   if (variants.length === 0) {
+    const selection = emptyTripletSelection();
     return {
       ok: false,
       layouts: [],
       candidates: [],
       diagnostics: [{ code: "NO_FOOTPRINT_VARIANT", message: "no footprint satisfies the envelope, room minimums, and GFA cap" }],
+      analyses: [],
+      scorecards: [],
+      selection,
+      selected: [],
+      selectedLayouts: [],
+      options: [],
       metadata: emptyMetadata,
     };
   }
@@ -1200,11 +1269,20 @@ export function generateLayouts(
     diagnostics.push({ code: "NO_VALID_LAYOUT", message: "bounded search found no hard-valid layout" });
   }
   emptyMetadata.expandedStates = expandedStates;
+  const analyses = scoreCandidates(layouts, project);
+  const selection = selectDiverseTriplet(analyses, project);
+  appendSelectionDiagnostics(diagnostics, selection);
   return {
     ok: layouts.length > 0,
     layouts,
     candidates: layouts,
     diagnostics,
+    analyses,
+    scorecards: analyses,
+    selection,
+    selected: selection.selected,
+    selectedLayouts: selection.layouts,
+    options: selection.selected,
     metadata: emptyMetadata,
   };
 }

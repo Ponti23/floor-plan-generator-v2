@@ -6,4 +6,8 @@ export * from "./fixtures.ts";
 export * from "./layout.ts";
 export * from "./prng.ts";
 export * from "./validation.ts";
+export * from "./metrics.ts";
+export * from "./scoring.ts";
+export * from "./diversity.ts";
+export * from "./diagnostics.ts";
 export * from "./generator.ts";
