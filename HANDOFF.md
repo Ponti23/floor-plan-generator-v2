@@ -2,9 +2,28 @@
 
 **Active plan:** [`DELEGATION-PLAN.md`](./DELEGATION-PLAN.md) · **Live queue:** [`knowledge/BOARD.md`](./knowledge/BOARD.md) · **Planning package:** [`knowledge/planlab/README.md`](./knowledge/planlab/README.md)
 
-**Status:** Stage 0 is complete and approved. Stage 1 is complete (independent domain API review passed 2026-09-14). **Stage 2 (access, rules, and validation) is complete** — all five buckets landed on `main` and the independent review (2.5) passed on 2026-09-14 with three access-layer defects fixed. **Stage 3 (generator, metrics, scoring, and diversity) is active**; buckets 3.1–3.4 are complete and bucket 3.5 independent review is next. The full benchmark is deterministic and p95 passes, but its median-runtime gate currently fails (3,036 ms vs <2,000 ms); 3.5 must judge and resolve or escalate this finding.
+**Status:** Stage 0 is complete and approved. Stage 1 is complete (independent domain API review passed 2026-09-14). **Stage 2 (access, rules, and validation) is complete** — all five buckets landed on `main` and the independent review (2.5) passed on 2026-09-14 with three access-layer defects fixed. **Stage 3 (generator, metrics, scoring, and diversity) is complete** — buckets 3.1–3.4 landed and the 3.5 review resolved the recorded median-runtime failure (3,036 ms → 904 ms, byte-identical results) and found the selection memo untested. **Next: the Stage 3 hard gate — the architect/user approves mathematical usefulness and the scoring language before any polished UI work.** Do not stage Milestone 4 before that decision.
 
 ## Last checkpoint
+
+- Bucket 3.5 landed as `d7f82b9` (`perf: memoise PlanLab selection pair distances`, plus its
+  review evidence). The recorded median-runtime gate failure was attributed to joint triplet
+  selection recomputing `compareLayoutDiversity` for every one of the ~41,000 assignment pairs
+  rather than the ~2,556 distinct pairs; an identity-keyed symmetric memo fixes it. Evidence:
+  `serializeCanonical(GenerationResult)` is byte-identical for all ten canonical seeds before and
+  after, expansion counts are unchanged, and the re-recorded baselines differ from the previous
+  ones in exactly one field each (the input fingerprint, which hashes every domain module).
+  Full gate now **PASS**: median **903.743 ms**, p95 **1,153.068 ms** (record run) and median
+  **817.392 ms**, p95 **1,038.613 ms** (immediate `--check`). The same review found the memo had no
+  test teeth — a deliberately wrong memo left `npm test` at 120/120 — so
+  `test/diversity-selection.test.ts` gained a distance-consistency oracle and a brute-force
+  triplet oracle, both mutation-verified. The frontier cut's comment was corrected to state that
+  the tiny-grid oracle certifies the minimum-area cut only. Verification: `npm test` **122
+  passing**; `npm run typecheck` 0 errors; `benchmark:stage0:check` and
+  `benchmark:stage0:bounded` both `baselineMatch: true`. Review record:
+  `artifacts/planlab/milestone-3/validation-review.md`. Open, not defects: the architect
+  usefulness/scoring-language hard gate, the Stage 0 evidence-shape decision from 2.5, and
+  deliberately untaken tuning headroom (`shortlistSize`, metric breakpoints).
 
 - Bucket 3.4 landed as `99e1904` (`feat: pin PlanLab determinism and regression evidence`). Seeded
   tie-breaking, budgets, and search-policy constants are versioned; an independent tiny-grid

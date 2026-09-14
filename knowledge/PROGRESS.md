@@ -7,47 +7,59 @@ tags: [progress, resume]
 
 ## Resume here
 
-- **Checkpoint date:** 2026-09-14 (later the same day as the Stage 1 checkpoint).
-- **Current focus:** Stage 2 (access, rules, and validation) is **complete**. All five buckets
-  landed on `main` (`9a24738`, `7f87add`, `2a4f216`, `f93ddd3`, `ded4d73`) and the independent
-  review (2.5) returned **PASS WITH OPEN FINDINGS** on 2026-09-14, fixing three access-layer
-  defects. The hard-validity stack is now authoritative: rule definitions/instances with
-  provenance, the eight-stage ordered pipeline, unsupported evaluators and aggregations that fail
-  instead of passing, and an access graph that can no longer disagree with the validator.
+- **Checkpoint date:** 2026-09-14 (later the same day as the Stage 2 checkpoint).
+- **Current focus:** Stage 3 (generator, metrics, scoring, and diversity) is **complete**. Buckets
+  3.1–3.4 landed on `main` (`6089c48`, `c5bff25`, `e301ed4` + `e8d4b45`, `99e1904`) and the 3.5
+  review closed the one blocking finding: the recorded median-runtime gate failure (3,036 ms vs
+  <2,000 ms) came from joint triplet selection recomputing `compareLayoutDiversity` for every one of
+  the ~41,000 assignment pairs instead of the ~2,556 distinct pairs. An identity-keyed symmetric
+  memo in `src/domain/diversity.ts` fixes it with byte-identical results; the full gate is now
+  **PASS** at median **904 ms** / p95 **1,153 ms**. Review also added the missing selection test
+  teeth (brute-force triplet oracle + distance-consistency oracle, mutation-verified) and corrected
+  a comment that overstated the tiny-grid oracle's scope. Evidence:
+  `artifacts/planlab/milestone-3/validation-review.md`.
 - **Open threads / waiting on user:**
-  1. **Stage 0 benchmark evidence (decision).** Bucket 2.1 added the derived facts indexes to the
-     serialized `GenerationResult`, so the ten recorded per-seed `outputHash` values no longer
-     reproduce — `e1c6f38` (end of Stage 1) is the last commit that reproduces them. Generated
-     layouts and selected triplets are byte-identical throughout, so this is an evidence-shape
-     change, not a semantics change. Either accept the evolution or stop serializing the derived
-     indexes so the canonical result stays byte-stable; the payload also grew ~256 MB → ~342 MB,
-     which matters for the Milestone 4 worker protocol. Detail:
-     `artifacts/planlab/milestone-2/validation-review.md`.
-  2. **Nothing is pushed** — `main` is ~40 commits ahead of `origin/main`.
-  3. Product/UX/copy and money/payment decisions remain human hard gates.
-- **Next step:** Sol@Max stages Milestone 3 (generator, metrics, scoring, and diversity) from
-  `knowledge/planlab/IMPLEMENTATION_PLAN.md`. Do not begin Milestone 3 implementation before that
-  staging; its definition of done is the architect usefulness/scoring-language hard gate.
+  1. **Stage 3 hard gate (architect/user).** The architect must approve mathematical usefulness and
+     the scoring language before any polished UI work. This is the definition of done for Stage 3
+     and was deliberately not claimed by the review. Do not start Milestone 4 scaffolding before it
+     closes.
+  2. **Stage 0 benchmark evidence (decision).** Since bucket 2.1 the derived facts indexes are part
+     of the serialized `GenerationResult`, so the ten recorded per-seed `outputHash` values no longer
+     reproduce — `e1c6f38` is the last commit that reproduces them — and the canonical payload grew
+     ~256 MB → ~342 MB, which matters for the Milestone 4 worker protocol. Layouts and selected
+     triplets are byte-identical throughout. Accept the evidence-shape evolution or stop serializing
+     the derived indexes. Detail: `artifacts/planlab/milestone-2/validation-review.md`.
+  3. **Nothing is pushed** — `main` is ~50 commits ahead of `origin/main`.
+  4. Product/UX/copy and money/payment decisions remain human hard gates.
+  5. **Deliberately untaken tuning headroom.** Selection now costs ~56 ms, so
+     `calibration.diversity.shortlistSize` (24 of a 300-candidate pool) and the metric breakpoints
+     could be revisited cheaply, but every such change moves selected triplets — that is scoring
+     language and belongs to the hard gate above.
+- **Next step:** the user's Stage 3 gate decision (usefulness + scoring language). Only then stage
+  Milestone 4 (worker/UI scaffolding) from `knowledge/planlab/IMPLEMENTATION_PLAN.md`.
 - **In-flight branches:** all work is on `main` (Milestone 0 baseline `8171058`, Stage 1
-  `0e8589b`…`e1c6f38` plus typecheck infra `19916f1`, Stage 2 as listed above);
-  `stage0-planlab-spike` is retained at the completed gate checkpoint `b8aba2a`.
-- **Deferred:** Milestone 3+ product implementation (generator/scoring hardening, worker/UI
-  scaffolding) is unstarted until staged. `INSTANCES_BY_PROJECT` in `rules.ts` caches instances per
-  project object identity — revisit when the project document becomes editable (Milestone 6).
+  `0e8589b`…`e1c6f38` plus typecheck infra `19916f1`, Stage 2 `9a24738`…`ded4d73`, Stage 3
+  `6089c48`…`99e1904` plus the 3.5 review); `stage0-planlab-spike` is retained at the completed gate
+  checkpoint `b8aba2a`.
+- **Deferred:** Milestone 4+ product implementation (worker/UI scaffolding) is unstarted until the
+  Stage 3 gate closes. `INSTANCES_BY_PROJECT` in `rules.ts` caches instances per project object
+  identity — revisit when the project document becomes editable (Milestone 6).
 
-**Stage 2 evidence:** `npm test` 102 passing (68 → 70 in Stage 1, 99 after 2.4, 102 after the 2.5
-review); `npm run typecheck` 0 errors; `npm run diagnostics:canonical -- --check` clean with the
-canonical fingerprint unchanged at
-`sha256:95d89f35db8b7eea5bc52196cb70f49a8885cf37bbdde5a82a5caff50cbc061d`; differential validation
-of 15 deliberately broken layouts against `e1c6f38` shows identical verdicts and violation sets;
-`serializeCanonical(GenerationResult)` is byte-identical from `9a24738` through `ded4d73`. Review
-record: `artifacts/planlab/milestone-2/validation-review.md`.
+**Stage 3 evidence:** `npm test` 122 passing (105 → 110 → 116 → 120 → 122 with the 3.5 oracles);
+`npm run typecheck` 0 errors; `npm run diagnostics:canonical -- --check` clean;
+`npm run benchmark:stage0:check` and `npm run benchmark:stage0:bounded` both `baselineMatch: true`
+with every gate line PASS (median 817 ms, p95 1,039 ms on the immediate re-run);
+`serializeCanonical(GenerationResult)` byte-identical for all ten canonical seeds across the 3.5
+fix, with expansion counts unchanged (6,779 / 7,108 / 8,641 / …); the re-recorded baselines differ
+from the previous ones in exactly one field each — the benchmark input fingerprint, which hashes
+every domain module. Review record: `artifacts/planlab/milestone-3/validation-review.md`.
 
-**Process note:** every dispatched executor in Stage 2 stalled at least once by reporting status and
-asking for authorization rather than implementing, and two spawned nested helpers. Four of the five
-buckets were finished directly by the orchestrator, and every new behaviour was mutation-checked
-(the fix was temporarily reverted and the new test confirmed to fail). Future briefs must say
-"do the work now, do not ask, do not spawn sub-agents".
+**Process note:** the 3.5 review was performed by the orchestrator because no separate agent was
+available in the session, so it leans on differential evidence (frozen prior commit in a scratch
+worktree, injected defects, a second process, independent oracles) rather than on reading alone.
+Both new behaviours were mutation-checked: a deliberately wrong selection memo failed the two new
+oracles, and a temporarily disabled frontier cut was used to measure that cut's real effect. A cold
+resume that wants a genuinely independent Stage 3 review should re-do it with a different agent.
 
 _(This block is rewritten by the `save-progress` skill. Everything below is the append-only timeline.)_
 
@@ -72,3 +84,10 @@ No merge has occurred yet; the timeline begins with the first real merge.
   typed rule registry and ordered validator (`2a4f216`), relationship aggregation and
   garage/circulation hard rules (`f93ddd3`), independent validation-review pass with three
   access-layer fixes (`ded4d73`) → next: Sol@Max stages Milestone 3.
+- Stage 3 delivered and reviewed: named metric breakpoints and validity gates (`6089c48`), frozen
+  calibration surface (`c5bff25`), canonical diversity identity plus joint triplet selection
+  (`e301ed4`, `e8d4b45`), determinism policy, pruning oracle, and regression baselines (`99e1904`),
+  then the 3.5 review that fixed the recorded median-runtime failure with an identity-keyed
+  selection memo (`d7f82b9`; median 3,036 ms → 904 ms, byte-identical results) and added the
+  missing selection oracles → next: the Stage 3 architect usefulness/scoring-language hard gate,
+  then stage Milestone 4.

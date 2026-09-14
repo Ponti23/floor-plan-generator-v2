@@ -25,7 +25,7 @@ Active design: [`planlab/README.md`](./planlab/README.md) · staged plan: [`../D
 | 3.2 | Strategy profiles and the calibration surface | luna-max | luna-max | done | `main` (`c5bff25`) |
 | 3.3 | Interchangeable matching, diversity, joint selection | luna-max | luna-max | done | `main` (`e8d4b45`) |
 | 3.4 | Determinism, pruning oracle, regression benchmark | luna-max | luna-max | done | `main` (`99e1904`) |
-| 3.5 | Independent Milestone 3 review | terra-max | terra-max | in-progress | `main` |
+| 3.5 | Independent Milestone 3 review | terra-max | orchestrator (`/root`) | done | `main` (`d7f82b9`) |
 
 ## Handoff rules
 
@@ -42,6 +42,10 @@ Active design: [`planlab/README.md`](./planlab/README.md) · staged plan: [`../D
 - Stage 2 is **complete** (`9a24738`, `7f87add`, `2a4f216`, `f93ddd3`, `ded4d73`). The independent
   review passed with open findings; see `artifacts/planlab/milestone-2/validation-review.md`.
   Milestone 3 is not active until the orchestrator stages it.
-- Stage 3 (generator, metrics, scoring, diversity) is staged and active. Buckets run in order.
-  Its definition of done is a **user hard gate**: the architect approves mathematical usefulness
-  and the scoring language before polished UI work; never merge that solo.
+- Stage 3 (generator, metrics, scoring, diversity) is **complete** (`6089c48`, `c5bff25`,
+  `e301ed4`, `e8d4b45`, `99e1904`, plus the 3.5 review). The review failed the median-runtime gate
+  as recorded by 3.4, attributed it to redundant pairwise comparisons in joint selection, and
+  fixed it without moving any recorded result (`artifacts/planlab/milestone-3/validation-review.md`).
+- Stage 3's definition of done remains an open **user hard gate**: the architect approves
+  mathematical usefulness and the scoring language before polished UI work; never merge that solo.
+  Do not start Milestone 4 worker/UI scaffolding before that gate closes.

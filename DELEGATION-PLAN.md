@@ -105,11 +105,18 @@ contracts and proving the claims it currently asserts.
   determinism, and benchmark reproducibility. Whatever the outcome of the Stage 0 benchmark
   evidence decision (see `HANDOFF.md`), record its mechanical consequence here rather than changing
   product semantics unilaterally. — `luna-max` (`99e1904`; benchmark deterministic, median-runtime gate open for 3.5 review)
-- [ ] **3.5 Independent Milestone 3 review.** Review the generator, metrics, scoring, and diversity
+- [x] **3.5 Independent Milestone 3 review.** Review the generator, metrics, scoring, and diversity
   stack for misleading metrics, false precision, determinism leaks, weak tests, pruning-oracle
   credibility, and benchmark honesty. Fix only Stage 3 defects, run the complete suite, and record
   evidence under `artifacts/planlab/milestone-3/`. — `terra-max` (reason: independent review; the
-  orchestrator judges Terra-authored work)
+  orchestrator judges Terra-authored work). Reviewed by the orchestrator (no separate agent was
+  available in the session) against differential evidence (`d7f82b9`): the median-runtime gate failure was
+  attributed to redundant pair comparisons in joint selection and fixed with an identity-keyed
+  memo, byte-identical results for all ten canonical seeds, median now **904 ms** (was 3,036 ms);
+  the memo had no test teeth, so a brute-force selection oracle and a distance-consistency oracle
+  were added; a frontier-cut comment that overstated the tiny-grid oracle's scope was corrected.
+  Evidence: `artifacts/planlab/milestone-3/validation-review.md`. All other Stage 3 findings are
+  user/architect decisions, not defects.
 
 **Hard gate at the end of Stage 3:** the architect/user explicitly approves mathematical usefulness
 and the scoring language before any polished UI work. Do not merge that decision solo.
