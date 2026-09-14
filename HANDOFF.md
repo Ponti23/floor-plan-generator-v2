@@ -13,7 +13,7 @@
   3. Hardcoded metre conversions (`/ 0.25`, `GRID_MM / 1_000`) in `metrics.ts`/`validation.ts` now use `GRID_UNIT_METRES` (identical value, one named source).
   4. `unionArea` gained the same exact-range accumulation guard as `overlapArea`.
 - Verification: `npm run typecheck` reports **0 errors** (was 22 pre-existing); `node --test` reports **70 passing** (was 68); `npm run diagnostics:canonical -- --check` is up to date with the canonical fingerprint unchanged at `sha256:95d89f35db8b7eea5bc52196cb70f49a8885cf37bbdde5a82a5caff50cbc061d`; a scratch-copy Stage 0 benchmark passes all gates and reproduces all ten recorded per-seed `outputHash`/`replayHash` values byte-for-byte, so Stage 1 preserved Stage 0 output semantics bit-for-bit.
-- Working tree is clean; `main` is ahead of `origin/main` and nothing is pushed. Disposable scratch copies remain under `%TEMP%\fp-bench-*` and `%TEMP%\fp-review-*` (recursive deletion is policy-blocked; safe to remove manually when convenient).
+- Working tree is clean; `main` is 26 commits ahead of `origin/main` and nothing is pushed. The disposable scratch copies under `%TEMP%\fp-bench-*` / `%TEMP%\fp-review-*` have been removed by the orchestrator.
 
 ## Next step
 
