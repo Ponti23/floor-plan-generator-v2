@@ -6,6 +6,46 @@
 
 ## Last checkpoint
 
+- Bucket 2.3 landed as `2a4f216` (`feat: add PlanLab rule registry and ordered validator`).
+  `src/domain/rules.ts` now holds the typed evaluator registry: one immutable `planlab-core`
+  definition per violation code, hard rule instances carrying `enforcement`, `source`, validated
+  `parameters`, and `scope`, evaluated in the eight-stage `RULE_ENGINE.md` pipeline order; an
+  unknown definition id or version mismatch evaluates to `unsupported` and fails, never passes.
+  Portal geometry/graph/transit policy moved to `src/domain/portalGraph.ts` (no import cycle), and
+  `validation.ts` is now a façade that builds one `RuleContext` and projects fail evaluations onto
+  the unchanged `ValidationResult` shape (violations additionally carry `geometryEvidence`).
+  Orchestrator review (2.3 is Terra-authored, so the author was not the reviewer): 15 deliberately
+  broken layouts were validated on `e1c6f38` and on this commit and compared field by field — every
+  case keeps the same valid/invalid verdict and the same violation set. Three documented deltas:
+  (a) violation order now follows the documented pipeline instead of the old inline order (6/15
+  cases reordered, sets identical); (b) `ruleId` separators changed from underscores to kebab-case
+  (`planlab-core.portal-not-on-shared-edge`); nothing in the repo consumes the old format (checked);
+  (c) some violations gained additive fields (`expected`/`actual`, a layout subject) and a
+  duplicate-space-id fixture now additionally reports the reachability consequences, which is the
+  "return all safe-to-compute violations" rule. Verification: `npm test` **91 passing**;
+  `npm run typecheck` 0 errors; canonical fingerprint unchanged; and a full
+  `serializeCanonical(GenerationResult)` for the canonical seed is byte-identical between `9a24738`
+  (bucket 2.1) and this commit, so buckets 2.2 and 2.3 introduced no serialization drift.
+
+### Stage 0 benchmark reproduction — accepted drift from bucket 2.1
+
+Verified independently (scratch worktrees at `e1c6f38` and `9a24738`, same machine):
+
+- `e1c6f38` (end of Stage 1) reproduces all ten recorded per-seed `outputHash` values byte-for-byte.
+- `9a24738` (bucket 2.1) does **not**: all ten hashes change. The cause is the enriched derived-facts
+  evidence (`factsVersion` 0.4 → 0.5 plus the new `overlaps` / `sharedWallIntervals` /
+  `sharedWallIndex` / `exteriorContacts` / `exteriorContactIndex` fields) being part of the
+  serialized `GenerationResult`.
+- The generated **layouts** and the **selected triplet** are byte-identical between `e1c6f38` and
+  `9a24738`, so layout and selection semantics are unchanged; only the derived evidence payload
+  moved (and grew the canonical result from ~256 MB to ~342 MB for the canonical seed).
+
+Consequence: the recorded Milestone 0 benchmark hashes are historical evidence, not a live gate —
+`e1c6f38` is the last commit that reproduces them. This needs a decision (not a hard gate): either
+accept it as intended evidence evolution, or stop serializing the derived indexes so the canonical
+result stays byte-stable and the Stage 0 benchmark keeps reproducing. The payload size also matters
+for the Milestone 4 worker protocol. Raised for bucket 2.5 and for the user.
+
 - Bucket 2.2 landed as `7f87add` (`fix: harden PlanLab portal geometry and access graph`).
   Two real defects closed: (a) `buildPortalGraph` added an edge for *any* portal whose
   endpoints resolved, so reachability could be established through a portal `validateLayout`
