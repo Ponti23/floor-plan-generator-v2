@@ -1,0 +1,764 @@
+{
+  "schemaVersion": "planlab-stage0-regression-baseline-1",
+  "suiteVersion": "planlab-stage0-seed-suite-0.6",
+  "mode": "full",
+  "engineVersion": "planlab-generator-0.4",
+  "ruleVersion": "planlab-core-2",
+  "determinismVersion": "planlab-generator-determinism-1",
+  "budgetVersion": "planlab-generator-budget-1",
+  "searchPolicy": {
+    "candidateBranchFactor": 8,
+    "retainedStateFactor": 4,
+    "dedupeStateFactor": 8,
+    "footprintVariantLimit": 64
+  },
+  "budget": {
+    "beamWidth": 64,
+    "maxExpansionsPerTopology": 15000,
+    "maxCandidatesPerTopology": 100,
+    "maxTotalCandidates": 300
+  },
+  "seeds": [
+    "planlab-canonical-01",
+    "planlab-canonical-02",
+    "planlab-canonical-03",
+    "planlab-canonical-04",
+    "planlab-canonical-05",
+    "planlab-canonical-06",
+    "planlab-canonical-07",
+    "planlab-canonical-08",
+    "planlab-canonical-09",
+    "planlab-canonical-10"
+  ],
+  "benchmarkInputFingerprint": "8a9a04bcdeaf64eeb07b00d5d52325ed4b9da18e3d1901c24d004e8ac9a938f8",
+  "historicalStage0Baseline": {
+    "commit": "e1c6f38",
+    "artifact": "artifacts/planlab/milestone-0/benchmark.json",
+    "meaning": "historical Stage 0 full-result hashes before derived-facts indexes were serialized",
+    "mechanicalConsequence": "current regression checks retain full-result, layout, selection, and evidence-shape signatures separately; the Stage 3.4 seeded tie-break has its own versioned current baseline; historical hashes remain reference evidence and are not a live gate",
+    "outputHashes": {
+      "planlab-canonical-01": "2e25c2f1375142b5e634ece7ad83c14a3edc7690267f2eb7d283c3268a25ef5a",
+      "planlab-canonical-02": "a958915b82414d49507b8e342c390071424b2d27fc36c5837a0a8d07e27d3bae",
+      "planlab-canonical-03": "ec0c221b17a5d29ea8aa4913a3805fb7f717d762e4db198d7e6f79f06c807a56",
+      "planlab-canonical-04": "bb93aff6aed6e03356ffd71b0aa24c75c0301806f9943627e30a155ecb50c05e",
+      "planlab-canonical-05": "eefd52e3baedf222751b2caeebea752b309525afc4e32213576807377ca55e39",
+      "planlab-canonical-06": "f899e35c28b80cc92507bd333b6ee1be04267650b0e4bbbb59937d8dd70e764e",
+      "planlab-canonical-07": "c91e362cbfd862010a17ee6daa356a6ca28261a77abf90c75e5e0ca0fb9478b3",
+      "planlab-canonical-08": "14e8fcfc20f53b9b00bf78dad5db67323cd26ee9c32a846e7342e12b2dfdd56e",
+      "planlab-canonical-09": "21e865f4345e7b7ed3e1942bd5469c8bb58c4a495466ed8779a196277515788d",
+      "planlab-canonical-10": "09b622a143038ec474b0146591694b7dcc78c7cc7dba907c777298c9b74e4184"
+    }
+  },
+  "canonical": [
+    {
+      "seed": "planlab-canonical-01",
+      "outputHash": "1ea3931c2c0d1fedf18449347c968720002464b20b4d5949999fe944f058ac4f",
+      "layoutHash": "5df0407527fab01d9da14c444f6f69c0a5609e7389ff1b5eaad927a886804c4d",
+      "selectionHash": "5ca45e8d6463a8499f3f99818dc4369ff9f1c69b0bfc205af2a9a6346f227dad",
+      "evidenceHash": "b44ad1795d7eaef8e3a8260921e0752319281a62bf34cba85ae0269b053d9e52",
+      "factsVersions": [
+        "planlab-metrics-0.6"
+      ],
+      "ok": true,
+      "candidateCount": 300,
+      "independentlyValidCandidateCount": 300,
+      "selectedCount": 3,
+      "independentlyValidSelectedCount": 3,
+      "selectionStatus": "complete",
+      "selectionComplete": true,
+      "selectionReason": null,
+      "diversityThreshold": 0.2,
+      "minimumSelectedPairwiseDistanceRaw": 0.3203629583969335,
+      "selectedPairwiseDistances": [
+        {
+          "a": "layout-L-footprint-48x60-171",
+          "b": "layout-L-footprint-48x60-117",
+          "distance": 0.320363,
+          "diverse": true
+        },
+        {
+          "a": "layout-L-footprint-48x60-171",
+          "b": "layout-straight-footprint-40x72-26",
+          "distance": 0.537394,
+          "diverse": true
+        },
+        {
+          "a": "layout-L-footprint-48x60-117",
+          "b": "layout-straight-footprint-40x72-26",
+          "distance": 0.546635,
+          "diverse": true
+        }
+      ],
+      "expansions": {
+        "total": 6779,
+        "perTopology": {
+          "straight": 4175,
+          "L": 1285,
+          "T": 1319
+        },
+        "validCandidatesPerTopology": {
+          "straight": 100,
+          "L": 100,
+          "T": 100
+        },
+        "pruning": {
+          "minimumAreaChecks": 6779,
+          "minimumAreaPruned": 2062,
+          "frontierChecks": 117296,
+          "frontierPruned": 48317
+        }
+      },
+      "diagnostics": []
+    },
+    {
+      "seed": "planlab-canonical-02",
+      "outputHash": "49d57cc9819812c0eacaeb7f0975bd96f79d10249096474f4545e62f0b138073",
+      "layoutHash": "1b33c8eaaeafadfbcdca1c624158ae845aee30b06830c0d05792248a61129e62",
+      "selectionHash": "3eb29503e79896a7abea521200c812a32ec82c63f0d32eb8ce682c6b655dcd4d",
+      "evidenceHash": "b44ad1795d7eaef8e3a8260921e0752319281a62bf34cba85ae0269b053d9e52",
+      "factsVersions": [
+        "planlab-metrics-0.6"
+      ],
+      "ok": true,
+      "candidateCount": 300,
+      "independentlyValidCandidateCount": 300,
+      "selectedCount": 3,
+      "independentlyValidSelectedCount": 3,
+      "selectionStatus": "complete",
+      "selectionComplete": true,
+      "selectionReason": null,
+      "diversityThreshold": 0.2,
+      "minimumSelectedPairwiseDistanceRaw": 0.40147644210767947,
+      "selectedPairwiseDistances": [
+        {
+          "a": "layout-L-footprint-48x60-173",
+          "b": "layout-straight-footprint-40x72-28",
+          "distance": 0.593967,
+          "diverse": true
+        },
+        {
+          "a": "layout-L-footprint-48x60-173",
+          "b": "layout-straight-footprint-40x72-26",
+          "distance": 0.517149,
+          "diverse": true
+        },
+        {
+          "a": "layout-straight-footprint-40x72-28",
+          "b": "layout-straight-footprint-40x72-26",
+          "distance": 0.401476,
+          "diverse": true
+        }
+      ],
+      "expansions": {
+        "total": 7108,
+        "perTopology": {
+          "straight": 4504,
+          "L": 1285,
+          "T": 1319
+        },
+        "validCandidatesPerTopology": {
+          "straight": 100,
+          "L": 100,
+          "T": 100
+        },
+        "pruning": {
+          "minimumAreaChecks": 7108,
+          "minimumAreaPruned": 2206,
+          "frontierChecks": 117556,
+          "frontierPruned": 48416
+        }
+      },
+      "diagnostics": []
+    },
+    {
+      "seed": "planlab-canonical-03",
+      "outputHash": "a1c213fb0350d39c77458f9c0235d0269852b7f362ca877022b96b4dbbbe6e80",
+      "layoutHash": "9bf253db69ab8435707116686a05341829eda1a19442910fc61f1d1f2b10b857",
+      "selectionHash": "a0f537bdfaebca58bf0278b8b94df018b68768f82a03d85b01d7fa1c857628d9",
+      "evidenceHash": "b44ad1795d7eaef8e3a8260921e0752319281a62bf34cba85ae0269b053d9e52",
+      "factsVersions": [
+        "planlab-metrics-0.6"
+      ],
+      "ok": true,
+      "candidateCount": 300,
+      "independentlyValidCandidateCount": 300,
+      "selectedCount": 3,
+      "independentlyValidSelectedCount": 3,
+      "selectionStatus": "complete",
+      "selectionComplete": true,
+      "selectionReason": null,
+      "diversityThreshold": 0.2,
+      "minimumSelectedPairwiseDistanceRaw": 0.3210322404029886,
+      "selectedPairwiseDistances": [
+        {
+          "a": "layout-L-footprint-48x60-167",
+          "b": "layout-L-footprint-48x60-179",
+          "distance": 0.321032,
+          "diverse": true
+        },
+        {
+          "a": "layout-L-footprint-48x60-167",
+          "b": "layout-straight-footprint-40x72-30",
+          "distance": 0.53503,
+          "diverse": true
+        },
+        {
+          "a": "layout-L-footprint-48x60-179",
+          "b": "layout-straight-footprint-40x72-30",
+          "distance": 0.546635,
+          "diverse": true
+        }
+      ],
+      "expansions": {
+        "total": 8641,
+        "perTopology": {
+          "straight": 4175,
+          "L": 2205,
+          "T": 2261
+        },
+        "validCandidatesPerTopology": {
+          "straight": 100,
+          "L": 100,
+          "T": 100
+        },
+        "pruning": {
+          "minimumAreaChecks": 8641,
+          "minimumAreaPruned": 2634,
+          "frontierChecks": 160546,
+          "frontierPruned": 65121
+        }
+      },
+      "diagnostics": []
+    },
+    {
+      "seed": "planlab-canonical-04",
+      "outputHash": "af5afa9b4cb0b193b1ac442eeec5d7b6d3c08b9de88996203ef2cab44c49ea9a",
+      "layoutHash": "55f36ddb1485ea6222365df460088ae9614d7301f7517687bbcbf56209333dbb",
+      "selectionHash": "6127812ce986f9baad7658d8464625a81f940c79b2896e718512f74d9056b6eb",
+      "evidenceHash": "b44ad1795d7eaef8e3a8260921e0752319281a62bf34cba85ae0269b053d9e52",
+      "factsVersions": [
+        "planlab-metrics-0.6"
+      ],
+      "ok": true,
+      "candidateCount": 300,
+      "independentlyValidCandidateCount": 300,
+      "selectedCount": 3,
+      "independentlyValidSelectedCount": 3,
+      "selectionStatus": "complete",
+      "selectionComplete": true,
+      "selectionReason": null,
+      "diversityThreshold": 0.2,
+      "minimumSelectedPairwiseDistanceRaw": 0.40147644210767947,
+      "selectedPairwiseDistances": [
+        {
+          "a": "layout-L-footprint-48x60-171",
+          "b": "layout-straight-footprint-40x72-28",
+          "distance": 0.593967,
+          "diverse": true
+        },
+        {
+          "a": "layout-L-footprint-48x60-171",
+          "b": "layout-straight-footprint-40x72-24",
+          "distance": 0.517149,
+          "diverse": true
+        },
+        {
+          "a": "layout-straight-footprint-40x72-28",
+          "b": "layout-straight-footprint-40x72-24",
+          "distance": 0.401476,
+          "diverse": true
+        }
+      ],
+      "expansions": {
+        "total": 7108,
+        "perTopology": {
+          "straight": 4504,
+          "L": 1285,
+          "T": 1319
+        },
+        "validCandidatesPerTopology": {
+          "straight": 100,
+          "L": 100,
+          "T": 100
+        },
+        "pruning": {
+          "minimumAreaChecks": 7108,
+          "minimumAreaPruned": 2197,
+          "frontierChecks": 117390,
+          "frontierPruned": 48223
+        }
+      },
+      "diagnostics": []
+    },
+    {
+      "seed": "planlab-canonical-05",
+      "outputHash": "a19b9cf35b03ca0c8cc1ce2f086436c11c81eceaa8285e59865b3c1c44ae42db",
+      "layoutHash": "4809008bf0ba19b8684429305cb768cf644bc64b91225b64fc4339ac31599d26",
+      "selectionHash": "5f27dc5516911a213051c9a2eeeee3a0c819c0a255f3b71a8e54b45dfc1a4776",
+      "evidenceHash": "b44ad1795d7eaef8e3a8260921e0752319281a62bf34cba85ae0269b053d9e52",
+      "factsVersions": [
+        "planlab-metrics-0.6"
+      ],
+      "ok": true,
+      "candidateCount": 300,
+      "independentlyValidCandidateCount": 300,
+      "selectedCount": 3,
+      "independentlyValidSelectedCount": 3,
+      "selectionStatus": "complete",
+      "selectionComplete": true,
+      "selectionReason": null,
+      "diversityThreshold": 0.2,
+      "minimumSelectedPairwiseDistanceRaw": 0.3203629583969335,
+      "selectedPairwiseDistances": [
+        {
+          "a": "layout-L-footprint-48x60-171",
+          "b": "layout-L-footprint-48x60-120",
+          "distance": 0.320363,
+          "diverse": true
+        },
+        {
+          "a": "layout-L-footprint-48x60-171",
+          "b": "layout-straight-footprint-40x72-25",
+          "distance": 0.537394,
+          "diverse": true
+        },
+        {
+          "a": "layout-L-footprint-48x60-120",
+          "b": "layout-straight-footprint-40x72-25",
+          "distance": 0.546635,
+          "diverse": true
+        }
+      ],
+      "expansions": {
+        "total": 6779,
+        "perTopology": {
+          "straight": 4175,
+          "L": 1285,
+          "T": 1319
+        },
+        "validCandidatesPerTopology": {
+          "straight": 100,
+          "L": 100,
+          "T": 100
+        },
+        "pruning": {
+          "minimumAreaChecks": 6779,
+          "minimumAreaPruned": 2061,
+          "frontierChecks": 117265,
+          "frontierPruned": 48297
+        }
+      },
+      "diagnostics": []
+    },
+    {
+      "seed": "planlab-canonical-06",
+      "outputHash": "69e490d7dd0fd889cc5bb4aa2c5d16cb800d78b94c3b4da4874f1bf169dd2ee1",
+      "layoutHash": "15e35bcb2bd988499e7499816df807b41c5b2e0f06df360e8987c4c5cbdbe34f",
+      "selectionHash": "4d67ab637c9926027877c6301cc2fe4b9d17b5f9668bd6cb22fe2eb12216ca74",
+      "evidenceHash": "b44ad1795d7eaef8e3a8260921e0752319281a62bf34cba85ae0269b053d9e52",
+      "factsVersions": [
+        "planlab-metrics-0.6"
+      ],
+      "ok": true,
+      "candidateCount": 300,
+      "independentlyValidCandidateCount": 300,
+      "selectedCount": 3,
+      "independentlyValidSelectedCount": 3,
+      "selectionStatus": "complete",
+      "selectionComplete": true,
+      "selectionReason": null,
+      "diversityThreshold": 0.2,
+      "minimumSelectedPairwiseDistanceRaw": 0.3210322404029886,
+      "selectedPairwiseDistances": [
+        {
+          "a": "layout-L-footprint-48x60-165",
+          "b": "layout-L-footprint-48x60-179",
+          "distance": 0.321032,
+          "diverse": true
+        },
+        {
+          "a": "layout-L-footprint-48x60-165",
+          "b": "layout-straight-footprint-40x72-30",
+          "distance": 0.53503,
+          "diverse": true
+        },
+        {
+          "a": "layout-L-footprint-48x60-179",
+          "b": "layout-straight-footprint-40x72-30",
+          "distance": 0.546635,
+          "diverse": true
+        }
+      ],
+      "expansions": {
+        "total": 8641,
+        "perTopology": {
+          "straight": 4175,
+          "L": 2205,
+          "T": 2261
+        },
+        "validCandidatesPerTopology": {
+          "straight": 100,
+          "L": 100,
+          "T": 100
+        },
+        "pruning": {
+          "minimumAreaChecks": 8641,
+          "minimumAreaPruned": 2634,
+          "frontierChecks": 162537,
+          "frontierPruned": 66011
+        }
+      },
+      "diagnostics": []
+    },
+    {
+      "seed": "planlab-canonical-07",
+      "outputHash": "9f15fef3b73e4bd8e9f73ec9d008eaa12330f6ce4578244e00ca08656ae723fd",
+      "layoutHash": "06c5071ade388a5212ff573b535401f4bcec24264b52d19370005d76caaaa97d",
+      "selectionHash": "01124005fda2929ae62b2281f6300abbde2ce889b5f203dfb816b50e8ce8b5d9",
+      "evidenceHash": "b44ad1795d7eaef8e3a8260921e0752319281a62bf34cba85ae0269b053d9e52",
+      "factsVersions": [
+        "planlab-metrics-0.6"
+      ],
+      "ok": true,
+      "candidateCount": 300,
+      "independentlyValidCandidateCount": 300,
+      "selectedCount": 3,
+      "independentlyValidSelectedCount": 3,
+      "selectionStatus": "complete",
+      "selectionComplete": true,
+      "selectionReason": null,
+      "diversityThreshold": 0.2,
+      "minimumSelectedPairwiseDistanceRaw": 0.40147644210767947,
+      "selectedPairwiseDistances": [
+        {
+          "a": "layout-L-footprint-48x60-166",
+          "b": "layout-straight-footprint-40x72-29",
+          "distance": 0.593826,
+          "diverse": true
+        },
+        {
+          "a": "layout-L-footprint-48x60-166",
+          "b": "layout-straight-footprint-40x72-24",
+          "distance": 0.514474,
+          "diverse": true
+        },
+        {
+          "a": "layout-straight-footprint-40x72-29",
+          "b": "layout-straight-footprint-40x72-24",
+          "distance": 0.401476,
+          "diverse": true
+        }
+      ],
+      "expansions": {
+        "total": 7132,
+        "perTopology": {
+          "straight": 4504,
+          "L": 1309,
+          "T": 1319
+        },
+        "validCandidatesPerTopology": {
+          "straight": 100,
+          "L": 100,
+          "T": 100
+        },
+        "pruning": {
+          "minimumAreaChecks": 7132,
+          "minimumAreaPruned": 2200,
+          "frontierChecks": 117712,
+          "frontierPruned": 48278
+        }
+      },
+      "diagnostics": []
+    },
+    {
+      "seed": "planlab-canonical-08",
+      "outputHash": "560507174e03fef001c0036bc9eadc4e714bc67b2edbc4de280e98b711e4ac39",
+      "layoutHash": "4eebd641306271ed1cadef45b63a93b5040c2a675f96a3d8e02d4bd0f4e2f50a",
+      "selectionHash": "8cd2390749c4acef8392fca36b7c1343db9757bec1d0f297fd40a6c3baf89c9c",
+      "evidenceHash": "b44ad1795d7eaef8e3a8260921e0752319281a62bf34cba85ae0269b053d9e52",
+      "factsVersions": [
+        "planlab-metrics-0.6"
+      ],
+      "ok": true,
+      "candidateCount": 300,
+      "independentlyValidCandidateCount": 300,
+      "selectedCount": 3,
+      "independentlyValidSelectedCount": 3,
+      "selectionStatus": "complete",
+      "selectionComplete": true,
+      "selectionReason": null,
+      "diversityThreshold": 0.2,
+      "minimumSelectedPairwiseDistanceRaw": 0.39084322500469393,
+      "selectedPairwiseDistances": [
+        {
+          "a": "layout-L-footprint-48x60-172",
+          "b": "layout-straight-footprint-40x72-29",
+          "distance": 0.593967,
+          "diverse": true
+        },
+        {
+          "a": "layout-L-footprint-48x60-172",
+          "b": "layout-straight-footprint-40x72-54",
+          "distance": 0.518398,
+          "diverse": true
+        },
+        {
+          "a": "layout-straight-footprint-40x72-29",
+          "b": "layout-straight-footprint-40x72-54",
+          "distance": 0.390843,
+          "diverse": true
+        }
+      ],
+      "expansions": {
+        "total": 9250,
+        "perTopology": {
+          "straight": 4504,
+          "L": 2485,
+          "T": 2261
+        },
+        "validCandidatesPerTopology": {
+          "straight": 100,
+          "L": 100,
+          "T": 100
+        },
+        "pruning": {
+          "minimumAreaChecks": 9250,
+          "minimumAreaPruned": 2877,
+          "frontierChecks": 161842,
+          "frontierPruned": 65728
+        }
+      },
+      "diagnostics": []
+    },
+    {
+      "seed": "planlab-canonical-09",
+      "outputHash": "f2314ac53e287f8148a97941379974d0387e285ccc5b44019689f16ea246a672",
+      "layoutHash": "6fd86169aa71fa544535601a07ee6c9f30e6d33a5c263a6cb67c5a8b1040078e",
+      "selectionHash": "3eb29503e79896a7abea521200c812a32ec82c63f0d32eb8ce682c6b655dcd4d",
+      "evidenceHash": "b44ad1795d7eaef8e3a8260921e0752319281a62bf34cba85ae0269b053d9e52",
+      "factsVersions": [
+        "planlab-metrics-0.6"
+      ],
+      "ok": true,
+      "candidateCount": 300,
+      "independentlyValidCandidateCount": 300,
+      "selectedCount": 3,
+      "independentlyValidSelectedCount": 3,
+      "selectionStatus": "complete",
+      "selectionComplete": true,
+      "selectionReason": null,
+      "diversityThreshold": 0.2,
+      "minimumSelectedPairwiseDistanceRaw": 0.40147644210767947,
+      "selectedPairwiseDistances": [
+        {
+          "a": "layout-L-footprint-48x60-173",
+          "b": "layout-straight-footprint-40x72-28",
+          "distance": 0.593967,
+          "diverse": true
+        },
+        {
+          "a": "layout-L-footprint-48x60-173",
+          "b": "layout-straight-footprint-40x72-26",
+          "distance": 0.517149,
+          "diverse": true
+        },
+        {
+          "a": "layout-straight-footprint-40x72-28",
+          "b": "layout-straight-footprint-40x72-26",
+          "distance": 0.401476,
+          "diverse": true
+        }
+      ],
+      "expansions": {
+        "total": 7108,
+        "perTopology": {
+          "straight": 4504,
+          "L": 1285,
+          "T": 1319
+        },
+        "validCandidatesPerTopology": {
+          "straight": 100,
+          "L": 100,
+          "T": 100
+        },
+        "pruning": {
+          "minimumAreaChecks": 7108,
+          "minimumAreaPruned": 2197,
+          "frontierChecks": 117390,
+          "frontierPruned": 48223
+        }
+      },
+      "diagnostics": []
+    },
+    {
+      "seed": "planlab-canonical-10",
+      "outputHash": "e643ccbd2b7e8e38f2feb49621cf4199d54db0dcea28ed7f200dbbc6a68b54cf",
+      "layoutHash": "12cb579637c433bd3287f9d3f45fcfab96de8e9f3a0c9a2771b0cd75256b5e69",
+      "selectionHash": "ec103a87015f12845e107324f4ab7ef274653634f0fe37760a6cd6bbddb8de60",
+      "evidenceHash": "b44ad1795d7eaef8e3a8260921e0752319281a62bf34cba85ae0269b053d9e52",
+      "factsVersions": [
+        "planlab-metrics-0.6"
+      ],
+      "ok": true,
+      "candidateCount": 300,
+      "independentlyValidCandidateCount": 300,
+      "selectedCount": 3,
+      "independentlyValidSelectedCount": 3,
+      "selectionStatus": "complete",
+      "selectionComplete": true,
+      "selectionReason": null,
+      "diversityThreshold": 0.2,
+      "minimumSelectedPairwiseDistanceRaw": 0.40147644210767947,
+      "selectedPairwiseDistances": [
+        {
+          "a": "layout-L-footprint-48x60-170",
+          "b": "layout-straight-footprint-40x72-29",
+          "distance": 0.593967,
+          "diverse": true
+        },
+        {
+          "a": "layout-L-footprint-48x60-170",
+          "b": "layout-straight-footprint-40x72-26",
+          "distance": 0.517149,
+          "diverse": true
+        },
+        {
+          "a": "layout-straight-footprint-40x72-29",
+          "b": "layout-straight-footprint-40x72-26",
+          "distance": 0.401476,
+          "diverse": true
+        }
+      ],
+      "expansions": {
+        "total": 9250,
+        "perTopology": {
+          "straight": 4504,
+          "L": 2485,
+          "T": 2261
+        },
+        "validCandidatesPerTopology": {
+          "straight": 100,
+          "L": 100,
+          "T": 100
+        },
+        "pruning": {
+          "minimumAreaChecks": 9250,
+          "minimumAreaPruned": 2875,
+          "frontierChecks": 163794,
+          "frontierPruned": 66598
+        }
+      },
+      "diagnostics": []
+    }
+  ],
+  "impossibleFixtures": [
+    {
+      "fixture": "envelopeConsumesSite",
+      "seed": "impossible-envelope",
+      "ok": false,
+      "candidateCount": 0,
+      "selectedCount": 0,
+      "expansions": {
+        "total": 0,
+        "perTopology": {
+          "straight": 0,
+          "L": 0,
+          "T": 0
+        },
+        "validCandidatesPerTopology": {
+          "straight": 0,
+          "L": 0,
+          "T": 0
+        },
+        "pruning": {
+          "minimumAreaChecks": 0,
+          "minimumAreaPruned": 0,
+          "frontierChecks": 0,
+          "frontierPruned": 0
+        }
+      },
+      "diagnostics": [
+        {
+          "code": "NORMALIZATION_FAILED",
+          "message": "NON_POSITIVE_EXACT_ENVELOPE: opposing offsets leave no positive exact envelope"
+        },
+        {
+          "code": "INFEASIBLE",
+          "message": "the brief is infeasible before candidate search"
+        }
+      ]
+    },
+    {
+      "fixture": "roomCannotFitEnvelope",
+      "seed": "impossible-room",
+      "ok": false,
+      "candidateCount": 0,
+      "selectedCount": 0,
+      "expansions": {
+        "total": 0,
+        "perTopology": {
+          "straight": 0,
+          "L": 0,
+          "T": 0
+        },
+        "validCandidatesPerTopology": {
+          "straight": 0,
+          "L": 0,
+          "T": 0
+        },
+        "pruning": {
+          "minimumAreaChecks": 0,
+          "minimumAreaPruned": 0,
+          "frontierChecks": 0,
+          "frontierPruned": 0
+        }
+      },
+      "diagnostics": [
+        {
+          "code": "NORMALIZATION_FAILED",
+          "message": "ROOM_CANNOT_FIT_ENVELOPE: Impossible Room minimum dimensions/area cannot fit the envelope"
+        },
+        {
+          "code": "INFEASIBLE",
+          "message": "the brief is infeasible before candidate search"
+        }
+      ]
+    },
+    {
+      "fixture": "programExceedsInstanceLimit",
+      "seed": "impossible-program-size",
+      "ok": false,
+      "candidateCount": 0,
+      "selectedCount": 0,
+      "expansions": {
+        "total": 0,
+        "perTopology": {
+          "straight": 0,
+          "L": 0,
+          "T": 0
+        },
+        "validCandidatesPerTopology": {
+          "straight": 0,
+          "L": 0,
+          "T": 0
+        },
+        "pruning": {
+          "minimumAreaChecks": 0,
+          "minimumAreaPruned": 0,
+          "frontierChecks": 0,
+          "frontierPruned": 0
+        }
+      },
+      "diagnostics": [
+        {
+          "code": "NORMALIZATION_FAILED",
+          "message": "PROGRAM_TOO_LARGE: the V1 solver supports at most 24 generated space instances"
+        },
+        {
+          "code": "INFEASIBLE",
+          "message": "the brief is infeasible before candidate search"
+        }
+      ]
+    }
+  ]
+}

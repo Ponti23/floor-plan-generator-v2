@@ -12,7 +12,7 @@
 import { createHash } from "node:crypto";
 import { cpus, EOL, platform, release, version as osVersion } from "node:os";
 import { execFileSync } from "node:child_process";
-import { mkdirSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
 import { dirname, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { performance } from "node:perf_hooks";
@@ -21,7 +21,10 @@ import {
   DEFAULT_DIVERSITY_THRESHOLD,
   DIVERSITY_VERSION,
   DEFAULT_GENERATION_BUDGET,
+  GENERATOR_BUDGET_VERSION,
+  GENERATOR_DETERMINISM_VERSION,
   GENERATOR_ENGINE_VERSION,
+  GENERATOR_SEARCH_POLICY,
   GENERATOR_RULE_VERSION,
   IMPOSSIBLE_FIXTURES,
   createCanonicalProject,
@@ -33,8 +36,16 @@ import {
 } from "../src/domain/index.ts";
 
 const REPO_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
-const OUTPUT_ROOT = resolve(REPO_ROOT, "artifacts", "planlab", "milestone-0");
+// The committed Milestone 0 artifacts remain historical evidence.  New runs
+// are written under Milestone 3, while --check reads a stable baseline and
+// does not rewrite either historical or current evidence.
+const OUTPUT_ROOT = resolve(REPO_ROOT, "artifacts", "planlab", "milestone-3");
 const DIAGNOSTIC_ROOT = resolve(OUTPUT_ROOT, "diagnostics");
+const BASELINE_ROOT = resolve(OUTPUT_ROOT, "benchmark-baselines");
+const CLI_ARGS = new Set(process.argv.slice(2));
+const RECORD_BASELINE_MODE = CLI_ARGS.has("--record-baseline");
+const CHECK_MODE = !RECORD_BASELINE_MODE && (CLI_ARGS.has("--check") || CLI_ARGS.has("--verify"));
+const BOUNDED_MODE = CLI_ARGS.has("--bounded");
 
 // Keep this list literal and versioned. The benchmark gate is intentionally
 // not allowed to drift by deriving seeds from the clock or from randomness.
@@ -51,10 +62,27 @@ export const CANONICAL_BENCHMARK_SEEDS = Object.freeze([
   "planlab-canonical-10",
 ]);
 
-const SUITE_VERSION = "planlab-stage0-seed-suite-0.5";
-const REPORT_VERSION = "planlab-milestone-0-benchmark-0.5";
-const TIMING_REPETITIONS = 3;
+const SUITE_VERSION = "planlab-stage0-seed-suite-0.6";
+const REPORT_VERSION = "planlab-stage0-regression-0.1";
+const TIMING_REPETITIONS = BOUNDED_MODE ? 1 : 3;
 const TIMING_TARGETS_MS = Object.freeze({ median: 2_000, p95: 4_000 });
+const BOUNDED_SEEDS = Object.freeze(CANONICAL_BENCHMARK_SEEDS.slice(0, 2));
+// Bounded mode limits suite/repetition count while retaining the approved
+// production budget, so a quick reproducibility check still exercises the
+// exact semantic stopping policy that full evidence uses.
+const BOUNDED_BUDGET = Object.freeze({ ...DEFAULT_GENERATION_BUDGET });
+
+function activeSeeds() {
+  return BOUNDED_MODE ? BOUNDED_SEEDS : CANONICAL_BENCHMARK_SEEDS;
+}
+
+function activeBudget() {
+  return BOUNDED_MODE ? BOUNDED_BUDGET : { ...DEFAULT_GENERATION_BUDGET };
+}
+
+function baselinePath() {
+  return resolve(BASELINE_ROOT, BOUNDED_MODE ? "bounded.json" : "full.json");
+}
 
 function round(value, places = 3) {
   const rounded = Number(value.toFixed(places));
@@ -132,6 +160,42 @@ function expansionSummary(result) {
     total: result.metadata.expandedStates,
     perTopology: { ...result.metadata.topologyExpansions },
     validCandidatesPerTopology: { ...result.metadata.topologyCounts },
+    pruning: { ...result.metadata.pruning },
+  };
+}
+
+function resultHashes(result, { includeOutput = true } = {}) {
+  const outputBytes = includeOutput ? serializeCanonical(result) : null;
+  const layoutBytes = serializeCanonical(result.layouts);
+  const selectionBytes = serializeCanonical({
+    status: result.selection.status,
+    complete: result.selection.complete,
+    reason: result.selection.reason ?? null,
+    selected: result.selection.selected.map((item) => ({
+      strategy: item.strategy,
+      layoutId: item.layout.id,
+    })),
+    layouts: result.selection.layouts.map((layout) => layout.id),
+    pairwiseDistances: result.selection.pairwiseDistances,
+  });
+  // Facts/scorecards are intentionally hashed separately from geometry.  This
+  // makes the accepted Stage 0 evidence-shape drift observable without
+  // pretending that a derived-index change changed layout semantics.
+  const evidenceBytes = serializeCanonical(result.analyses.map((analysis) => ({
+    layoutId: analysis.layout.id,
+    factsVersion: analysis.facts.factsVersion,
+    // Shape metadata keeps this check cheap while still detecting an evidence
+    // schema change (for example, adding shared-wall or exterior indexes).
+    factsKeys: Object.keys(analysis.facts).sort(),
+    metricKeys: Object.keys(analysis.metrics).sort(),
+    scorecardKeys: Object.keys(analysis.scorecards).sort(),
+  })));
+  return {
+    ...(includeOutput ? { outputHash: sha256(outputBytes) } : {}),
+    layoutHash: sha256(layoutBytes),
+    selectionHash: sha256(selectionBytes),
+    evidenceHash: sha256(evidenceBytes),
+    factsVersions: [...new Set(result.analyses.map((analysis) => analysis.facts.factsVersion))].sort(),
   };
 }
 
@@ -166,8 +230,11 @@ function makeCanonicalRecord(seed, budget) {
   // benchmark evidence and Stage 1 fingerprints cannot disagree about what a
   // result "is".
   const firstBytes = serializeCanonical(result);
-  const repeatedBytes = timedRuns.map((run) => serializeCanonical(run.result));
   const replayBytes = serializeCanonical(replay);
+  const hashes = resultHashes(result);
+  const replayHashes = resultHashes(replay);
+  const repeatedSignatures = timedRuns.map((run) => resultHashes(run.result, { includeOutput: false }));
+  const firstSignature = resultHashes(result, { includeOutput: false });
 
   // The result contains normalized geometry but intentionally does not carry a
   // project reference. Recreate the normalized brief once, outside timing.
@@ -192,9 +259,14 @@ function makeCanonicalRecord(seed, budget) {
     timingSamplesMs,
     timingSamplesRawMs,
     replayElapsedMs: round(replayElapsedMs),
-    deterministic: repeatedBytes.every((bytes) => bytes === firstBytes) && firstBytes === replayBytes,
-    outputHash: sha256(firstBytes),
+    deterministic: repeatedSignatures.every((signature) =>
+      serializeCanonical(signature) === serializeCanonical(firstSignature)) && firstBytes === replayBytes,
+    ...hashes,
     replayHash: sha256(replayBytes),
+    replayLayoutHash: replayHashes.layoutHash,
+    replaySelectionHash: replayHashes.selectionHash,
+    replayEvidenceHash: replayHashes.evidenceHash,
+    factsVersions: hashes.factsVersions,
     ok: result.ok,
     candidateCount: result.layouts.length,
     independentlyValidCandidateCount: validLayouts.length,
@@ -217,10 +289,10 @@ function makeCanonicalRecord(seed, budget) {
   };
 }
 
-function makeImpossibleRecord(name, fixture) {
+function makeImpossibleRecord(name, fixture, budget) {
   const seed = fixture.generation.seed;
   const start = performance.now();
-  const result = generateLayouts(fixture, { seed });
+  const result = generateLayouts(fixture, { seed, budget });
   const elapsedMs = performance.now() - start;
   return {
     fixture: name,
@@ -236,6 +308,78 @@ function makeImpossibleRecord(name, fixture) {
 
 function safeName(value) {
   return value.replace(/[^a-zA-Z0-9._-]+/g, "-");
+}
+
+const HISTORICAL_STAGE0_BASELINE = Object.freeze({
+  commit: "e1c6f38",
+  artifact: "artifacts/planlab/milestone-0/benchmark.json",
+  meaning: "historical Stage 0 full-result hashes before derived-facts indexes were serialized",
+  mechanicalConsequence: "current regression checks retain full-result, layout, selection, and evidence-shape signatures separately; the Stage 3.4 seeded tie-break has its own versioned current baseline; historical hashes remain reference evidence and are not a live gate",
+});
+
+function historicalStage0Evidence() {
+  const path = resolve(REPO_ROOT, "artifacts", "planlab", "milestone-0", "benchmark.json");
+  try {
+    const historical = JSON.parse(readFileSync(path, "utf8"));
+    return {
+      ...HISTORICAL_STAGE0_BASELINE,
+      outputHashes: Object.fromEntries((historical.canonical ?? []).map((record) => [record.seed, record.outputHash])),
+    };
+  } catch {
+    return { ...HISTORICAL_STAGE0_BASELINE, outputHashes: {} };
+  }
+}
+
+function regressionSnapshot(benchmark) {
+  return {
+    schemaVersion: "planlab-stage0-regression-baseline-1",
+    suiteVersion: benchmark.suiteVersion,
+    mode: benchmark.methodology.mode,
+    engineVersion: benchmark.engineVersion,
+    ruleVersion: benchmark.ruleVersion,
+    determinismVersion: benchmark.determinismVersion,
+    budgetVersion: benchmark.budgetVersion,
+    searchPolicy: benchmark.searchPolicy,
+    budget: benchmark.methodology.budget,
+    seeds: benchmark.methodology.seeds,
+    benchmarkInputFingerprint: benchmark.environment.benchmarkInputFingerprint,
+    historicalStage0Baseline: historicalStage0Evidence(),
+    canonical: benchmark.canonical.map((record) => ({
+      seed: record.seed,
+      outputHash: record.outputHash,
+      layoutHash: record.layoutHash,
+      selectionHash: record.selectionHash,
+      evidenceHash: record.evidenceHash,
+      factsVersions: record.factsVersions,
+      ok: record.ok,
+      candidateCount: record.candidateCount,
+      independentlyValidCandidateCount: record.independentlyValidCandidateCount,
+      selectedCount: record.selectedCount,
+      independentlyValidSelectedCount: record.independentlyValidSelectedCount,
+      selectionStatus: record.selectionStatus,
+      selectionComplete: record.selectionComplete,
+      selectionReason: record.selectionReason,
+      diversityThreshold: record.diversityThreshold,
+      minimumSelectedPairwiseDistanceRaw: record.minimumSelectedPairwiseDistanceRaw,
+      selectedPairwiseDistances: record.selectedPairwiseDistances,
+      expansions: record.expansions,
+      diagnostics: record.diagnostics,
+    })),
+    impossibleFixtures: benchmark.impossibleFixtures.map((record) => ({
+      fixture: record.fixture,
+      seed: record.seed,
+      ok: record.ok,
+      candidateCount: record.candidateCount,
+      selectedCount: record.selectedCount,
+      expansions: record.expansions,
+      diagnostics: record.diagnostics,
+    })),
+  };
+}
+
+function readBaseline(path) {
+  if (!existsSync(path)) return null;
+  return JSON.parse(readFileSync(path, "utf8"));
 }
 
 function writeDiagnosticArtifacts(record) {
@@ -257,7 +401,7 @@ function writeDiagnosticArtifacts(record) {
     });
   }
   writeFileSync(resolve(directory, "README.md"), [
-    "# Milestone 0 crude diagnostic artifacts",
+    "# Stage 3 regression crude diagnostic artifacts",
     "",
     `These artifacts are the three selected layouts for the first measured seed, **${record.seed}**.`,
     "They are a direct projection of authoritative grid rectangles and portals; they are not a polished UI or construction drawing.",
@@ -281,7 +425,7 @@ function makeMarkdownReport(benchmark) {
   const canonical = benchmark.canonical;
   const summary = benchmark.summary;
   const lines = [
-    "# PlanLab Milestone 0 feasibility benchmark",
+    "# PlanLab Stage 0 regression benchmark",
     "",
     `**Report version:** ${benchmark.reportVersion}<br>`,
     `**Recorded:** ${benchmark.recordedAt}<br>`,
@@ -289,17 +433,17 @@ function makeMarkdownReport(benchmark) {
     `**Benchmark input fingerprint:** \`${benchmark.environment.benchmarkInputFingerprint}\`<br>`,
     `**Overall technical gate:** **${benchmark.gate.pass ? "PASS" : "FAIL"}**<br>`,
     "",
-    "This report covers the Stage 0 technical benchmark only. The architect usefulness review remains the separate Stage 0 hard gate.",
+    `This report re-runs the historical Stage 0 suite in **${benchmark.methodology.mode}** mode. Timing and host data are run evidence; the checked-in regression baseline compares stable result signatures only. The architect usefulness review remains the separate Stage 0 hard gate.`,
     "",
     "## Method",
     "",
-    `- Fixed suite: exactly ${benchmark.methodology.seedCount} seeds (${benchmark.methodology.seeds.join(", ")}).`,
+    `- Fixed suite: ${benchmark.methodology.seedCount} seed${benchmark.methodology.seedCount === 1 ? "" : "s"} (${benchmark.methodology.seeds.join(", ")}).`,
     `- Input: the canonical brief generated for each seed; the public generator performs normalization internally.`,
-    `- Budget: beam width ${benchmark.methodology.budget.beamWidth}; ${benchmark.methodology.budget.maxExpansionsPerTopology.toLocaleString()} expansions/topology; ${benchmark.methodology.budget.maxCandidatesPerTopology} candidates/topology; ${benchmark.methodology.budget.maxTotalCandidates} total candidates.`,
+    `- Budget (${benchmark.budgetVersion}): beam width ${benchmark.methodology.budget.beamWidth}; ${benchmark.methodology.budget.maxExpansionsPerTopology.toLocaleString()} expansions/topology; ${benchmark.methodology.budget.maxCandidatesPerTopology} candidates/topology; ${benchmark.methodology.budget.maxTotalCandidates} total candidates.`,
     `- Warm-up: ${benchmark.methodology.warmupRuns} unmeasured run before the timed suite.`,
     `- Timing: ${benchmark.methodology.timedRunsPerSeed} timed generations per seed using Node \`performance.now()\`; the table reports each seed median and the gate uses all ${benchmark.methodology.timedRuns} samples. Replay calls verify determinism and are reported separately.`,
     `- Percentiles: linear interpolation at p50 and p95 over all ${benchmark.methodology.timedRuns} measured timings.`,
-    `- Diversity: selected-triplet pair distances from ${benchmark.methodology.diversityVersion}, with threshold ${benchmark.methodology.diversityThreshold}.`,
+    `- Determinism policy: ${benchmark.determinismVersion}; diversity: selected-triplet pair distances from ${benchmark.methodology.diversityVersion}, with threshold ${benchmark.methodology.diversityThreshold}.`,
     `- Provenance: the input fingerprint hashes ${benchmark.environment.benchmarkInputFiles.length} local benchmark inputs (the runner, package manifest, and every domain module), so it remains authoritative even when Git HEAD is a pre-artifact commit.`,
     "",
     "## Reference environment",
@@ -307,10 +451,10 @@ function makeMarkdownReport(benchmark) {
     `- OS: ${benchmark.environment.os} (${benchmark.environment.arch})` ,
     `- CPU: ${benchmark.environment.cpuModel} (${benchmark.environment.logicalCores} logical cores)`,
     `- Runtime: Node ${benchmark.environment.node} / V8 ${benchmark.environment.v8}`,
-    `- Engine: ${benchmark.engineVersion}; rules: ${benchmark.ruleVersion}`,
+    `- Engine: ${benchmark.engineVersion}; rules: ${benchmark.ruleVersion}; facts: ${benchmark.canonical[0]?.factsVersions?.join(", ") ?? "unavailable"}`,
     `- Worktree status at start: ${benchmark.environment.workingTreeCleanAtRun ? "clean" : "dirty; full porcelain status is retained in benchmark.json"}`,
     "",
-    "## Canonical 10-seed evidence",
+    `## Canonical ${benchmark.methodology.seedCount}-seed evidence`,
     "",
     "| Seed | Median time (ms) | Candidates / valid | Selected | Min pairwise | Expansions | Replay | Diagnostics |",
     "|---|---:|---:|---:|---:|---:|---|---|",
@@ -340,15 +484,19 @@ function makeMarkdownReport(benchmark) {
     `- Minimum selected-triplet diversity ≥ ${benchmark.methodology.diversityThreshold}: **${pass(benchmark.gate.diversityThreshold)}**`,
     `- Byte-equivalent replay for every seed: **${pass(benchmark.gate.determinism)}**`,
     `- Expansion budgets respected: **${pass(benchmark.gate.expansionBudget)}**`,
-    `- Median < ${TIMING_TARGETS_MS.median / 1000} s: **${pass(benchmark.gate.medianRuntime)}**`,
-    `- p95 < ${TIMING_TARGETS_MS.p95 / 1000} s: **${pass(benchmark.gate.p95Runtime)}**`,
+    `- Same seeded budget reproduces byte-equivalent output: **${pass(benchmark.gate.budgetDeterminism)}**`,
+    `- Median < ${TIMING_TARGETS_MS.median / 1000} s: **${benchmark.gate.timingGateApplied ? pass(benchmark.gate.medianRuntime) : "not applied in bounded mode"}**`,
+    `- p95 < ${TIMING_TARGETS_MS.p95 / 1000} s: **${benchmark.gate.timingGateApplied ? pass(benchmark.gate.p95Runtime) : "not applied in bounded mode"}**`,
     `- All impossible fixtures diagnosed: **${pass(benchmark.gate.impossibleFixtures)}**`,
+    `- Stable regression baseline (${benchmark.gate.baselinePath}): **${benchmark.gate.baselineChecked ? pass(benchmark.gate.baselineMatch) : "not checked (run with --check)"}**`,
     "",
     "## Review artifacts",
     "",
     "Crude SVG and text outputs for the first seed are in [`diagnostics/README.md`](diagnostics/README.md). Machine-readable evidence is [`benchmark.json`](benchmark.json).",
     "",
-    "No prototype constants were tuned for this run; the approved default generation budget was used unchanged.",
+    `Historical evidence remains anchored to commit \`${HISTORICAL_STAGE0_BASELINE.commit}\`; current derived-facts evidence is recorded separately and does not silently rewrite that baseline.`,
+    "",
+    "No prototype constants were tuned for this run; the approved generation budget was used unchanged for the selected mode.",
   ];
   return lines.join(EOL);
 }
@@ -357,23 +505,31 @@ function main() {
   if (CANONICAL_BENCHMARK_SEEDS.length !== 10) {
     throw new Error("canonical benchmark suite must contain exactly 10 fixed seeds");
   }
-  mkdirSync(DIAGNOSTIC_ROOT, { recursive: true });
+  if (!CHECK_MODE) mkdirSync(DIAGNOSTIC_ROOT, { recursive: true });
   const inputManifest = benchmarkInputManifest();
   const gitHeadAtRun = gitValue(["rev-parse", "HEAD"]);
   const workingTreeStatusAtRun = gitValue(["status", "--short"]);
 
-  const budget = { ...DEFAULT_GENERATION_BUDGET };
+  const budget = activeBudget();
+  const seeds = activeSeeds();
   // Warm the module/JIT path with an existing suite seed without adding an
   // unlisted seed to the benchmark's canonical input set.
-  const warmupSeed = CANONICAL_BENCHMARK_SEEDS[0];
+  const warmupSeed = seeds[0];
   generateLayouts(createCanonicalProject(warmupSeed), { seed: warmupSeed, budget });
 
-  const canonicalRecords = CANONICAL_BENCHMARK_SEEDS.map((seed) => makeCanonicalRecord(seed, budget));
+  const canonicalRecords = seeds.map((seed) => makeCanonicalRecord(seed, budget));
   const firstRecord = canonicalRecords[0];
-  if (firstRecord) writeDiagnosticArtifacts(firstRecord);
+  if (firstRecord && !CHECK_MODE) writeDiagnosticArtifacts(firstRecord);
+  // The complete result is retained only long enough to create diagnostics;
+  // stable hash/count evidence below does not need hundreds of megabytes of
+  // duplicate object graphs kept alive until report serialization.
+  for (const record of canonicalRecords) {
+    delete record.rawResult;
+    delete record.normalizedProject;
+  }
 
   const impossibleRecords = Object.entries(IMPOSSIBLE_FIXTURES)
-    .map(([name, fixture]) => makeImpossibleRecord(name, fixture));
+    .map(([name, fixture]) => makeImpossibleRecord(name, fixture, budget));
   const timings = canonicalRecords.flatMap((record) => record.timingSamplesRawMs);
   const medianMs = percentile(timings, 0.5);
   const p95Ms = percentile(timings, 0.95);
@@ -393,9 +549,14 @@ function main() {
     Object.values(record.expansions.perTopology).every((count) => count <= budget.maxExpansionsPerTopology) &&
     record.expansions.total <= budget.maxExpansionsPerTopology * 3,
   );
+  const budgetDeterminism = canonicalRecords.every((record) =>
+    record.deterministic && record.replayLayoutHash === record.layoutHash &&
+    record.replaySelectionHash === record.selectionHash && record.replayEvidenceHash === record.evidenceHash,
+  );
   const impossibleFixtures = impossibleRecords.length === Object.keys(IMPOSSIBLE_FIXTURES).length &&
     impossibleRecords.every((record) => !record.ok && record.candidateCount === 0 &&
-      record.diagnostics.length > 0 && record.diagnostics.every((item) => item.code === "NORMALIZATION_FAILED"));
+      record.diagnostics.some((item) => item.code === "NORMALIZATION_FAILED") &&
+      record.diagnostics.every((item) => item.code === "NORMALIZATION_FAILED" || item.code === "INFEASIBLE"));
 
   const benchmark = {
     reportVersion: REPORT_VERSION,
@@ -403,6 +564,9 @@ function main() {
     recordedAt: new Date().toISOString(),
     engineVersion: GENERATOR_ENGINE_VERSION,
     ruleVersion: GENERATOR_RULE_VERSION,
+    determinismVersion: GENERATOR_DETERMINISM_VERSION,
+    budgetVersion: GENERATOR_BUDGET_VERSION,
+    searchPolicy: GENERATOR_SEARCH_POLICY,
     environment: {
       gitHeadAtRun,
       workingTreeStatusAtRun,
@@ -419,8 +583,9 @@ function main() {
     },
     methodology: {
       seedSuiteVersion: SUITE_VERSION,
-      seedCount: CANONICAL_BENCHMARK_SEEDS.length,
-      seeds: [...CANONICAL_BENCHMARK_SEEDS],
+      mode: BOUNDED_MODE ? "bounded" : "full",
+      seedCount: seeds.length,
+      seeds: [...seeds],
       warmupRuns: 1,
       timedRunsPerSeed: TIMING_REPETITIONS,
       timedRuns: canonicalRecords.length * TIMING_REPETITIONS,
@@ -429,10 +594,15 @@ function main() {
       timingClock: "node:perf_hooks performance.now",
       replayComparison: "stable-key JSON of the complete GenerationResult",
       budget,
+      searchPolicy: GENERATOR_SEARCH_POLICY,
       diversityVersion: DIVERSITY_VERSION,
       diversityThreshold: threshold,
       percentileMethod: "linear interpolation over sorted measured timings",
       timingTargetsMs: { ...TIMING_TARGETS_MS },
+      boundedMode: BOUNDED_MODE ? {
+        seedSelection: "first two fixed suite seeds",
+        budget: BOUNDED_BUDGET,
+      } : null,
     },
     summary: {
       medianMs: round(medianMs),
@@ -445,11 +615,14 @@ function main() {
       diversityThreshold,
       determinism,
       expansionBudget,
-      medianRuntime: medianMs < TIMING_TARGETS_MS.median,
-      p95Runtime: p95Ms < TIMING_TARGETS_MS.p95,
+      budgetDeterminism,
+      timingGateApplied: !BOUNDED_MODE,
+      medianRuntime: BOUNDED_MODE || medianMs < TIMING_TARGETS_MS.median,
+      p95Runtime: BOUNDED_MODE || p95Ms < TIMING_TARGETS_MS.p95,
       impossibleFixtures,
-      pass: threeValidLayoutsPerSeed && diversityThreshold && determinism && expansionBudget &&
-        medianMs < TIMING_TARGETS_MS.median && p95Ms < TIMING_TARGETS_MS.p95 && impossibleFixtures,
+      pass: threeValidLayoutsPerSeed && diversityThreshold && determinism && expansionBudget && budgetDeterminism &&
+        (BOUNDED_MODE || medianMs < TIMING_TARGETS_MS.median) &&
+        (BOUNDED_MODE || p95Ms < TIMING_TARGETS_MS.p95) && impossibleFixtures,
     },
     canonical: canonicalRecords.map(({ rawResult, normalizedProject, ...record }) => record),
     impossibleFixtures: impossibleRecords,
@@ -460,15 +633,36 @@ function main() {
     },
   };
 
-  writeFileSync(resolve(OUTPUT_ROOT, "benchmark.json"), `${JSON.stringify(benchmark, null, 2)}${EOL}`, "utf8");
-  writeFileSync(resolve(OUTPUT_ROOT, "benchmark.md"), `${makeMarkdownReport(benchmark)}${EOL}`, "utf8");
-  const written = JSON.parse(readFileSync(resolve(OUTPUT_ROOT, "benchmark.json"), "utf8"));
-  if (written.environment?.benchmarkInputFingerprint !== inputManifest.fingerprint) {
-    throw new Error("written benchmark artifact does not match its recorded input fingerprint");
+  const snapshot = regressionSnapshot(benchmark);
+  const baselineFile = baselinePath();
+  const existingBaseline = readBaseline(baselineFile);
+  const baselineMatch = existingBaseline !== null &&
+    serializeCanonical(existingBaseline) === serializeCanonical(snapshot);
+  benchmark.gate.baselinePath = relative(REPO_ROOT, baselineFile).replaceAll("\\", "/");
+  benchmark.gate.baselineChecked = CHECK_MODE;
+  benchmark.gate.baselineMatch = baselineMatch;
+  benchmark.gate.pass = benchmark.gate.pass && (!CHECK_MODE || baselineMatch);
+
+  if (RECORD_BASELINE_MODE) {
+    mkdirSync(BASELINE_ROOT, { recursive: true });
+    writeFileSync(baselineFile, `${JSON.stringify(snapshot, null, 2)}${EOL}`, "utf8");
+  }
+
+  if (!CHECK_MODE) {
+    writeFileSync(resolve(OUTPUT_ROOT, "benchmark.json"), `${JSON.stringify(benchmark, null, 2)}${EOL}`, "utf8");
+    writeFileSync(resolve(OUTPUT_ROOT, "benchmark.md"), `${makeMarkdownReport(benchmark)}${EOL}`, "utf8");
+    const written = JSON.parse(readFileSync(resolve(OUTPUT_ROOT, "benchmark.json"), "utf8"));
+    if (written.environment?.benchmarkInputFingerprint !== inputManifest.fingerprint) {
+      throw new Error("written benchmark artifact does not match its recorded input fingerprint");
+    }
   }
   process.stdout.write(`${JSON.stringify({
-    report: relative(REPO_ROOT, resolve(OUTPUT_ROOT, "benchmark.md")),
-    json: relative(REPO_ROOT, resolve(OUTPUT_ROOT, "benchmark.json")),
+    report: CHECK_MODE ? null : relative(REPO_ROOT, resolve(OUTPUT_ROOT, "benchmark.md")),
+    json: CHECK_MODE ? null : relative(REPO_ROOT, resolve(OUTPUT_ROOT, "benchmark.json")),
+    baseline: relative(REPO_ROOT, baselineFile),
+    baselineChecked: CHECK_MODE,
+    baselineMatch,
+    mode: benchmark.methodology.mode,
     gate: benchmark.gate,
     medianMs: benchmark.summary.medianMs,
     p95Ms: benchmark.summary.p95Ms,

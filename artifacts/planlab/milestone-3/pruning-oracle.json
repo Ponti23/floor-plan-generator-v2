@@ -1,0 +1,55 @@
+{
+  "schemaVersion": "planlab-tiny-grid-pruning-oracle-1",
+  "description": "Independent exhaustive occupied-cell enumeration compared with minimum-area pruning.",
+  "problem": {
+    "footprint": { "x": 0, "y": 0, "width": 4, "depth": 3 },
+    "rooms": [
+      {
+        "id": "first",
+        "minimumArea": 4,
+        "variants": [
+          { "id": "fills-grid", "width": 4, "depth": 3, "score": 100 },
+          { "id": "compact", "width": 2, "depth": 2, "score": 1 }
+        ]
+      },
+      {
+        "id": "second",
+        "minimumArea": 4,
+        "variants": [
+          { "id": "required", "width": 2, "depth": 2, "score": 1 }
+        ]
+      }
+    ]
+  },
+  "exhaustiveOptimum": {
+    "score": 2,
+    "key": "first/compact@0,0,2,2|second/required@2,0,2,2"
+  },
+  "prunedOptimum": {
+    "score": 2,
+    "key": "first/compact@0,0,2,2|second/required@2,0,2,2"
+  },
+  "equivalent": true,
+  "exhaustiveSolutionCount": 8,
+  "prunedSolutionCount": 8,
+  "exhaustiveBranches": 16,
+  "prunedBranches": [
+    {
+      "path": [
+        {
+          "roomId": "first",
+          "variantId": "fills-grid",
+          "x": 0,
+          "y": 0,
+          "width": 4,
+          "depth": 3,
+          "score": 100
+        }
+      ],
+      "availableArea": 0,
+      "minimumRemainingArea": 4,
+      "reason": "minimum-remaining-area",
+      "cannotContainSelectedOptimum": true
+    }
+  ]
+}

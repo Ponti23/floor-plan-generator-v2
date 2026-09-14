@@ -29,7 +29,7 @@ import {
   type Layout,
   type PlacedSpace,
 } from "./layout.ts";
-import { createSeededPrng, hashSeed, type SeededPrng } from "./prng.ts";
+import { createSeededPrng, hashSeed } from "./prng.ts";
 import { isTransitNode } from "./portalGraph.ts";
 import { validateLayout, type ValidationResult } from "./validation.ts";
 import {
@@ -48,6 +48,21 @@ import {
 
 export const GENERATOR_ENGINE_VERSION = "planlab-generator-0.4";
 export const GENERATOR_RULE_VERSION = "planlab-core-2";
+/**
+ * Version of the deterministic search policy.  This is kept separate from
+ * the engine version because it describes the ordering/budget contract rather
+ * than the shape of the generated domain value.
+ */
+export const GENERATOR_DETERMINISM_VERSION = "planlab-generator-determinism-1";
+export const GENERATOR_BUDGET_VERSION = "planlab-generator-budget-1";
+
+/** Fixed internal beam factors are part of the semantic stopping policy. */
+export const GENERATOR_SEARCH_POLICY = Object.freeze({
+  candidateBranchFactor: 8,
+  retainedStateFactor: 4,
+  dedupeStateFactor: 8,
+  footprintVariantLimit: 64,
+});
 
 export interface GenerationBudget {
   beamWidth: number;
@@ -62,6 +77,17 @@ export const DEFAULT_GENERATION_BUDGET: Readonly<GenerationBudget> = Object.free
   maxCandidatesPerTopology: 100,
   maxTotalCandidates: 300,
 });
+
+export interface PruningStats {
+  /** Number of minimum-area admissibility checks made by the search. */
+  minimumAreaChecks: number;
+  /** Branches rejected because no completion can fit by area alone. */
+  minimumAreaPruned: number;
+  /** Number of room-frontier access checks made by the search. */
+  frontierChecks: number;
+  /** Branches rejected because the room had no transit frontier. */
+  frontierPruned: number;
+}
 
 export interface GenerationOptions {
   seed?: string;
@@ -108,6 +134,9 @@ export interface GenerationResult {
     calibrationVersion: string;
     seed: string;
     budget: GenerationBudget;
+    budgetVersion: string;
+    determinismVersion: string;
+    pruning: PruningStats;
     expandedStates: number;
     topologyExpansions: Record<CirculationSkeletonKind, number>;
     topologyCounts: Record<CirculationSkeletonKind, number>;
@@ -122,6 +151,7 @@ interface SearchState {
   spaces: PlacedSpace[];
   score: number;
   key: string;
+  tieBreak: number;
 }
 
 interface SearchCandidate {
@@ -129,6 +159,23 @@ interface SearchCandidate {
   validation: ValidationResult;
   score: number;
   key: string;
+  tieBreak: number;
+}
+
+function emptyPruningStats(): PruningStats {
+  return {
+    minimumAreaChecks: 0,
+    minimumAreaPruned: 0,
+    frontierChecks: 0,
+    frontierPruned: 0,
+  };
+}
+
+function addPruningStats(target: PruningStats, source: PruningStats): void {
+  target.minimumAreaChecks += source.minimumAreaChecks;
+  target.minimumAreaPruned += source.minimumAreaPruned;
+  target.frontierChecks += source.frontierChecks;
+  target.frontierPruned += source.frontierPruned;
 }
 
 const TOPOLOGY_ORDER: CirculationSkeletonKind[] = ["straight", "L", "T"];
@@ -148,16 +195,41 @@ function isNormalized(value: unknown): value is NormalizedProject {
 }
 
 function canonicalBudget(budget: Partial<GenerationBudget> | undefined): GenerationBudget {
-  const result = {
-    ...DEFAULT_GENERATION_BUDGET,
-    ...(budget ?? {}),
+  // Copy only the four declared fields.  An accidental enumerable property on
+  // a caller's options object must not become part of the effective stopping
+  // policy or the serialized metadata.
+  const result: GenerationBudget = {
+    beamWidth: budget?.beamWidth ?? DEFAULT_GENERATION_BUDGET.beamWidth,
+    maxExpansionsPerTopology: budget?.maxExpansionsPerTopology ?? DEFAULT_GENERATION_BUDGET.maxExpansionsPerTopology,
+    maxCandidatesPerTopology: budget?.maxCandidatesPerTopology ?? DEFAULT_GENERATION_BUDGET.maxCandidatesPerTopology,
+    maxTotalCandidates: budget?.maxTotalCandidates ?? DEFAULT_GENERATION_BUDGET.maxTotalCandidates,
   };
   for (const [name, value] of Object.entries(result)) {
     if (!Number.isSafeInteger(value) || (value as number) <= 0) {
       throw new RangeError(`${name} must be a positive safe integer`);
     }
   }
-  return result;
+  return Object.freeze(result);
+}
+
+/** Normalize and validate a generation budget for callers that need to pin it. */
+export const canonicalizeGenerationBudget = canonicalBudget;
+
+/** Stable hash tie-break independent of iteration order or wall-clock time. */
+function seededTieBreak(seed: string, scope: string, key: string): number {
+  return hashSeed(`${GENERATOR_DETERMINISM_VERSION}:${seed}:${scope}:${key}`);
+}
+
+function createTieBreaker(seed: string): (scope: string, key: string) => number {
+  const cache = new Map<string, number>();
+  return (scope, key) => {
+    const cacheKey = `${scope}\0${key}`;
+    const existing = cache.get(cacheKey);
+    if (existing !== undefined) return existing;
+    const value = seededTieBreak(seed, scope, key);
+    cache.set(cacheKey, value);
+    return value;
+  };
 }
 
 function projectSeed(project: NormalizedProject, options: string | GenerationOptions | undefined): string {
@@ -287,7 +359,7 @@ export function deriveFootprintVariants(
     maxArea,
   );
 
-  const random = createSeededPrng(`${seed}:footprints`);
+  const random = createSeededPrng(`${GENERATOR_DETERMINISM_VERSION}:${seed}:footprints`);
   const candidates = [...dimensions].map((value) => {
     const [widthText, depthText] = value.split("x");
     const width = Number(widthText);
@@ -312,7 +384,7 @@ export function deriveFootprintVariants(
       a.width - b.width ||
       a.depth - b.depth,
   );
-  return candidates.slice(0, 64).map(({ id, width, depth, area: footprintArea }) => ({
+  return candidates.slice(0, GENERATOR_SEARCH_POLICY.footprintVariantLimit).map(({ id, width, depth, area: footprintArea }) => ({
     id,
     width,
     depth,
@@ -376,7 +448,7 @@ function makeSkeleton(
   );
   const garageSpaces: PlacedSpace[] = [];
   const occupiedGarageRects: GridRect[] = [];
-  let garageSide: "left" | "right" = createSeededPrng(`${seed}:${kind}:garage`).nextBoolean()
+  let garageSide: "left" | "right" = createSeededPrng(`${GENERATOR_DETERMINISM_VERSION}:${seed}:${kind}:garage`).nextBoolean()
     ? "left"
     : "right";
   for (const room of garageRooms) {
@@ -987,15 +1059,23 @@ function searchTopology(
   seed: string,
   budget: GenerationBudget,
   candidateOffset: number,
-): { candidates: SearchCandidate[]; expandedStates: number; budgetExceeded: boolean } {
+): { candidates: SearchCandidate[]; expandedStates: number; budgetExceeded: boolean; pruning: PruningStats } {
   const footprint = footprintPlacement(project.site.envelope, footprintVariant.width, footprintVariant.depth);
   const skeleton = makeSkeleton(project, footprint, topology, seed);
-  if (!skeleton) return { candidates: [], expandedStates: 0, budgetExceeded: false };
+  if (!skeleton) return { candidates: [], expandedStates: 0, budgetExceeded: false, pruning: emptyPruningStats() };
   const roomOrder = orderedRooms(project, skeleton);
   const initialSpaces = [...skeleton.garageSpaces];
-  let beam: SearchState[] = [{ spaces: initialSpaces, score: 0, key: stateKey(initialSpaces) }];
+  const tieBreak = createTieBreaker(seed);
+  const initialKey = stateKey(initialSpaces);
+  let beam: SearchState[] = [{
+    spaces: initialSpaces,
+    score: 0,
+    key: initialKey,
+    tieBreak: tieBreak(`${topology}:${footprintVariant.id}:initial`, initialKey),
+  }];
   let expandedStates = 0;
   let budgetExceeded = false;
+  const pruning = emptyPruningStats();
   for (let roomIndex = 0; roomIndex < roomOrder.length; roomIndex += 1) {
     const room = roomOrder[roomIndex];
     const next: SearchState[] = [];
@@ -1017,13 +1097,19 @@ function searchTopology(
         .slice(roomIndex)
         .reduce((total, candidate) => total + candidate.dimensions.minAreaUnits2, 0);
       // Cheap admissible area pruning: even the minimum rectangle area of the
-      // current and remaining rooms must fit in the still-free footprint.
-      if (remainingFreeArea < minimumRemainingArea) continue;
+      // current and remaining rooms must fit in the still-free footprint.  The
+      // independent tiny-grid oracle in pruning.ts verifies this claim without
+      // sharing the rectangle decomposition implementation.
+      pruning.minimumAreaChecks += 1;
+      if (remainingFreeArea < minimumRemainingArea) {
+        pruning.minimumAreaPruned += 1;
+        continue;
+      }
       const desiredArea = Math.max(
         room.dimensions.minAreaUnits2,
         Math.floor(remainingFreeArea / Math.max(1, roomOrder.length - roomIndex)),
       );
-      const candidates: Array<{ rect: GridRect; frontier: number; score: number; key: string }> = [];
+      const candidates: Array<{ rect: GridRect; frontier: number; score: number; key: string; tieBreak: number }> = [];
       for (const freeRect of free) {
         for (const dimensions of dimensionVariants(room, freeRect.width, freeRect.depth, desiredArea)) {
           for (const rect of candidatePositions(freeRect, dimensions.width, dimensions.depth, [
@@ -1042,17 +1128,23 @@ function searchTopology(
             // pass-through public room).  Refusing a room with no transit
             // frontier here is the constructive counterpart to the independent
             // validator's forbidden-pass-through check.
-            if (frontier < MIN_PORTAL_WIDTH_UNITS) continue;
+            pruning.frontierChecks += 1;
+            if (frontier < MIN_PORTAL_WIDTH_UNITS) {
+              pruning.frontierPruned += 1;
+              continue;
+            }
             const occupied = unionArea([...obstacles, rect]);
             const candidateScore =
               frontier * 100 +
               (occupied / area(footprint)) * 25 -
               Math.abs(rect.width * rect.depth - desiredArea) / Math.max(1, area(footprint)) * 10;
+            const key = `${rect.x},${rect.y},${rect.width},${rect.depth}`;
             candidates.push({
               rect,
               frontier,
               score: candidateScore,
-              key: `${rect.x},${rect.y},${rect.width},${rect.depth}`,
+              key,
+              tieBreak: tieBreak(`${topology}:${footprintVariant.id}:${room.id}:candidate`, key),
             });
           }
         }
@@ -1062,29 +1154,32 @@ function searchTopology(
         (a, b) =>
           b.frontier - a.frontier ||
           b.score - a.score ||
+          b.tieBreak - a.tieBreak ||
           compareText(a.key, b.key),
       );
-      for (const candidate of sorted.slice(0, budget.beamWidth * 8)) {
+      for (const candidate of sorted.slice(0, budget.beamWidth * GENERATOR_SEARCH_POLICY.candidateBranchFactor)) {
         const spaces = [...state.spaces, makeSpace(room.id, "room", candidate.rect)];
+        const key = state.key + `|${room.id}@${candidate.key}`;
         next.push({
           spaces,
           score: state.score + candidate.score,
-          key: state.key + `|${room.id}@${candidate.key}`,
+          key,
+          tieBreak: tieBreak(`${topology}:${footprintVariant.id}:state:${roomIndex}`, key),
         });
       }
     }
     if (next.length === 0 || budgetExceeded) break;
-    next.sort((a, b) => b.score - a.score || compareText(a.key, b.key));
+    next.sort((a, b) => b.score - a.score || b.tieBreak - a.tieBreak || compareText(a.key, b.key));
     const unique = new Map<string, SearchState>();
     for (const state of next) {
       const canonical = stateKey(state.spaces);
       if (!unique.has(canonical)) unique.set(canonical, state);
-      if (unique.size >= budget.beamWidth * 8) break;
+      if (unique.size >= budget.beamWidth * GENERATOR_SEARCH_POLICY.dedupeStateFactor) break;
     }
-    beam = [...unique.values()].slice(0, budget.beamWidth * 4);
+    beam = [...unique.values()].slice(0, budget.beamWidth * GENERATOR_SEARCH_POLICY.retainedStateFactor);
   }
   if (beam.length === 0 || beam[0].spaces.length < skeleton.garageSpaces.length + roomOrder.length) {
-    return { candidates: [], expandedStates, budgetExceeded };
+    return { candidates: [], expandedStates, budgetExceeded, pruning };
   }
   const candidates: SearchCandidate[] = [];
   for (const [index, state] of beam.entries()) {
@@ -1100,11 +1195,17 @@ function searchTopology(
     );
     const validation = validateLayout(layout, project);
     if (validation.valid) {
-      candidates.push({ layout, validation, score: state.score, key: state.key });
+      candidates.push({
+        layout,
+        validation,
+        score: state.score,
+        key: state.key,
+        tieBreak: tieBreak(`${topology}:${footprintVariant.id}:complete`, state.key),
+      });
     }
     if (candidates.length >= budget.maxCandidatesPerTopology) break;
   }
-  return { candidates, expandedStates, budgetExceeded };
+  return { candidates, expandedStates, budgetExceeded, pruning };
 }
 
 function normalizeInput(
@@ -1177,10 +1278,13 @@ export function generateLayouts(
   const emptyMetadata = {
     engineVersion: GENERATOR_ENGINE_VERSION,
     ruleVersion: GENERATOR_RULE_VERSION,
+    budgetVersion: GENERATOR_BUDGET_VERSION,
+    determinismVersion: GENERATOR_DETERMINISM_VERSION,
     scoringVersion: SCORING_VERSION,
     calibrationVersion: CALIBRATION_SURFACE.version,
     seed,
     budget,
+    pruning: emptyPruningStats(),
     expandedStates: 0,
     topologyExpansions: { straight: 0, L: 0, T: 0 } as Record<CirculationSkeletonKind, number>,
     topologyCounts: { straight: 0, L: 0, T: 0 } as Record<CirculationSkeletonKind, number>,
@@ -1247,6 +1351,7 @@ export function generateLayouts(
       );
       topologyExpanded += search.expandedStates;
       expandedStates += search.expandedStates;
+      addPruningStats(emptyMetadata.pruning, search.pruning);
       topologyCandidates.push(...search.candidates);
       if (search.budgetExceeded) {
         diagnostics.push({
@@ -1260,7 +1365,7 @@ export function generateLayouts(
       }
       if (topologyCandidates.length >= budget.maxCandidatesPerTopology) break;
     }
-    topologyCandidates.sort((a, b) => b.score - a.score || compareText(a.key, b.key));
+    topologyCandidates.sort((a, b) => b.score - a.score || b.tieBreak - a.tieBreak || compareText(a.key, b.key));
     topologyCandidates = topologyCandidates.slice(0, budget.maxCandidatesPerTopology);
     for (const candidate of topologyCandidates) {
       // A second independent call is intentional: do not trust the validation

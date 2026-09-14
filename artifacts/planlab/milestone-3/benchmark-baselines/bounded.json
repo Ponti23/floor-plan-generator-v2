@@ -1,0 +1,276 @@
+{
+  "schemaVersion": "planlab-stage0-regression-baseline-1",
+  "suiteVersion": "planlab-stage0-seed-suite-0.6",
+  "mode": "bounded",
+  "engineVersion": "planlab-generator-0.4",
+  "ruleVersion": "planlab-core-2",
+  "determinismVersion": "planlab-generator-determinism-1",
+  "budgetVersion": "planlab-generator-budget-1",
+  "searchPolicy": {
+    "candidateBranchFactor": 8,
+    "retainedStateFactor": 4,
+    "dedupeStateFactor": 8,
+    "footprintVariantLimit": 64
+  },
+  "budget": {
+    "beamWidth": 64,
+    "maxExpansionsPerTopology": 15000,
+    "maxCandidatesPerTopology": 100,
+    "maxTotalCandidates": 300
+  },
+  "seeds": [
+    "planlab-canonical-01",
+    "planlab-canonical-02"
+  ],
+  "benchmarkInputFingerprint": "8a9a04bcdeaf64eeb07b00d5d52325ed4b9da18e3d1901c24d004e8ac9a938f8",
+  "historicalStage0Baseline": {
+    "commit": "e1c6f38",
+    "artifact": "artifacts/planlab/milestone-0/benchmark.json",
+    "meaning": "historical Stage 0 full-result hashes before derived-facts indexes were serialized",
+    "mechanicalConsequence": "current regression checks retain full-result, layout, selection, and evidence-shape signatures separately; the Stage 3.4 seeded tie-break has its own versioned current baseline; historical hashes remain reference evidence and are not a live gate",
+    "outputHashes": {
+      "planlab-canonical-01": "2e25c2f1375142b5e634ece7ad83c14a3edc7690267f2eb7d283c3268a25ef5a",
+      "planlab-canonical-02": "a958915b82414d49507b8e342c390071424b2d27fc36c5837a0a8d07e27d3bae",
+      "planlab-canonical-03": "ec0c221b17a5d29ea8aa4913a3805fb7f717d762e4db198d7e6f79f06c807a56",
+      "planlab-canonical-04": "bb93aff6aed6e03356ffd71b0aa24c75c0301806f9943627e30a155ecb50c05e",
+      "planlab-canonical-05": "eefd52e3baedf222751b2caeebea752b309525afc4e32213576807377ca55e39",
+      "planlab-canonical-06": "f899e35c28b80cc92507bd333b6ee1be04267650b0e4bbbb59937d8dd70e764e",
+      "planlab-canonical-07": "c91e362cbfd862010a17ee6daa356a6ca28261a77abf90c75e5e0ca0fb9478b3",
+      "planlab-canonical-08": "14e8fcfc20f53b9b00bf78dad5db67323cd26ee9c32a846e7342e12b2dfdd56e",
+      "planlab-canonical-09": "21e865f4345e7b7ed3e1942bd5469c8bb58c4a495466ed8779a196277515788d",
+      "planlab-canonical-10": "09b622a143038ec474b0146591694b7dcc78c7cc7dba907c777298c9b74e4184"
+    }
+  },
+  "canonical": [
+    {
+      "seed": "planlab-canonical-01",
+      "outputHash": "1ea3931c2c0d1fedf18449347c968720002464b20b4d5949999fe944f058ac4f",
+      "layoutHash": "5df0407527fab01d9da14c444f6f69c0a5609e7389ff1b5eaad927a886804c4d",
+      "selectionHash": "5ca45e8d6463a8499f3f99818dc4369ff9f1c69b0bfc205af2a9a6346f227dad",
+      "evidenceHash": "b44ad1795d7eaef8e3a8260921e0752319281a62bf34cba85ae0269b053d9e52",
+      "factsVersions": [
+        "planlab-metrics-0.6"
+      ],
+      "ok": true,
+      "candidateCount": 300,
+      "independentlyValidCandidateCount": 300,
+      "selectedCount": 3,
+      "independentlyValidSelectedCount": 3,
+      "selectionStatus": "complete",
+      "selectionComplete": true,
+      "selectionReason": null,
+      "diversityThreshold": 0.2,
+      "minimumSelectedPairwiseDistanceRaw": 0.3203629583969335,
+      "selectedPairwiseDistances": [
+        {
+          "a": "layout-L-footprint-48x60-171",
+          "b": "layout-L-footprint-48x60-117",
+          "distance": 0.320363,
+          "diverse": true
+        },
+        {
+          "a": "layout-L-footprint-48x60-171",
+          "b": "layout-straight-footprint-40x72-26",
+          "distance": 0.537394,
+          "diverse": true
+        },
+        {
+          "a": "layout-L-footprint-48x60-117",
+          "b": "layout-straight-footprint-40x72-26",
+          "distance": 0.546635,
+          "diverse": true
+        }
+      ],
+      "expansions": {
+        "total": 6779,
+        "perTopology": {
+          "straight": 4175,
+          "L": 1285,
+          "T": 1319
+        },
+        "validCandidatesPerTopology": {
+          "straight": 100,
+          "L": 100,
+          "T": 100
+        },
+        "pruning": {
+          "minimumAreaChecks": 6779,
+          "minimumAreaPruned": 2062,
+          "frontierChecks": 117296,
+          "frontierPruned": 48317
+        }
+      },
+      "diagnostics": []
+    },
+    {
+      "seed": "planlab-canonical-02",
+      "outputHash": "49d57cc9819812c0eacaeb7f0975bd96f79d10249096474f4545e62f0b138073",
+      "layoutHash": "1b33c8eaaeafadfbcdca1c624158ae845aee30b06830c0d05792248a61129e62",
+      "selectionHash": "3eb29503e79896a7abea521200c812a32ec82c63f0d32eb8ce682c6b655dcd4d",
+      "evidenceHash": "b44ad1795d7eaef8e3a8260921e0752319281a62bf34cba85ae0269b053d9e52",
+      "factsVersions": [
+        "planlab-metrics-0.6"
+      ],
+      "ok": true,
+      "candidateCount": 300,
+      "independentlyValidCandidateCount": 300,
+      "selectedCount": 3,
+      "independentlyValidSelectedCount": 3,
+      "selectionStatus": "complete",
+      "selectionComplete": true,
+      "selectionReason": null,
+      "diversityThreshold": 0.2,
+      "minimumSelectedPairwiseDistanceRaw": 0.40147644210767947,
+      "selectedPairwiseDistances": [
+        {
+          "a": "layout-L-footprint-48x60-173",
+          "b": "layout-straight-footprint-40x72-28",
+          "distance": 0.593967,
+          "diverse": true
+        },
+        {
+          "a": "layout-L-footprint-48x60-173",
+          "b": "layout-straight-footprint-40x72-26",
+          "distance": 0.517149,
+          "diverse": true
+        },
+        {
+          "a": "layout-straight-footprint-40x72-28",
+          "b": "layout-straight-footprint-40x72-26",
+          "distance": 0.401476,
+          "diverse": true
+        }
+      ],
+      "expansions": {
+        "total": 7108,
+        "perTopology": {
+          "straight": 4504,
+          "L": 1285,
+          "T": 1319
+        },
+        "validCandidatesPerTopology": {
+          "straight": 100,
+          "L": 100,
+          "T": 100
+        },
+        "pruning": {
+          "minimumAreaChecks": 7108,
+          "minimumAreaPruned": 2206,
+          "frontierChecks": 117556,
+          "frontierPruned": 48416
+        }
+      },
+      "diagnostics": []
+    }
+  ],
+  "impossibleFixtures": [
+    {
+      "fixture": "envelopeConsumesSite",
+      "seed": "impossible-envelope",
+      "ok": false,
+      "candidateCount": 0,
+      "selectedCount": 0,
+      "expansions": {
+        "total": 0,
+        "perTopology": {
+          "straight": 0,
+          "L": 0,
+          "T": 0
+        },
+        "validCandidatesPerTopology": {
+          "straight": 0,
+          "L": 0,
+          "T": 0
+        },
+        "pruning": {
+          "minimumAreaChecks": 0,
+          "minimumAreaPruned": 0,
+          "frontierChecks": 0,
+          "frontierPruned": 0
+        }
+      },
+      "diagnostics": [
+        {
+          "code": "NORMALIZATION_FAILED",
+          "message": "NON_POSITIVE_EXACT_ENVELOPE: opposing offsets leave no positive exact envelope"
+        },
+        {
+          "code": "INFEASIBLE",
+          "message": "the brief is infeasible before candidate search"
+        }
+      ]
+    },
+    {
+      "fixture": "roomCannotFitEnvelope",
+      "seed": "impossible-room",
+      "ok": false,
+      "candidateCount": 0,
+      "selectedCount": 0,
+      "expansions": {
+        "total": 0,
+        "perTopology": {
+          "straight": 0,
+          "L": 0,
+          "T": 0
+        },
+        "validCandidatesPerTopology": {
+          "straight": 0,
+          "L": 0,
+          "T": 0
+        },
+        "pruning": {
+          "minimumAreaChecks": 0,
+          "minimumAreaPruned": 0,
+          "frontierChecks": 0,
+          "frontierPruned": 0
+        }
+      },
+      "diagnostics": [
+        {
+          "code": "NORMALIZATION_FAILED",
+          "message": "ROOM_CANNOT_FIT_ENVELOPE: Impossible Room minimum dimensions/area cannot fit the envelope"
+        },
+        {
+          "code": "INFEASIBLE",
+          "message": "the brief is infeasible before candidate search"
+        }
+      ]
+    },
+    {
+      "fixture": "programExceedsInstanceLimit",
+      "seed": "impossible-program-size",
+      "ok": false,
+      "candidateCount": 0,
+      "selectedCount": 0,
+      "expansions": {
+        "total": 0,
+        "perTopology": {
+          "straight": 0,
+          "L": 0,
+          "T": 0
+        },
+        "validCandidatesPerTopology": {
+          "straight": 0,
+          "L": 0,
+          "T": 0
+        },
+        "pruning": {
+          "minimumAreaChecks": 0,
+          "minimumAreaPruned": 0,
+          "frontierChecks": 0,
+          "frontierPruned": 0
+        }
+      },
+      "diagnostics": [
+        {
+          "code": "NORMALIZATION_FAILED",
+          "message": "PROGRAM_TOO_LARGE: the V1 solver supports at most 24 generated space instances"
+        },
+        {
+          "code": "INFEASIBLE",
+          "message": "the brief is infeasible before candidate search"
+        }
+      ]
+    }
+  ]
+}

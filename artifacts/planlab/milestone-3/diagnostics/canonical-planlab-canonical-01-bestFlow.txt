@@ -1,0 +1,45 @@
+PlanLab diagnostic layout-L-footprint-48x60-117
+Validity: PASS (0 hard findings)
+Footprint: 12.00 × 15.00 (180.00 m²)
+Site: 600.00 m² | Buildable: 374.00 m²
+Programmed usable: 124.00 m² | Garage: 36.00 m² | Circulation: 20.00 m²
+GFA: 180.00 m² | target Δ 0.00 m² | max Δ -20.00 m²
+Unallocated interior: 0.00 m² (0.0%) | Planning efficiency: 86.1% | Allocation ratio (diagnostic): 100.0%
+Circulation ratio: 11.1%
+Reachability: 8/8 required rooms | Dead ends: 0
+Portals: 13
+Calibration: planlab-calibration-0.1 | diversity threshold 0.2
+Strategy calibration:
+- Compact Efficiency: programSpace 40%, flow 20%, relationships 15%, liveability 10%, servicesSite 15% | strategy.compactEfficiency.tradeoff
+- Best Flow: programSpace 15%, flow 40%, relationships 25%, liveability 15%, servicesSite 5% | strategy.bestFlow.tradeoff
+- Balanced: programSpace 25%, flow 25%, relationships 20%, liveability 20%, servicesSite 10% | strategy.balanced.tradeoff
+Spaces:
+- Garage [room] @ 40,58 6.00 × 6.00 (36.00 m²)
+- circulation-L-1 [circulation] @ 36,22 1.00 × 7.00 (7.00 m²)
+- circulation-L-2 [circulation] @ 36,54 1.00 × 6.00 (6.00 m²)
+- circulation-L-3 [circulation] @ 16,50 6.00 × 1.00 (6.00 m²)
+- entry-L [entry] @ 36,78 1.00 × 1.00 (1.00 m²)
+- Living Room [room] @ 40,22 3.00 × 9.00 (27.00 m²)
+- Bedroom 1 [room] @ 16,22 5.00 × 7.00 (35.00 m²)
+- Bedroom 2 [room] @ 52,22 3.00 × 9.00 (27.00 m²)
+- Bedroom 3 [room] @ 23,54 3.25 × 3.25 (10.56 m²)
+- Kitchen [room] @ 23,67 3.25 × 3.75 (12.19 m²)
+- Bathroom [room] @ 20,54 0.75 × 7.00 (5.25 m²)
+- Laundry [room] @ 16,54 1.00 × 7.00 (7.00 m²)
+Score model: planlab-scoring-0.6
+Scores:
+- Compact Efficiency: 82/100 | programSpace 88, flow 80, relationships 57, liveability 92, servicesSite 85
+  + validation.hard.pass [validation:hard]
+  + programSpace.targetFootprint.strong [footprint:targetGfa]
+  + programSpace.unallocatedInterior.strong [footprint:unallocated]
+  + flow.circulationRatio.strong [circulation:area]
+- Best Flow: 77/100 | programSpace 88, flow 80, relationships 57, liveability 92, servicesSite 85
+  + validation.hard.pass [validation:hard]
+  + programSpace.targetFootprint.strong [footprint:targetGfa]
+  + programSpace.unallocatedInterior.strong [footprint:unallocated]
+  + flow.circulationRatio.strong [circulation:area]
+- Balanced: 80/100 | programSpace 88, flow 80, relationships 57, liveability 92, servicesSite 85
+  + validation.hard.pass [validation:hard]
+  + programSpace.targetFootprint.strong [footprint:targetGfa]
+  + programSpace.unallocatedInterior.strong [footprint:unallocated]
+  + flow.circulationRatio.strong [circulation:area]

@@ -1,0 +1,43 @@
+PlanLab diagnostic layout-straight-footprint-40x72-26
+Validity: PASS (0 hard findings)
+Footprint: 10.00 × 18.00 (180.00 m²)
+Site: 600.00 m² | Buildable: 374.00 m²
+Programmed usable: 126.00 m² | Garage: 36.00 m² | Circulation: 18.00 m²
+GFA: 180.00 m² | target Δ 0.00 m² | max Δ -20.00 m²
+Unallocated interior: 0.00 m² (0.0%) | Planning efficiency: 87.5% | Allocation ratio (diagnostic): 100.0%
+Circulation ratio: 10.0%
+Reachability: 8/8 required rooms | Dead ends: 0
+Portals: 11
+Calibration: planlab-calibration-0.1 | diversity threshold 0.2
+Strategy calibration:
+- Compact Efficiency: programSpace 40%, flow 20%, relationships 15%, liveability 10%, servicesSite 15% | strategy.compactEfficiency.tradeoff
+- Best Flow: programSpace 15%, flow 40%, relationships 25%, liveability 15%, servicesSite 5% | strategy.bestFlow.tradeoff
+- Balanced: programSpace 25%, flow 25%, relationships 20%, liveability 20%, servicesSite 10% | strategy.balanced.tradeoff
+Spaces:
+- Garage [room] @ 36,64 6.00 × 6.00 (36.00 m²)
+- circulation-straight-1 [circulation] @ 32,16 1.00 × 17.00 (17.00 m²)
+- entry-straight [entry] @ 32,84 1.00 × 1.00 (1.00 m²)
+- Living Room [room] @ 36,16 3.00 × 12.00 (36.00 m²)
+- Bedroom 1 [room] @ 20,16 3.00 × 5.00 (15.00 m²)
+- Bedroom 2 [room] @ 20,36 3.00 × 13.00 (39.00 m²)
+- Bedroom 3 [room] @ 48,16 3.00 × 3.50 (10.50 m²)
+- Kitchen [room] @ 48,30 1.50 × 8.50 (12.75 m²)
+- Bathroom [room] @ 54,30 1.50 × 3.50 (5.25 m²)
+- Laundry [room] @ 54,44 1.50 × 5.00 (7.50 m²)
+Score model: planlab-scoring-0.6
+Scores:
+- Compact Efficiency: 81/100 | programSpace 85, flow 77, relationships 58, liveability 95, servicesSite 90
+  + validation.hard.pass [validation:hard]
+  + programSpace.targetFootprint.strong [footprint:targetGfa]
+  + programSpace.unallocatedInterior.strong [footprint:unallocated]
+  − programSpace.proportion.weak [room:garage-1:aspect, room:living-1:aspect, room:bedroom-1:aspect, room:bedroom-2:aspect, room:bedroom-3:aspect, room:kitchen-1:aspect, room:bathroom-1:aspect, room:laundry-1:aspect]
+- Best Flow: 77/100 | programSpace 85, flow 77, relationships 58, liveability 95, servicesSite 90
+  + validation.hard.pass [validation:hard]
+  + programSpace.targetFootprint.strong [footprint:targetGfa]
+  + programSpace.unallocatedInterior.strong [footprint:unallocated]
+  − programSpace.proportion.weak [room:garage-1:aspect, room:living-1:aspect, room:bedroom-1:aspect, room:bedroom-2:aspect, room:bedroom-3:aspect, room:kitchen-1:aspect, room:bathroom-1:aspect, room:laundry-1:aspect]
+- Balanced: 80/100 | programSpace 85, flow 77, relationships 58, liveability 95, servicesSite 90
+  + validation.hard.pass [validation:hard]
+  + programSpace.targetFootprint.strong [footprint:targetGfa]
+  + programSpace.unallocatedInterior.strong [footprint:unallocated]
+  − programSpace.proportion.weak [room:garage-1:aspect, room:living-1:aspect, room:bedroom-1:aspect, room:bedroom-2:aspect, room:bedroom-3:aspect, room:kitchen-1:aspect, room:bathroom-1:aspect, room:laundry-1:aspect]
