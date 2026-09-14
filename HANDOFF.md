@@ -2,26 +2,34 @@
 
 **Active plan:** [`DELEGATION-PLAN.md`](./DELEGATION-PLAN.md) · **Live queue:** [`knowledge/BOARD.md`](./knowledge/BOARD.md) · **Planning package:** [`knowledge/planlab/README.md`](./knowledge/planlab/README.md)
 
-**Status:** Stage 0 is complete and approved. Stage 1 is complete (independent domain API review passed 2026-09-14). **Stage 2 (access, rules, and validation) is complete** — all five buckets landed on `main` and the independent review (2.5) passed on 2026-09-14 with three access-layer defects fixed. **Stage 3 (generator, metrics, scoring, and diversity) is complete** — buckets 3.1–3.4 landed and the 3.5 review resolved the recorded median-runtime failure (3,036 ms → 904 ms, byte-identical results) and found the selection memo untested. **Next: the Stage 3 hard gate — the architect/user approves mathematical usefulness and the scoring language before any polished UI work.** Do not stage Milestone 4 before that decision.
+**Status:** Stages 0–3 are complete. The **Stage 3 hard gate is answered** (2026-09-14): the user
+did not approve the usefulness claim for D1 but directed a fix, approved the scoring language as the
+default while requiring it to stay settable (D2/D3), and asked for the engineering-shaped decisions
+to be done rather than returned as questions (D4). All of it is implemented, verified and green
+(136 tests, full regression gate PASS at median 1,750 ms). Record:
+[`artifacts/planlab/milestone-3/gate-amendment-d1-d4.md`](artifacts/planlab/milestone-3/gate-amendment-d1-d4.md).
+**Next: answer D5 (push), then build Milestone 4.**
 
-## Blocked on — Stage 3 hard gate (needs human, nothing dispatched)
+## Waiting on — D5 only
 
-The next action is a decision, not a bucket. The decision package is
-[`artifacts/planlab/milestone-3/gate-brief.md`](artifacts/planlab/milestone-3/gate-brief.md):
-state `main` @ `cf31d93`, 122 tests passing, regression gate PASS, the calibration being approved
-(`planlab-calibration-0.1`), what seed 01 actually produced, and the observations that bear on the
-judgement. The exact asks:
+Everything else the gate asked for is settled. The one open decision is **D5: push `main` to
+`origin/main`** (56 commits ahead since Stage 1). Nothing has been pushed, so nothing was committed
+to a remote and no irreversible action has been taken.
 
-- **D1 Mathematical usefulness** — approve, or redirect and name what is missing.
-- **D2 Scoring language** — approve the five categories, breakpoints, profile weights, diversity
-  threshold, and false-precision policy, or point at the values to change.
-- **D3** Tune metric breakpoints / `shortlistSize` now, or accept as-is (every change moves selected
-  triplets).
-- **D4 Stage 0 evidence shape** (carried from 2.5) — accept the new `outputHash` baselines or stop
-  serializing derived indexes; ~256 → ~342 MB canonical payload matters for Milestone 4.
-- **D5** Push `main` to `origin/main` (55 commits ahead since Stage 1).
+Two things a resuming session should know before it re-measures anything:
 
-Do not start Milestone 4 worker/UI scaffolding before D1 and D2 are answered.
+1. **Timing numbers taken while sub-agents are running are not representative.** This session
+   measured a 2.2 s median while two agents were loading the machine, then the same commit measured
+   **1,750 ms** on a quiet machine. Re-measure before concluding a timing gate fails.
+2. **The D4 payload projection reduced evidence resolution.** The benchmark's `evidenceHash` now
+   hashes derived *schema keys* rather than every value, so a silent change to an individual derived
+   value that leaves layouts byte-identical is no longer caught by that hash. A review that needs
+   value-level derived drift must call `serializeCanonical(result)` explicitly.
+
+**Milestone 4 status:** bucket 4.1 (worker + three-pane UI shell per
+`knowledge/planlab/UI_ARCHITECTURE.md`) was dispatched to a sub-agent that stalled for ~40 minutes
+without writing a single file and was interrupted. No `app/` directory exists. The bucket is back in
+the queue.
 
 ## Last checkpoint
 

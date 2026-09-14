@@ -5,6 +5,6 @@ They are a direct projection of authoritative grid rectangles and portals; they 
 
 | Strategy | Layout | SVG | Text evidence |
 |---|---|---|---|
-| compactEfficiency | layout-L-footprint-48x60-171 | [SVG](canonical-planlab-canonical-01-compactEfficiency.svg) | [text](canonical-planlab-canonical-01-compactEfficiency.txt) |
-| bestFlow | layout-L-footprint-48x60-117 | [SVG](canonical-planlab-canonical-01-bestFlow.svg) | [text](canonical-planlab-canonical-01-bestFlow.txt) |
-| balanced | layout-straight-footprint-40x72-26 | [SVG](canonical-planlab-canonical-01-balanced.svg) | [text](canonical-planlab-canonical-01-balanced.txt) |
+| compactEfficiency | layout-straight-footprint-40x72-0 | [SVG](canonical-planlab-canonical-01-compactEfficiency.svg) | [text](canonical-planlab-canonical-01-compactEfficiency.txt) |
+| bestFlow | layout-L-footprint-40x72-151 | [SVG](canonical-planlab-canonical-01-bestFlow.svg) | [text](canonical-planlab-canonical-01-bestFlow.txt) |
+| balanced | layout-straight-footprint-40x72-20 | [SVG](canonical-planlab-canonical-01-balanced.svg) | [text](canonical-planlab-canonical-01-balanced.txt) |

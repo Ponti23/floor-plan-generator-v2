@@ -11,6 +11,7 @@ import {
   type LayoutScorecardSet,
 } from "./scoring.ts";
 import {
+  assertCalibrationSurface,
   CALIBRATION_SURFACE,
   CALIBRATED_STRATEGY_PROFILE_IDS,
   type ScoringCalibrationSurface,
@@ -26,6 +27,8 @@ export interface DiagnosticRenderOptions {
   includeGrid?: boolean;
   includeLabels?: boolean;
   scorecards?: LayoutScorecardSet;
+  /** Scoring calibration to render and score with; defaults to the approved surface. */
+  calibration?: ScoringCalibrationSurface;
 }
 
 export interface CrudeLayoutDiagnostic {
@@ -146,6 +149,7 @@ export function renderDiagnosticText(
   facts = computeLayoutFacts(layout, project),
   validation = validateLayout(layout, project),
   scorecards?: LayoutScorecardSet,
+  calibration: ScoringCalibrationSurface = CALIBRATION_SURFACE,
 ): string {
   const footprint = isGridRect(layout.footprint) ? layout.footprint : undefined;
   const lines = [
@@ -161,14 +165,14 @@ export function renderDiagnosticText(
     `Circulation ratio: ${(facts.circulationRatio * 100).toFixed(1)}%`,
     `Reachability: ${facts.reachableRequiredRoomCount}/${facts.requiredRoomCount} required rooms | Dead ends: ${facts.deadEndCount}`,
     `Portals: ${Array.isArray(layout.portals) ? layout.portals.length : 0}`,
-    `Calibration: ${CALIBRATION_SURFACE.version} | diversity threshold ${CALIBRATION_SURFACE.diversity.threshold}`,
+    `Calibration: ${calibration.version} | diversity threshold ${calibration.diversity.threshold}`,
     "Strategy calibration:",
     ...CALIBRATED_STRATEGY_PROFILE_IDS.map((id) => {
-      const profile = CALIBRATION_SURFACE.profiles[id];
+      const profile = calibration.profiles[id];
       const weights = Object.entries(profile.weights)
         .map(([category, weight]) => `${category} ${(weight * 100).toFixed(0)}%`)
         .join(", ");
-      const tradeoff = CALIBRATION_SURFACE.tradeoffs[id];
+      const tradeoff = calibration.tradeoffs[id];
       return `- ${profile.label}: ${weights} | ${tradeoff.message.key}`;
     }),
     "Spaces:",
@@ -203,18 +207,21 @@ export function createCrudeDiagnostic(
   project: NormalizedProject,
   options: DiagnosticRenderOptions = {},
 ): CrudeLayoutDiagnostic {
+  const calibration = options.calibration ?? CALIBRATION_SURFACE;
+  assertCalibrationSurface(calibration);
   const validation = validateLayout(layout, project);
   const facts = computeLayoutFacts(layout, project, validation);
-  const scorecards = options.scorecards ?? scoreLayoutProfiles(layout, project, facts, validation);
+  const scorecards = options.scorecards
+    ?? scoreLayoutProfiles(layout, project, facts, validation, calibration);
   return {
     version: DIAGNOSTIC_VERSION,
     layoutId: layout.id,
     validation,
     facts,
     scorecards,
-    calibration: CALIBRATION_SURFACE,
-    svg: renderDiagnosticSvg(layout, project, { ...options, scorecards }),
-    text: renderDiagnosticText(layout, project, facts, validation, scorecards),
+    calibration,
+    svg: renderDiagnosticSvg(layout, project, { ...options, scorecards, calibration }),
+    text: renderDiagnosticText(layout, project, facts, validation, scorecards, calibration),
   };
 }
 

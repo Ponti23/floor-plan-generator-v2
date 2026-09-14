@@ -37,7 +37,11 @@ import {
   scoreCandidates,
   type ScoredLayoutCandidate,
 } from "./scoring.ts";
-import { CALIBRATION_SURFACE } from "./calibration.ts";
+import {
+  assertCalibrationSurface,
+  CALIBRATION_SURFACE,
+  type ScoringCalibrationSurface,
+} from "./calibration.ts";
 import {
   DEFAULT_DIVERSITY_THRESHOLD,
   DIVERSITY_VERSION,
@@ -92,6 +96,16 @@ export interface PruningStats {
 export interface GenerationOptions {
   seed?: string;
   budget?: Partial<GenerationBudget>;
+  /**
+   * Reviewed or user-edited scoring calibration.
+   *
+   * Soft scoring only: selection weights, metric breakpoints, the diversity
+   * threshold, and `shortlistSize` come from here, while hard validity keeps
+   * coming from the brief and the rule registry.  Build one with
+   * `resolveCalibrationSurface(overrides)` so the approved baseline stays the
+   * default and every edited value is validated before it is used.
+   */
+  calibration?: ScoringCalibrationSurface;
 }
 
 export interface GenerationDiagnostic {
@@ -773,10 +787,18 @@ function stateKey(spaces: readonly PlacedSpace[]): string {
     .join("|");
 }
 
-function frontierLength(candidate: GridRect, spaces: readonly PlacedSpace[], project: NormalizedProject): number {
-  return spaces.reduce((total, space) => {
-    return total + (transitSpace(space, project) ? sharedWallLength(candidate, space.rect) : 0);
-  }, 0);
+function frontierLength(
+  candidate: GridRect,
+  spaces: readonly PlacedSpace[],
+  isTransit: (space: PlacedSpace) => boolean,
+): number {
+  // Accumulated in declaration order, exactly as the previous reduce did, so the
+  // frontier value is bit-identical.
+  let total = 0;
+  for (const space of spaces) {
+    if (isTransit(space)) total += sharedWallLength(candidate, space.rect);
+  }
+  return total;
 }
 
 function candidatePositions(
@@ -1066,6 +1088,30 @@ function searchTopology(
   const roomOrder = orderedRooms(project, skeleton);
   const initialSpaces = [...skeleton.garageSpaces];
   const tieBreak = createTieBreaker(seed);
+  // The skeleton's circulation, garage, and entry spaces never change for this
+  // topology, and the already-placed spaces are fixed within one expansion, so
+  // the combined list is built once per expansion instead of once per candidate
+  // rectangle.  Declaration order is preserved because the frontier sum depends
+  // on it.
+  const skeletonSpaces: PlacedSpace[] = [
+    ...skeleton.garageSpaces,
+    ...skeleton.rectangles.map((candidate, index) =>
+      makeSpace(skeleton.rectangleIds[index], "circulation", candidate)),
+    makeSpace(skeleton.entryId, "entry", skeleton.entry),
+  ];
+  // `transitSpace` scans the project's rooms and ignores the rectangle, so its
+  // answer is fixed for the whole search.  It previously ran for every space on
+  // every candidate rectangle.
+  const transitAnswers = new Map<string, boolean>();
+  const isTransit = (space: PlacedSpace): boolean => {
+    const key = `${space.role}:${space.instanceId}`;
+    let answer = transitAnswers.get(key);
+    if (answer === undefined) {
+      answer = transitSpace(space, project);
+      transitAnswers.set(key, answer);
+    }
+    return answer;
+  };
   const initialKey = stateKey(initialSpaces);
   let beam: SearchState[] = [{
     spaces: initialSpaces,
@@ -1105,25 +1151,42 @@ function searchTopology(
         pruning.minimumAreaPruned += 1;
         continue;
       }
+      // Split the still-free area in proportion to each remaining room's declared
+      // preference instead of equally.  Equal shares ignored preference entirely,
+      // which is how the canonical brief produced 31.5 / 28.8 / 13.5 m2
+      // interchangeable bedrooms: the first two placed rooms absorbed the surplus
+      // the last one never saw.  Proportional allocation makes same-kind rooms
+      // equal by construction and larger rooms larger, while consuming the same
+      // total area — so feasibility and candidate spread are unchanged.
+      const remainingRooms = roomOrder.slice(roomIndex);
+      const remainingPreference = remainingRooms.reduce(
+        (total, candidate) =>
+          total + (candidate.dimensions.preferredAreaUnits2 ?? candidate.dimensions.minAreaUnits2),
+        0,
+      );
+      const roomPreference =
+        room.dimensions.preferredAreaUnits2 ?? room.dimensions.minAreaUnits2;
+      // A preference may not consume area the later rooms still need at their own
+      // minimums; without this ceiling a high-preference room placed early asks
+      // for more than the free rectangle can ever hold and the branch dies after
+      // an expansion.
+      const reservedForLaterRooms = Math.max(
+        0,
+        minimumRemainingArea - room.dimensions.minAreaUnits2,
+      );
       const desiredArea = Math.max(
         room.dimensions.minAreaUnits2,
-        Math.floor(remainingFreeArea / Math.max(1, roomOrder.length - roomIndex)),
+        Math.min(
+          Math.floor((remainingFreeArea * roomPreference) / Math.max(1, remainingPreference)),
+          Math.max(0, remainingFreeArea - reservedForLaterRooms),
+        ),
       );
       const candidates: Array<{ rect: GridRect; frontier: number; score: number; key: string; tieBreak: number }> = [];
+      const contextSpaces = [...skeletonSpaces, ...state.spaces];
       for (const freeRect of free) {
         for (const dimensions of dimensionVariants(room, freeRect.width, freeRect.depth, desiredArea)) {
-          for (const rect of candidatePositions(freeRect, dimensions.width, dimensions.depth, [
-            ...skeleton.garageSpaces,
-            ...skeleton.rectangles.map((candidate, index) => makeSpace(skeleton.rectangleIds[index], "circulation", candidate)),
-            makeSpace(skeleton.entryId, "entry", skeleton.entry),
-            ...state.spaces,
-          ])) {
-            const frontier = frontierLength(rect, [
-              ...skeleton.garageSpaces,
-              ...skeleton.rectangles.map((candidate, index) => makeSpace(skeleton.rectangleIds[index], "circulation", candidate)),
-              makeSpace(skeleton.entryId, "entry", skeleton.entry),
-              ...state.spaces,
-            ], project);
+          for (const rect of candidatePositions(freeRect, dimensions.width, dimensions.depth, contextSpaces)) {
+            const frontier = frontierLength(rect, contextSpaces, isTransit);
             // Every occupiable room must be a destination off circulation (or a
             // pass-through public room).  Refusing a room with no transit
             // frontier here is the constructive counterpart to the independent
@@ -1281,13 +1344,18 @@ export function generateLayouts(
     ? projectSeed(normalized.project, options)
     : typeof options === "string" ? options : options?.seed ?? "";
   const budget = canonicalBudget(typeof options === "object" ? options?.budget : undefined);
+  // Soft scoring policy for this run.  Absent means the approved baseline, so an
+  // unconfigured caller is bit-identical to the reviewed `planlab-calibration-0.1`.
+  const calibration = (typeof options === "object" ? options?.calibration : undefined)
+    ?? CALIBRATION_SURFACE;
+  assertCalibrationSurface(calibration);
   const emptyMetadata = {
     engineVersion: GENERATOR_ENGINE_VERSION,
     ruleVersion: GENERATOR_RULE_VERSION,
     budgetVersion: GENERATOR_BUDGET_VERSION,
     determinismVersion: GENERATOR_DETERMINISM_VERSION,
     scoringVersion: SCORING_VERSION,
-    calibrationVersion: CALIBRATION_SURFACE.version,
+    calibrationVersion: calibration.version,
     seed,
     budget,
     pruning: emptyPruningStats(),
@@ -1400,8 +1468,8 @@ export function generateLayouts(
     diagnostics.push({ code: "NO_VALID_LAYOUT", message: "bounded search found no hard-valid layout" });
   }
   emptyMetadata.expandedStates = expandedStates;
-  const analyses = scoreCandidates(layouts, project);
-  const selection = selectDiverseTriplet(analyses, project);
+  const analyses = scoreCandidates(layouts, project, { calibration });
+  const selection = selectDiverseTriplet(analyses, project, { calibration });
   appendSelectionDiagnostics(diagnostics, selection);
   return {
     ok: layouts.length > 0,

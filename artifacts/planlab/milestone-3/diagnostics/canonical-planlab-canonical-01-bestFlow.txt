@@ -1,11 +1,11 @@
-PlanLab diagnostic layout-L-footprint-48x60-117
+PlanLab diagnostic layout-L-footprint-40x72-151
 Validity: PASS (0 hard findings)
-Footprint: 12.00 × 15.00 (180.00 m²)
+Footprint: 10.00 × 18.00 (180.00 m²)
 Site: 600.00 m² | Buildable: 374.00 m²
-Programmed usable: 124.00 m² | Garage: 36.00 m² | Circulation: 20.00 m²
+Programmed usable: 123.00 m² | Garage: 36.00 m² | Circulation: 21.00 m²
 GFA: 180.00 m² | target Δ 0.00 m² | max Δ -20.00 m²
-Unallocated interior: 0.00 m² (0.0%) | Planning efficiency: 86.1% | Allocation ratio (diagnostic): 100.0%
-Circulation ratio: 11.1%
+Unallocated interior: 0.00 m² (0.0%) | Planning efficiency: 85.4% | Allocation ratio (diagnostic): 100.0%
+Circulation ratio: 11.7%
 Reachability: 8/8 required rooms | Dead ends: 0
 Portals: 13
 Calibration: planlab-calibration-0.1 | diversity threshold 0.2
@@ -14,32 +14,32 @@ Strategy calibration:
 - Best Flow: programSpace 15%, flow 40%, relationships 25%, liveability 15%, servicesSite 5% | strategy.bestFlow.tradeoff
 - Balanced: programSpace 25%, flow 25%, relationships 20%, liveability 20%, servicesSite 10% | strategy.balanced.tradeoff
 Spaces:
-- Garage [room] @ 40,58 6.00 × 6.00 (36.00 m²)
-- circulation-L-1 [circulation] @ 36,22 1.00 × 7.00 (7.00 m²)
-- circulation-L-2 [circulation] @ 36,54 1.00 × 6.00 (6.00 m²)
-- circulation-L-3 [circulation] @ 16,50 6.00 × 1.00 (6.00 m²)
-- entry-L [entry] @ 36,78 1.00 × 1.00 (1.00 m²)
-- Living Room [room] @ 40,22 3.00 × 9.00 (27.00 m²)
-- Bedroom 1 [room] @ 16,22 5.00 × 7.00 (35.00 m²)
-- Bedroom 2 [room] @ 52,22 3.00 × 9.00 (27.00 m²)
-- Bedroom 3 [room] @ 23,54 3.25 × 3.25 (10.56 m²)
-- Kitchen [room] @ 23,67 3.25 × 3.75 (12.19 m²)
-- Bathroom [room] @ 20,54 0.75 × 7.00 (5.25 m²)
-- Laundry [room] @ 16,54 1.00 × 7.00 (7.00 m²)
+- Garage [room] @ 36,64 6.00 × 6.00 (36.00 m²)
+- circulation-L-1 [circulation] @ 32,16 1.00 × 8.50 (8.50 m²)
+- circulation-L-2 [circulation] @ 32,54 1.00 × 7.50 (7.50 m²)
+- circulation-L-3 [circulation] @ 20,50 4.00 × 1.00 (4.00 m²)
+- entry-L [entry] @ 32,84 1.00 × 1.00 (1.00 m²)
+- Living Room [room] @ 36,16 6.00 × 6.00 (36.00 m²)
+- Kitchen [room] @ 36,40 6.00 × 3.00 (18.00 m²)
+- Bedroom 1 [room] @ 20,27 3.00 × 5.75 (17.25 m²)
+- Bedroom 2 [room] @ 36,52 6.00 × 3.00 (18.00 m²)
+- Bedroom 3 [room] @ 20,54 3.00 × 3.50 (10.50 m²)
+- Bathroom [room] @ 20,68 3.00 × 5.00 (15.00 m²)
+- Laundry [room] @ 20,16 3.00 × 2.75 (8.25 m²)
 Score model: planlab-scoring-0.6
 Scores:
-- Compact Efficiency: 82/100 | programSpace 88, flow 80, relationships 57, liveability 92, servicesSite 85
+- Compact Efficiency: 79/100 | programSpace 87, flow 79, relationships 68, liveability 98, servicesSite 55
   + validation.hard.pass [validation:hard]
   + programSpace.targetFootprint.strong [footprint:targetGfa]
   + programSpace.unallocatedInterior.strong [footprint:unallocated]
-  + flow.circulationRatio.strong [circulation:area]
-- Best Flow: 77/100 | programSpace 88, flow 80, relationships 57, liveability 92, servicesSite 85
+  + programSpace.preferredArea.strong [room:living-1:area, room:kitchen-1:area, room:bedroom-1:area, room:bedroom-2:area, room:bedroom-3:area, room:bathroom-1:area, room:laundry-1:area]
+- Best Flow: 79/100 | programSpace 87, flow 79, relationships 68, liveability 98, servicesSite 55
   + validation.hard.pass [validation:hard]
   + programSpace.targetFootprint.strong [footprint:targetGfa]
   + programSpace.unallocatedInterior.strong [footprint:unallocated]
-  + flow.circulationRatio.strong [circulation:area]
-- Balanced: 80/100 | programSpace 88, flow 80, relationships 57, liveability 92, servicesSite 85
+  + programSpace.preferredArea.strong [room:living-1:area, room:kitchen-1:area, room:bedroom-1:area, room:bedroom-2:area, room:bedroom-3:area, room:bathroom-1:area, room:laundry-1:area]
+- Balanced: 80/100 | programSpace 87, flow 79, relationships 68, liveability 98, servicesSite 55
   + validation.hard.pass [validation:hard]
   + programSpace.targetFootprint.strong [footprint:targetGfa]
   + programSpace.unallocatedInterior.strong [footprint:unallocated]
-  + flow.circulationRatio.strong [circulation:area]
+  + programSpace.preferredArea.strong [room:living-1:area, room:kitchen-1:area, room:bedroom-1:area, room:bedroom-2:area, room:bedroom-3:area, room:bathroom-1:area, room:laundry-1:area]

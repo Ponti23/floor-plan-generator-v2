@@ -143,7 +143,10 @@ function validFixture(): { layout: Layout; project: NormalizedProject } {
     seed: "registry-valid",
     budget: {
       beamWidth: 8,
-      maxExpansionsPerTopology: 400,
+      // The room-shape policy makes a valid tiling take more search before the
+      // first candidate appears (400 expansions now finds none, 800 finds two).
+      // This fixture only needs one valid layout to exercise the rule registry.
+      maxExpansionsPerTopology: 1_200,
       maxCandidatesPerTopology: 2,
       maxTotalCandidates: 6,
     },

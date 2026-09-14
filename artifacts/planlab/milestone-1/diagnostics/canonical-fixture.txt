@@ -1,7 +1,7 @@
 PlanLab project inspection planlab-project-inspection-1
 Project: canonical-planlab-project (PlanLab canonical prototype)
 Schema: v1 | Seed: canonical-0
-Fingerprint: sha256:4a407630cec11dc3aeb4f376e1e4038426742f7f07760efdd3aa29a6c06a1386
+Fingerprint: sha256:8efe5b5efdca0659dd1ae44e7e48672824e7fae49c97d341ea69adf287621a27
 
 Discretization (grid 250 mm)
 Project: canonical-planlab-project
@@ -15,13 +15,13 @@ Findings: EXACT_GRID_FIT
 - EXACT_GRID_FIT (info): authored site and envelope land exactly on the 250 mm grid; no authored millimetres are lost
 
 Program: 8 room instances
-- bedroom-1: bedroom "Bedroom 1" [required] | min area 10.00 m² (160 units²) | min short side 3.00 m | zone private, wet no, exterior high, pass-through not allowed
-- bedroom-2: bedroom "Bedroom 2" [required] | min area 10.00 m² (160 units²) | min short side 3.00 m | zone private, wet no, exterior high, pass-through not allowed
-- bedroom-3: bedroom "Bedroom 3" [required] | min area 10.00 m² (160 units²) | min short side 3.00 m | zone private, wet no, exterior high, pass-through not allowed
-- bathroom-1: bathroom "Bathroom" [required] | min area 5.00 m² (80 units²) | zone service, wet yes, exterior low, pass-through not allowed
-- kitchen-1: kitchen "Kitchen" [required] | min area 12.00 m² (192 units²) | zone public, wet yes, exterior medium, pass-through allowed
-- living-1: living "Living Room" [required] | min area 20.00 m² (320 units²) | zone public, wet no, exterior high, pass-through allowed
-- laundry-1: laundry "Laundry" [required] | min area 5.00 m² (80 units²) | zone service, wet yes, exterior low, pass-through not allowed
+- bedroom-1: bedroom "Bedroom 1" [required] | min area 10.00 m² (160 units²) | preferred area 16.00 m² (256 units²) | min short side 3.00 m | max aspect ratio 2 | zone private, wet no, exterior high, pass-through not allowed
+- bedroom-2: bedroom "Bedroom 2" [required] | min area 10.00 m² (160 units²) | preferred area 16.00 m² (256 units²) | min short side 3.00 m | max aspect ratio 2 | zone private, wet no, exterior high, pass-through not allowed
+- bedroom-3: bedroom "Bedroom 3" [required] | min area 10.00 m² (160 units²) | preferred area 16.00 m² (256 units²) | min short side 3.00 m | max aspect ratio 2 | zone private, wet no, exterior high, pass-through not allowed
+- bathroom-1: bathroom "Bathroom" [required] | min area 5.00 m² (80 units²) | preferred area 10.00 m² (160 units²) | min short side 1.50 m | max aspect ratio 2 | zone service, wet yes, exterior low, pass-through not allowed
+- kitchen-1: kitchen "Kitchen" [required] | min area 12.00 m² (192 units²) | preferred area 24.00 m² (384 units²) | min short side 3.00 m | max aspect ratio 2 | zone public, wet yes, exterior medium, pass-through allowed
+- living-1: living "Living Room" [required] | min area 20.00 m² (320 units²) | preferred area 34.00 m² (544 units²) | min short side 3.00 m | max aspect ratio 2 | zone public, wet no, exterior high, pass-through allowed
+- laundry-1: laundry "Laundry" [required] | min area 5.00 m² (80 units²) | preferred area 8.00 m² (128 units²) | min short side 1.50 m | max aspect ratio 2 | zone service, wet yes, exterior low, pass-through not allowed
 - garage-1: garage "Garage" [required] | min area 36.00 m² (576 units²) | min width 6.00 m | min depth 6.00 m | zone service, wet no, exterior none, pass-through not allowed, frontage south vehicle, 2 vehicle spaces
 
 Relationships: 2

@@ -32,6 +32,7 @@ import {
   generateLayouts,
   normalizeProject,
   serializeCanonical,
+  serializeGenerationResult,
   validateLayout,
 } from "../src/domain/index.ts";
 
@@ -165,7 +166,12 @@ function expansionSummary(result) {
 }
 
 function resultHashes(result, { includeOutput = true } = {}) {
-  const outputBytes = includeOutput ? serializeCanonical(result) : null;
+  // D4: the derived geometry indexes are deliberately *not* part of the
+  // serialized result.  They are a pure function of the layout and the brief, and
+  // they were 99.6% of the bytes (325.7 MB of a 325.7 MB canonical result), which
+  // made the regression hash dominated by recomputable data.  Hash the semantic
+  // payload instead; `evidenceHash` below still detects a derived-schema change.
+  const outputBytes = includeOutput ? serializeGenerationResult(result) : null;
   const layoutBytes = serializeCanonical(result.layouts);
   const selectionBytes = serializeCanonical({
     status: result.selection.status,

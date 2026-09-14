@@ -15,6 +15,7 @@ export * from "./scoring.ts";
 export * from "./diversity.ts";
 export * from "./diagnostics.ts";
 export * from "./serialization.ts";
+export * from "./resultPayload.ts";
 export * from "./inspection.ts";
 export * from "./generator.ts";
 export * from "./pruning.ts";

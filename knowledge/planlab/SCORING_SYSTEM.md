@@ -107,3 +107,44 @@ The UI formats this record; it does not hardcode the finding. Observations must 
 - Mark the score model version.
 - Use qualitative comparison when two overall scores round to the same value.
 - Avoid adjectives such as compliant, optimal, accessible, or buildable unless their limited PlanLab meaning is explicit.
+
+## Changing the calibration later (approved 2026-09-14, gate decisions D2 and D3)
+
+The Stage 3 gate approved `planlab-calibration-0.1` **as the default**, and approved the
+scoring language being *settable later* without a source change. That seam is
+`resolveCalibrationSurface(overrides)` in `src/domain/calibration.ts`.
+
+```ts
+import { generateLayouts, resolveCalibrationSurface } from "./src/domain/index.ts";
+
+// Keep the approved baseline, then adjust only what an editor changed.
+const calibration = resolveCalibrationSurface({
+  profiles: { bestFlow: { weights: { flow: 0.45, relationships: 0.20 } } },
+  metricConfig: { targetCirculationRatio: 0.18 },
+  diversity: { threshold: 0.25, shortlistSize: 32 },
+});
+
+const result = generateLayouts(brief, { seed, calibration });
+```
+
+Rules this surface keeps:
+
+- **Defaults are the approved values.** A caller that passes nothing is bit-identical to the
+  reviewed `planlab-calibration-0.1`; `resolveCalibrationSurface()` returns that frozen surface
+  itself rather than a copy.
+- **A derived surface never claims the approved version.** Omitting `version` labels the result
+  `${base.version}+custom`, so a run's provenance is never misreported.
+- **Edits are validated before use.** The same validator that guards the built-in data
+  (`calibrationIssues` / `assertCalibrationSurface`) rejects a bad weight, threshold, or
+  `shortlistSize` with a `RangeError` at the editor, instead of producing quietly wrong scores.
+- **Explanations follow the weights.** `StrategyTradeoffDescriptor.message.values` copies
+  `focusWeight` / `tradeoffWeight` so a UI can explain a profile without recomputing; the resolver
+  re-derives those copies so an edited profile is never described by stale numbers.
+- **Hard validity is out of reach.** Soft calibration never decides a hard verdict. A hostile
+  calibration can change ranking and selection while every candidate keeps its verdict and its
+  violation set (`test/calibration-overrides.test.ts` pins both directions).
+
+Deliberately unchanged at this gate (D3): `shortlistSize` stays 24 and the metric breakpoints stay
+as recorded. Both are now reachable through the override surface, so tuning them is a data change
+rather than a code change — but every such change moves selected triplets, so it belongs to a
+future calibration decision rather than happening silently.

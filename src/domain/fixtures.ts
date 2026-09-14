@@ -7,9 +7,23 @@ import {
   CANONICAL_SITE_WIDTH_MM,
   GARAGE_MIN_DEPTH_MM,
   GARAGE_MIN_WIDTH_MM,
+  ROOM_SHAPE_POLICY,
 } from "./constants.ts";
 import { normalizeProject } from "./normalization.ts";
 import type { Offset, ProjectBrief, RoomRequirement, SiteBrief } from "./model.ts";
+
+/**
+ * Expand the approved room-shape policy into authored millimetre constraints.
+ * The values stay ordinary brief data so a future brief editor owns them.
+ */
+const shape = (kind: keyof typeof ROOM_SHAPE_POLICY) => {
+  const policy = ROOM_SHAPE_POLICY[kind];
+  return {
+    minShortSideMm: policy.minShortSideM * 1_000,
+    preferredAreaMm2: policy.preferredAreaM2 * 1_000_000,
+    maxAspectRatio: policy.maxAspectRatio,
+  };
+};
 
 const offset = (distanceMm: number, source: Offset["source"] = "architect"): Offset => ({
   distanceMm,
@@ -38,7 +52,7 @@ const canonicalProgram = (): RoomRequirement[] => [
     label: "Bedroom",
     kind: "bedroom",
     quantity: 3,
-    dimensions: { minAreaMm2: 10_000_000, minShortSideMm: 3_000 },
+    dimensions: { minAreaMm2: 10_000_000, ...shape("bedroom") },
     traits: {
       zone: "private",
       wet: false,
@@ -51,7 +65,7 @@ const canonicalProgram = (): RoomRequirement[] => [
     label: "Bathroom",
     kind: "bathroom",
     quantity: 1,
-    dimensions: { minAreaMm2: 5_000_000 },
+    dimensions: { minAreaMm2: 5_000_000, ...shape("bathroom") },
     traits: {
       zone: "service",
       wet: true,
@@ -64,7 +78,7 @@ const canonicalProgram = (): RoomRequirement[] => [
     label: "Kitchen",
     kind: "kitchen",
     quantity: 1,
-    dimensions: { minAreaMm2: 12_000_000 },
+    dimensions: { minAreaMm2: 12_000_000, ...shape("kitchen") },
     traits: {
       zone: "public",
       wet: true,
@@ -77,7 +91,7 @@ const canonicalProgram = (): RoomRequirement[] => [
     label: "Living Room",
     kind: "living",
     quantity: 1,
-    dimensions: { minAreaMm2: 20_000_000 },
+    dimensions: { minAreaMm2: 20_000_000, ...shape("living") },
     traits: {
       zone: "public",
       wet: false,
@@ -90,7 +104,7 @@ const canonicalProgram = (): RoomRequirement[] => [
     label: "Laundry",
     kind: "laundry",
     quantity: 1,
-    dimensions: { minAreaMm2: 5_000_000 },
+    dimensions: { minAreaMm2: 5_000_000, ...shape("laundry") },
     traits: {
       zone: "service",
       wet: true,

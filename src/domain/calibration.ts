@@ -407,5 +407,154 @@ export function assertCalibrationSurface(
   if (issues.length > 0) throw new RangeError(`invalid scoring calibration: ${issues.join("; ")}`);
 }
 
+/**
+ * Partial, user-authored overrides for the approved scoring calibration.
+ *
+ * This is the "set it later" seam requested at the Stage 3 gate.  An editor —
+ * a brief panel, a project document, or a saved calibration record — can change
+ * category weights, metric breakpoints, the diversity threshold, or
+ * `shortlistSize` without touching source.  The approved `planlab-calibration-0.1`
+ * values stay the defaults, so a profile that is never overridden is bit-identical
+ * to the reviewed surface.
+ *
+ * Overrides only ever reach soft scoring.  Hard validation is sourced from the
+ * brief and the rule registry, never from here, so no calibration edit can make
+ * an invalid layout valid or the reverse.
+ */
+export interface CalibrationOverrides {
+  /**
+   * Explicit version tag.  Omitted means the resolved surface is labelled
+   * `${base.version}+custom`, so a derived calibration never claims to be the
+   * approved baseline it was derived from.
+   */
+  version?: string;
+  /** Metric breakpoints; any omitted key keeps its approved value. */
+  metricConfig?: Partial<MetricConfig>;
+  /** Category weights and labels per strategy; omitted categories keep theirs. */
+  profiles?: Partial<Record<CalibratedStrategyProfileId, {
+    label?: StrategyProfileLabel;
+    weights?: Partial<Record<MetricCategory, number>>;
+  }>>;
+  /** Diversity threshold, component weights, bonus, and `shortlistSize`. */
+  diversity?: Partial<DiversityCalibration>;
+  /** Explanation retention limit. */
+  explanations?: Partial<ExplanationCalibration>;
+}
+
+function isMetricCategory(value: unknown): value is MetricCategory {
+  return typeof value === "string" && METRIC_CATEGORIES.includes(value as MetricCategory);
+}
+
+/**
+ * Re-derive the semantic trade-off weights from the merged profile weights.
+ *
+ * `StrategyTradeoffDescriptor.message.values` carries copied numbers so a
+ * presentation layer can explain a profile without recomputing anything.  If a
+ * caller overrides a weight, those copies would silently describe the old
+ * surface; rebuilding them here keeps the explanation honest.
+ */
+function resolveTradeoff(
+  base: StrategyTradeoffDescriptor,
+  weights: Readonly<Record<MetricCategory, number>>,
+): StrategyTradeoffDescriptor {
+  const baseValues = base.message.values;
+  // `focusCategory` may name more than one category ("programSpace|flow"); the
+  // declared weight always refers to the first one listed.
+  const focusCategory = typeof baseValues.focusCategory === "string"
+    ? baseValues.focusCategory.split("|")[0]
+    : undefined;
+  const tradedCategory = baseValues.tradeoffCategory;
+  return Object.freeze({
+    profileId: base.profileId,
+    message: Object.freeze({
+      key: base.message.key,
+      values: Object.freeze({
+        ...baseValues,
+        ...(isMetricCategory(focusCategory) ? { focusWeight: weights[focusCategory] } : {}),
+        ...(isMetricCategory(tradedCategory) ? { tradeoffWeight: weights[tradedCategory] } : {}),
+      }),
+    }),
+    focusCategories: base.focusCategories,
+    tradeoffCategories: base.tradeoffCategories,
+  });
+}
+
+/**
+ * Merge partial overrides onto a reviewed calibration surface and return a
+ * frozen, validated result.
+ *
+ * Throws a `RangeError` before an unsafe surface can reach scoring — the same
+ * validator that guards the built-in data guards user edits, so a bad number is
+ * rejected at the editor rather than producing quietly wrong scores.
+ */
+export function resolveCalibrationSurface(
+  overrides: CalibrationOverrides = {},
+  base: ScoringCalibrationSurface = CALIBRATION_SURFACE,
+): ScoringCalibrationSurface {
+  assertCalibrationSurface(base);
+  // Nothing to merge: hand back the reviewed surface itself so an unconfigured
+  // caller keeps the exact approved version tag instead of a "+custom" copy.
+  if (Object.keys(overrides).length === 0) return base;
+
+  const metricConfig = Object.freeze({
+    ...base.metricConfig,
+    ...(overrides.metricConfig ?? {}),
+  }) as MetricConfig;
+
+  const profiles = Object.freeze(Object.fromEntries(
+    CALIBRATED_STRATEGY_PROFILE_IDS.map((id) => {
+      const baseProfile = base.profiles[id];
+      const override = overrides.profiles?.[id];
+      return [id, Object.freeze({
+        id,
+        label: override?.label ?? baseProfile.label,
+        weights: Object.freeze({
+          ...baseProfile.weights,
+          ...(override?.weights ?? {}),
+        }),
+      })];
+    }),
+  ) as Record<CalibratedStrategyProfileId, StrategyProfileCalibration>);
+
+  const tradeoffs = Object.freeze(Object.fromEntries(
+    CALIBRATED_STRATEGY_PROFILE_IDS.map((id) => [
+      id,
+      resolveTradeoff(base.tradeoffs[id], profiles[id].weights),
+    ]),
+  ) as Record<CalibratedStrategyProfileId, StrategyTradeoffDescriptor>);
+
+  // `adjacencyThresholdUnits` is documented as the meaningful shared-wall cutoff
+  // and defaults to the metric breakpoint.  Follow an overridden breakpoint unless
+  // the caller also overrode the cutoff explicitly.
+  const adjacencyFollowsMetric =
+    overrides.diversity?.adjacencyThresholdUnits === undefined &&
+    overrides.metricConfig?.defaultAdjacencyTargetUnits !== undefined;
+
+  const diversity = Object.freeze({
+    ...base.diversity,
+    ...(overrides.diversity ?? {}),
+    ...(adjacencyFollowsMetric
+      ? { adjacencyThresholdUnits: metricConfig.defaultAdjacencyTargetUnits }
+      : {}),
+  });
+
+  const explanations = Object.freeze({
+    ...base.explanations,
+    ...(overrides.explanations ?? {}),
+  });
+
+  const resolved: ScoringCalibrationSurface = Object.freeze({
+    version: overrides.version ?? `${base.version}+custom`,
+    metricConfig,
+    profiles,
+    tradeoffs,
+    diversity,
+    explanations,
+  });
+
+  assertCalibrationSurface(resolved);
+  return resolved;
+}
+
 // Fail fast if a future edit makes the built-in data internally inconsistent.
 assertCalibrationSurface(CALIBRATION_SURFACE);

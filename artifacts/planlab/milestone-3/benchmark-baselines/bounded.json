@@ -22,7 +22,7 @@
     "planlab-canonical-01",
     "planlab-canonical-02"
   ],
-  "benchmarkInputFingerprint": "3a8854bbf1223b8cb48a1559c31ddd40958170a8f6a8cd5a82b2bc2e6283a99f",
+  "benchmarkInputFingerprint": "f85df394b8572f58e306965e221ae5997fecc52467919329367a78862da4cc2f",
   "historicalStage0Baseline": {
     "commit": "e1c6f38",
     "artifact": "artifacts/planlab/milestone-0/benchmark.json",
@@ -44,10 +44,10 @@
   "canonical": [
     {
       "seed": "planlab-canonical-01",
-      "outputHash": "1ea3931c2c0d1fedf18449347c968720002464b20b4d5949999fe944f058ac4f",
-      "layoutHash": "5df0407527fab01d9da14c444f6f69c0a5609e7389ff1b5eaad927a886804c4d",
-      "selectionHash": "5ca45e8d6463a8499f3f99818dc4369ff9f1c69b0bfc205af2a9a6346f227dad",
-      "evidenceHash": "b44ad1795d7eaef8e3a8260921e0752319281a62bf34cba85ae0269b053d9e52",
+      "outputHash": "9a5bf7e368ffacd4b2fcabe971e205826c56c1a192a03ff588007aa003f8b49c",
+      "layoutHash": "0df06e8639bcd012ac898040c0955ae48080304885749827135aba278032ff30",
+      "selectionHash": "a852c294ce2573af69bb6ac964d5a37c8907d083ff24071d0f909b87af211ca5",
+      "evidenceHash": "9f77745558598cb675f49644534334a739f26ca0ff6b2577fcbdd7003fe766c0",
       "factsVersions": [
         "planlab-metrics-0.6"
       ],
@@ -60,33 +60,33 @@
       "selectionComplete": true,
       "selectionReason": null,
       "diversityThreshold": 0.2,
-      "minimumSelectedPairwiseDistanceRaw": 0.3203629583969335,
+      "minimumSelectedPairwiseDistanceRaw": 0.25581025483372893,
       "selectedPairwiseDistances": [
         {
-          "a": "layout-L-footprint-48x60-171",
-          "b": "layout-L-footprint-48x60-117",
-          "distance": 0.320363,
+          "a": "layout-straight-footprint-40x72-0",
+          "b": "layout-L-footprint-40x72-151",
+          "distance": 0.450706,
           "diverse": true
         },
         {
-          "a": "layout-L-footprint-48x60-171",
-          "b": "layout-straight-footprint-40x72-26",
-          "distance": 0.537394,
+          "a": "layout-straight-footprint-40x72-0",
+          "b": "layout-straight-footprint-40x72-20",
+          "distance": 0.286365,
           "diverse": true
         },
         {
-          "a": "layout-L-footprint-48x60-117",
-          "b": "layout-straight-footprint-40x72-26",
-          "distance": 0.546635,
+          "a": "layout-L-footprint-40x72-151",
+          "b": "layout-straight-footprint-40x72-20",
+          "distance": 0.25581,
           "diverse": true
         }
       ],
       "expansions": {
-        "total": 6779,
+        "total": 15456,
         "perTopology": {
-          "straight": 4175,
-          "L": 1285,
-          "T": 1319
+          "straight": 4746,
+          "L": 5193,
+          "T": 5517
         },
         "validCandidatesPerTopology": {
           "straight": 100,
@@ -94,20 +94,20 @@
           "T": 100
         },
         "pruning": {
-          "minimumAreaChecks": 6779,
-          "minimumAreaPruned": 2062,
-          "frontierChecks": 117296,
-          "frontierPruned": 48317
+          "minimumAreaChecks": 15456,
+          "minimumAreaPruned": 3205,
+          "frontierChecks": 293105,
+          "frontierPruned": 89214
         }
       },
       "diagnostics": []
     },
     {
       "seed": "planlab-canonical-02",
-      "outputHash": "49d57cc9819812c0eacaeb7f0975bd96f79d10249096474f4545e62f0b138073",
-      "layoutHash": "1b33c8eaaeafadfbcdca1c624158ae845aee30b06830c0d05792248a61129e62",
-      "selectionHash": "3eb29503e79896a7abea521200c812a32ec82c63f0d32eb8ce682c6b655dcd4d",
-      "evidenceHash": "b44ad1795d7eaef8e3a8260921e0752319281a62bf34cba85ae0269b053d9e52",
+      "outputHash": "d0fc97a52f7cebc249b1a4b62af2fd290872372488b3d86c4a4998bc77f6831f",
+      "layoutHash": "aaecabc4e9b5e1305744eab13098a403774bc7e5cc53bb92d51eabc17566f13a",
+      "selectionHash": "f24e18025db4de01819a42ce43d333e8429c5ada2fc15bd1afb8ba33c59e8f62",
+      "evidenceHash": "9f77745558598cb675f49644534334a739f26ca0ff6b2577fcbdd7003fe766c0",
       "factsVersions": [
         "planlab-metrics-0.6"
       ],
@@ -120,33 +120,33 @@
       "selectionComplete": true,
       "selectionReason": null,
       "diversityThreshold": 0.2,
-      "minimumSelectedPairwiseDistanceRaw": 0.40147644210767947,
+      "minimumSelectedPairwiseDistanceRaw": 0.3119236098121419,
       "selectedPairwiseDistances": [
         {
-          "a": "layout-L-footprint-48x60-173",
-          "b": "layout-straight-footprint-40x72-28",
-          "distance": 0.593967,
+          "a": "layout-straight-footprint-40x72-34",
+          "b": "layout-L-footprint-40x72-152",
+          "distance": 0.4511,
           "diverse": true
         },
         {
-          "a": "layout-L-footprint-48x60-173",
-          "b": "layout-straight-footprint-40x72-26",
-          "distance": 0.517149,
+          "a": "layout-straight-footprint-40x72-34",
+          "b": "layout-straight-footprint-40x72-33",
+          "distance": 0.311924,
           "diverse": true
         },
         {
-          "a": "layout-straight-footprint-40x72-28",
-          "b": "layout-straight-footprint-40x72-26",
-          "distance": 0.401476,
+          "a": "layout-L-footprint-40x72-152",
+          "b": "layout-straight-footprint-40x72-33",
+          "distance": 0.318867,
           "diverse": true
         }
       ],
       "expansions": {
-        "total": 7108,
+        "total": 15481,
         "perTopology": {
-          "straight": 4504,
-          "L": 1285,
-          "T": 1319
+          "straight": 4755,
+          "L": 5193,
+          "T": 5533
         },
         "validCandidatesPerTopology": {
           "straight": 100,
@@ -154,10 +154,10 @@
           "T": 100
         },
         "pruning": {
-          "minimumAreaChecks": 7108,
-          "minimumAreaPruned": 2206,
-          "frontierChecks": 117556,
-          "frontierPruned": 48416
+          "minimumAreaChecks": 15481,
+          "minimumAreaPruned": 3175,
+          "frontierChecks": 294808,
+          "frontierPruned": 90244
         }
       },
       "diagnostics": []

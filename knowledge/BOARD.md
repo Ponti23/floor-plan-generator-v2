@@ -26,7 +26,11 @@ Active design: [`planlab/README.md`](./planlab/README.md) · staged plan: [`../D
 | 3.3 | Interchangeable matching, diversity, joint selection | luna-max | luna-max | done | `main` (`e8d4b45`) |
 | 3.4 | Determinism, pruning oracle, regression benchmark | luna-max | luna-max | done | `main` (`99e1904`) |
 | 3.5 | Independent Milestone 3 review | terra-max | orchestrator (`/root`) | done | `main` (`d7f82b9`) |
-| 3.6 | Stage 3 architect usefulness + scoring-language review **(HARD GATE)** | astra-plan | user | needs-human | `main` (`cf31d93`) |
+| 3.6 | Stage 3 architect usefulness + scoring-language review **(HARD GATE)** | astra-plan | user | done | `main` (D1–D4 answered 2026-09-14) |
+| 3.7 | D1 room-shape policy and preferred-area allocation | terra-max | orchestrator (`/root`) | done | `main` (uncommitted at time of writing) |
+| 3.8 | D2/D3 settable calibration surface | terra-max | orchestrator (`/root`) | done | `main` (uncommitted) |
+| 3.9 | D4 generation-result payload projection | terra-max | orchestrator (`/root`) | done | `main` (uncommitted) |
+| 4.1 | Milestone 4 UI shell (worker + three-pane app) | terra-max | orchestrator (`/root`) | todo | — |
 
 ## Handoff rules
 
@@ -54,3 +58,11 @@ Active design: [`planlab/README.md`](./planlab/README.md) · staged plan: [`../D
   `artifacts/planlab/milestone-3/gate-brief.md` (D1 usefulness, D2 scoring language, D3 tuning,
   D4 Stage 0 evidence shape, D5 push). It stays `needs-human` until the user answers; no executor
   may claim or close it.
+- Bucket 3.6 is **answered**: the user directed a D1 change rather than an approval, and asked for
+  the engineering-shaped decisions to be done rather than returned as questions. Record:
+  `artifacts/planlab/milestone-3/gate-amendment-d1-d4.md`. D5 (push) is still unanswered.
+- Buckets 3.7–3.9 carry that work. The room-shape values, the calibration overrides and the payload
+  projection are all **data or seam changes with the approved defaults preserved**, so the approved
+  scoring language is still the default rather than a replaced one.
+- Milestone 4 is unblocked once D5 is answered. 4.1 was dispatched to a sub-agent and that agent
+  stalled without writing a file; the bucket is back in the queue for the orchestrator.

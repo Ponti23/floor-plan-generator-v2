@@ -1,4 +1,4 @@
-PlanLab diagnostic layout-straight-footprint-40x72-26
+PlanLab diagnostic layout-straight-footprint-40x72-20
 Validity: PASS (0 hard findings)
 Footprint: 10.00 × 18.00 (180.00 m²)
 Site: 600.00 m² | Buildable: 374.00 m²
@@ -17,27 +17,27 @@ Spaces:
 - Garage [room] @ 36,64 6.00 × 6.00 (36.00 m²)
 - circulation-straight-1 [circulation] @ 32,16 1.00 × 17.00 (17.00 m²)
 - entry-straight [entry] @ 32,84 1.00 × 1.00 (1.00 m²)
-- Living Room [room] @ 36,16 3.00 × 12.00 (36.00 m²)
-- Bedroom 1 [room] @ 20,16 3.00 × 5.00 (15.00 m²)
-- Bedroom 2 [room] @ 20,36 3.00 × 13.00 (39.00 m²)
-- Bedroom 3 [room] @ 48,16 3.00 × 3.50 (10.50 m²)
-- Kitchen [room] @ 48,30 1.50 × 8.50 (12.75 m²)
-- Bathroom [room] @ 54,30 1.50 × 3.50 (5.25 m²)
-- Laundry [room] @ 54,44 1.50 × 5.00 (7.50 m²)
+- Living Room [room] @ 36,16 6.00 × 6.00 (36.00 m²)
+- Kitchen [room] @ 36,40 6.00 × 3.00 (18.00 m²)
+- Bedroom 1 [room] @ 36,52 6.00 × 3.00 (18.00 m²)
+- Bedroom 2 [room] @ 20,16 3.00 × 6.00 (18.00 m²)
+- Bedroom 3 [room] @ 20,64 3.00 × 6.00 (18.00 m²)
+- Bathroom [room] @ 20,40 3.00 × 3.75 (11.25 m²)
+- Laundry [room] @ 20,55 3.00 × 2.25 (6.75 m²)
 Score model: planlab-scoring-0.6
 Scores:
-- Compact Efficiency: 81/100 | programSpace 85, flow 77, relationships 58, liveability 95, servicesSite 90
+- Compact Efficiency: 82/100 | programSpace 86, flow 78, relationships 69, liveability 99, servicesSite 78
   + validation.hard.pass [validation:hard]
   + programSpace.targetFootprint.strong [footprint:targetGfa]
   + programSpace.unallocatedInterior.strong [footprint:unallocated]
-  − programSpace.proportion.weak [room:garage-1:aspect, room:living-1:aspect, room:bedroom-1:aspect, room:bedroom-2:aspect, room:bedroom-3:aspect, room:kitchen-1:aspect, room:bathroom-1:aspect, room:laundry-1:aspect]
-- Best Flow: 77/100 | programSpace 85, flow 77, relationships 58, liveability 95, servicesSite 90
+  + programSpace.preferredArea.strong [room:living-1:area, room:kitchen-1:area, room:bedroom-1:area, room:bedroom-2:area, room:bedroom-3:area, room:bathroom-1:area, room:laundry-1:area]
+- Best Flow: 80/100 | programSpace 86, flow 78, relationships 69, liveability 99, servicesSite 78
   + validation.hard.pass [validation:hard]
   + programSpace.targetFootprint.strong [footprint:targetGfa]
   + programSpace.unallocatedInterior.strong [footprint:unallocated]
-  − programSpace.proportion.weak [room:garage-1:aspect, room:living-1:aspect, room:bedroom-1:aspect, room:bedroom-2:aspect, room:bedroom-3:aspect, room:kitchen-1:aspect, room:bathroom-1:aspect, room:laundry-1:aspect]
-- Balanced: 80/100 | programSpace 85, flow 77, relationships 58, liveability 95, servicesSite 90
+  + programSpace.preferredArea.strong [room:living-1:area, room:kitchen-1:area, room:bedroom-1:area, room:bedroom-2:area, room:bedroom-3:area, room:bathroom-1:area, room:laundry-1:area]
+- Balanced: 83/100 | programSpace 86, flow 78, relationships 69, liveability 99, servicesSite 78
   + validation.hard.pass [validation:hard]
   + programSpace.targetFootprint.strong [footprint:targetGfa]
   + programSpace.unallocatedInterior.strong [footprint:unallocated]
-  − programSpace.proportion.weak [room:garage-1:aspect, room:living-1:aspect, room:bedroom-1:aspect, room:bedroom-2:aspect, room:bedroom-3:aspect, room:kitchen-1:aspect, room:bathroom-1:aspect, room:laundry-1:aspect]
+  + programSpace.preferredArea.strong [room:living-1:area, room:kitchen-1:area, room:bedroom-1:area, room:bedroom-2:area, room:bedroom-3:area, room:bathroom-1:area, room:laundry-1:area]

@@ -29,7 +29,7 @@ import {
 
 /** Fingerprint of the approved canonical fixture; a drift guard for the recorded baseline. */
 const CANONICAL_PROJECT_FINGERPRINT =
-  "sha256:4a407630cec11dc3aeb4f376e1e4038426742f7f07760efdd3aa29a6c06a1386";
+  "sha256:8efe5b5efdca0659dd1ae44e7e48672824e7fae49c97d341ea69adf287621a27";
 
 const GENERATION_OPTIONS = Object.freeze({
   budget: { maxCandidatesPerTopology: 3, maxTotalCandidates: 9 },

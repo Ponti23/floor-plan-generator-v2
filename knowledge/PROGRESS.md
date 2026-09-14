@@ -7,36 +7,44 @@ tags: [progress, resume]
 
 ## Resume here
 
-- **Checkpoint date:** 2026-09-14 (later the same day as the Stage 2 checkpoint).
-- **Current focus:** Stage 3 (generator, metrics, scoring, and diversity) is **complete**. Buckets
-  3.1–3.4 landed on `main` (`6089c48`, `c5bff25`, `e301ed4` + `e8d4b45`, `99e1904`) and the 3.5
-  review closed the one blocking finding: the recorded median-runtime gate failure (3,036 ms vs
-  <2,000 ms) came from joint triplet selection recomputing `compareLayoutDiversity` for every one of
-  the ~41,000 assignment pairs instead of the ~2,556 distinct pairs. An identity-keyed symmetric
-  memo in `src/domain/diversity.ts` fixes it with byte-identical results; the full gate is now
-  **PASS** at median **904 ms** / p95 **1,153 ms**. Review also added the missing selection test
-  teeth (brute-force triplet oracle + distance-consistency oracle, mutation-verified) and corrected
-  a comment that overstated the tiny-grid oracle's scope. Evidence:
-  `artifacts/planlab/milestone-3/validation-review.md`.
+- **Checkpoint date:** 2026-09-14 (later the same day as the Stage 3 review).
+- **Current focus:** the Stage 3 hard gate is **answered**. The user did not approve the usefulness
+  claim; they directed a fix (D1), approved the scoring language as the default while requiring it to
+  stay settable (D2/D3), and asked for the engineering-shaped decisions to be done rather than
+  returned as questions (D4). All of that is implemented and green. Full record:
+  `artifacts/planlab/milestone-3/gate-amendment-d1-d4.md`.
+- **What changed (D1).** Minimum area alone admitted unusable rooms: the brief declared no minimum
+  **short side** for the bathroom, kitchen, living room or laundry, so seed 01 passed hard validity
+  with a **7.00 × 0.75 m bathroom**. A `ROOM_SHAPE_POLICY` table in `src/domain/constants.ts`,
+  expanded into ordinary brief data in `src/domain/fixtures.ts`, now gives every habitable room a
+  minimum short side, a preferred area and a 2.0 aspect cap. Separately, the generator divided free
+  area **equally** and ignored `preferredAreaUnits2` entirely — which is why three interchangeable
+  bedrooms came out 35 / 27 / 10.6 m² — so `src/domain/generator.ts` now allocates in proportion to
+  declared preference. Seed 01 now yields 18.0 / 18.0 / 18.0 m² bedrooms, a 6.00 × 6.00 m living
+  room and no sliver rooms, at 81 / 79 / 83 and 3/3 selection on all ten seeds.
+- **What changed (D2/D3).** `resolveCalibrationSurface(overrides)` makes category weights, metric
+  breakpoints, `shortlistSize`, the diversity threshold and the explanation limit editable without a
+  source change. An unconfigured run stays bit-identical to `planlab-calibration-0.1`, a derived
+  surface is labelled `…+custom`, and a hostile calibration cannot move a hard verdict.
+- **What changed (D4).** Measured: the canonical full result is **324.6 MB**, of which the plans are
+  **0.9 MB** and the recomputable derived indexes are 99.6%. `src/domain/resultPayload.ts` projects
+  the result onto its semantics for serialization and transport; the in-memory result still carries
+  the indexes. **Reduced resolution:** the benchmark's `evidenceHash` now hashes derived schema keys
+  rather than every value, so a silent value-level change that leaves layouts byte-identical is no
+  longer caught by that hash.
+- **Cost, stated honestly.** Expansions per seed rose **6,779 → 15,456** and the full-gate median
+  **904 ms → 1,750 ms**. Targets still met (median <2,000, p95 <4,000, 20,000 expansions) but the
+  median margin fell from ~55% to ~13%, and expansions now sit close to the cap.
 - **Open threads / waiting on user:**
-  1. **Stage 3 hard gate (architect/user).** The architect must approve mathematical usefulness and
-     the scoring language before any polished UI work. This is the definition of done for Stage 3
-     and was deliberately not claimed by the review. Do not start Milestone 4 scaffolding before it
-     closes.
-  2. **Stage 0 benchmark evidence (decision).** Since bucket 2.1 the derived facts indexes are part
-     of the serialized `GenerationResult`, so the ten recorded per-seed `outputHash` values no longer
-     reproduce — `e1c6f38` is the last commit that reproduces them — and the canonical payload grew
-     ~256 MB → ~342 MB, which matters for the Milestone 4 worker protocol. Layouts and selected
-     triplets are byte-identical throughout. Accept the evidence-shape evolution or stop serializing
-     the derived indexes. Detail: `artifacts/planlab/milestone-2/validation-review.md`.
-  3. **Nothing is pushed** — `main` is ~50 commits ahead of `origin/main`.
-  4. Product/UX/copy and money/payment decisions remain human hard gates.
-  5. **Deliberately untaken tuning headroom.** Selection now costs ~56 ms, so
-     `calibration.diversity.shortlistSize` (24 of a 300-candidate pool) and the metric breakpoints
-     could be revisited cheaply, but every such change moves selected triplets — that is scoring
-     language and belongs to the hard gate above.
-- **Next step:** the user's Stage 3 gate decision (usefulness + scoring language). Only then stage
-  Milestone 4 (worker/UI scaffolding) from `knowledge/planlab/IMPLEMENTATION_PLAN.md`.
+  1. **D5 — push.** `main` is 56 commits ahead of `origin/main`; still nothing pushed.
+  2. **Milestone 4 (UI).** Unblocked by D1/D2. Bucket 4.1 was dispatched to a sub-agent that stalled
+     for ~40 minutes without writing a single file and was interrupted; it is back in the queue.
+  3. Product/UX/copy and money/payment decisions remain human hard gates. The calibration override
+     seam deliberately makes copy-adjacent values *settable* without freezing them.
+  4. **Evidence-resolution caveat** in D4 above — a future review needing value-level derived drift
+     detection must use `serializeCanonical(result)` explicitly.
+- **Next step:** answer D5, then build Milestone 4 (worker/UI scaffolding) from
+  `knowledge/planlab/IMPLEMENTATION_PLAN.md`, following `knowledge/planlab/UI_ARCHITECTURE.md`.
 - **In-flight branches:** all work is on `main` (Milestone 0 baseline `8171058`, Stage 1
   `0e8589b`…`e1c6f38` plus typecheck infra `19916f1`, Stage 2 `9a24738`…`ded4d73`, Stage 3
   `6089c48`…`99e1904` plus the 3.5 review); `stage0-planlab-spike` is retained at the completed gate
@@ -45,14 +53,14 @@ tags: [progress, resume]
   Stage 3 gate closes. `INSTANCES_BY_PROJECT` in `rules.ts` caches instances per project object
   identity — revisit when the project document becomes editable (Milestone 6).
 
-**Stage 3 evidence:** `npm test` 122 passing (105 → 110 → 116 → 120 → 122 with the 3.5 oracles);
-`npm run typecheck` 0 errors; `npm run diagnostics:canonical -- --check` clean;
-`npm run benchmark:stage0:check` and `npm run benchmark:stage0:bounded` both `baselineMatch: true`
-with every gate line PASS (median 817 ms, p95 1,039 ms on the immediate re-run);
-`serializeCanonical(GenerationResult)` byte-identical for all ten canonical seeds across the 3.5
-fix, with expansion counts unchanged (6,779 / 7,108 / 8,641 / …); the re-recorded baselines differ
-from the previous ones in exactly one field each — the benchmark input fingerprint, which hashes
-every domain module. Review record: `artifacts/planlab/milestone-3/validation-review.md`.
+**Evidence after the gate amendment:** `npm test` **136 passing** (122 → 129 → 136: +4 room-shape
+policy, +7 calibration overrides, +3 result payload); `npm run typecheck` 0 errors;
+`npm run diagnostics:canonical -- --check` clean at fingerprint `sha256:8efe5b5e…`;
+`npm run benchmark:stage0:check` **`baselineMatch: true`** with every gate line PASS at median
+**1,749.5 ms** / p95 **1,831.1 ms** (record run 1,786.9 ms; bounded 1,774.8 ms) on a quiet machine.
+The room-shape tests were mutation-checked (relaxing the bedroom aspect cap broke three of four).
+Earlier timings of ~2.2 s were measured while sub-agents were loading the machine and are not
+representative — re-measure before drawing any timing conclusion.
 
 **Process note:** the 3.5 review was performed by the orchestrator because no separate agent was
 available in the session, so it leans on differential evidence (frozen prior commit in a scratch

@@ -29,6 +29,36 @@ export const GARAGE_MIN_DEPTH_UNITS = GARAGE_MIN_DEPTH_MM / GRID_MM;
 export const GARAGE_FRONT_SIDE = "south" as const;
 export const MIRRORED_LAYOUTS_COUNT_AS_DISTINCT = false;
 
+/**
+ * Room shape and preferred-size policy approved at the Stage 3 usefulness gate
+ * (2026-09-14, user decision D1).
+ *
+ * Minimum area alone admits unusable slivers: a 7.00 x 0.75 m bathroom satisfies a
+ * 5 m2 minimum exactly, which is how the canonical brief passed hard validity while
+ * producing a bathroom nobody could enter. Every habitable room row therefore carries
+ * an explicit minimum short side as well as its minimum area.
+ *
+ * Preferred areas are quality targets and never validity. They make it expensive to
+ * dump surplus floor area into a room that is already large enough, which is why the
+ * canonical brief produced 35 / 27 / 10.6 m2 interchangeable bedrooms. `maxAspectRatio`
+ * is the general anti-sliver guard: a room may not be shaped like a corridor even if
+ * its area and short side are satisfied.
+ *
+ * These are authored brief values, not solver behaviour. A room row in the project
+ * document sets them, so a brief editor can change any of them without touching the
+ * generator, the validator, or the scoring surface.
+ */
+export const ROOM_SHAPE_POLICY = Object.freeze({
+  bedroom: Object.freeze({ minShortSideM: 3, preferredAreaM2: 16, maxAspectRatio: 2 }),
+  bathroom: Object.freeze({ minShortSideM: 1.5, preferredAreaM2: 10, maxAspectRatio: 2 }),
+  kitchen: Object.freeze({ minShortSideM: 3, preferredAreaM2: 24, maxAspectRatio: 2 }),
+  living: Object.freeze({ minShortSideM: 3, preferredAreaM2: 34, maxAspectRatio: 2 }),
+  laundry: Object.freeze({ minShortSideM: 1.5, preferredAreaM2: 8, maxAspectRatio: 2 }),
+});
+
+/** Room kinds carrying an approved shape and preferred-size policy. */
+export type ShapedRoomKind = keyof typeof ROOM_SHAPE_POLICY;
+
 export const CANONICAL_SITE_WIDTH_M = 20;
 export const CANONICAL_SITE_DEPTH_M = 30;
 export const CANONICAL_SITE_WIDTH_MM = CANONICAL_SITE_WIDTH_M * 1_000;
