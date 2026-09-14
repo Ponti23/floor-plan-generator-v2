@@ -87,11 +87,11 @@ contracts and proving the claims it currently asserts.
   compliance percentage, no metric rescued by a score, invalid geometry always invalid regardless
   of score. Verify formula breakpoints, monotonic responses, bound saturation, and the
   invalid-geometry-never-rescued rule. — `luna-max` (`6089c48`)
-- [ ] **3.2 Strategy profiles and the calibration surface.** Consolidate every profile weight and
+- [x] **3.2 Strategy profiles and the calibration surface.** Consolidate every profile weight and
   threshold into one auditable calibration surface, prove a profile can never change hard validity
   or feasibility, and make the strategy trade-off language inspectable so the architect can
   calibrate thresholds. Verify weights normalize as documented, profiles differ only through
-  weights, and a profile change cannot flip a hard verdict. — `luna-max`
+  weights, and a profile change cannot flip a hard verdict. — `luna-max` (`c5bff25`)
 - [ ] **3.3 Interchangeable matching, diversity, and joint triplet selection.** Harden
   interchangeable-instance matching so a bedroom-number swap or a mirror is not a new design, keep
   the diversity distance metric symmetric and bounded, and ensure joint triplet selection reports
