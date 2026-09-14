@@ -1,7 +1,7 @@
 {
   "reportVersion": "planlab-stage0-regression-0.1",
   "suiteVersion": "planlab-stage0-seed-suite-0.6",
-  "recordedAt": "2026-09-14T10:48:31.534Z",
+  "recordedAt": "2026-09-14T11:23:56.005Z",
   "engineVersion": "planlab-generator-0.4",
   "ruleVersion": "planlab-core-2",
   "determinismVersion": "planlab-generator-determinism-1",
@@ -13,10 +13,10 @@
     "footprintVariantLimit": 64
   },
   "environment": {
-    "gitHeadAtRun": "d8dd119509ae4572f5e164de9c56f859918b87c1",
-    "workingTreeStatusAtRun": "M package.json\n M scripts/benchmark-stage0.mjs\n M src/domain/generator.ts\n M src/domain/index.ts\n?? artifacts/planlab/milestone-3/\n?? src/domain/pruning.ts\n?? test/benchmark-regression.test.ts\n?? test/determinism-pruning.test.ts",
+    "gitHeadAtRun": "b2b87de7e9c956d55db7c9661e8a03c6bea95828",
+    "workingTreeStatusAtRun": "M artifacts/planlab/milestone-3/benchmark-baselines/bounded.json\n M artifacts/planlab/milestone-3/benchmark-baselines/full.json\n M artifacts/planlab/milestone-3/benchmark.json\n M artifacts/planlab/milestone-3/benchmark.md\n M src/domain/diversity.ts\n M src/domain/generator.ts\n M test/diversity-selection.test.ts",
     "workingTreeCleanAtRun": false,
-    "benchmarkInputFingerprint": "8a9a04bcdeaf64eeb07b00d5d52325ed4b9da18e3d1901c24d004e8ac9a938f8",
+    "benchmarkInputFingerprint": "3a8854bbf1223b8cb48a1559c31ddd40958170a8f6a8cd5a82b2bc2e6283a99f",
     "benchmarkInputFiles": [
       {
         "path": "package.json",
@@ -40,7 +40,7 @@
       },
       {
         "path": "src/domain/diversity.ts",
-        "sha256": "c047c65b476c8d69a1ebafc1a2b10d71dbbee85eacf1073601074b6f7b0950a4"
+        "sha256": "96688870a4fa2444d3ff20d2121d6c7fb58716fb26ae0aa3a471dfef6e6a5b83"
       },
       {
         "path": "src/domain/facts.ts",
@@ -56,7 +56,7 @@
       },
       {
         "path": "src/domain/generator.ts",
-        "sha256": "4b22a3fd8c27687e4f51d4162db6a6f1d7d12865e5235d3a226ac36e808d3fd9"
+        "sha256": "a360ee77bc083834beefdd89a8019c42602d7e45bd022474dc15e631527343fb"
       },
       {
         "path": "src/domain/geometry.ts",
@@ -172,10 +172,10 @@
     "boundedMode": null
   },
   "summary": {
-    "medianMs": 3036.067,
-    "p95Ms": 3381.464,
-    "minimumMs": 2806.311,
-    "maximumMs": 3452.468
+    "medianMs": 903.743,
+    "p95Ms": 1153.068,
+    "minimumMs": 761.898,
+    "maximumMs": 1165.26
   },
   "gate": {
     "threeValidLayoutsPerSeed": true,
@@ -184,29 +184,29 @@
     "expansionBudget": true,
     "budgetDeterminism": true,
     "timingGateApplied": true,
-    "medianRuntime": false,
+    "medianRuntime": true,
     "p95Runtime": true,
     "impossibleFixtures": true,
-    "pass": false,
+    "pass": true,
     "baselinePath": "artifacts/planlab/milestone-3/benchmark-baselines/full.json",
     "baselineChecked": false,
-    "baselineMatch": true
+    "baselineMatch": false
   },
   "canonical": [
     {
       "seed": "planlab-canonical-01",
-      "elapsedMs": 3011.145,
+      "elapsedMs": 853.954,
       "timingSamplesMs": [
-        3062.712,
-        3011.145,
-        2976.782
+        853.954,
+        830.681,
+        918.333
       ],
       "timingSamplesRawMs": [
-        3062.7122,
-        3011.1453999999994,
-        2976.7818000000007
+        853.954,
+        830.6809000000001,
+        918.3328000000001
       ],
-      "replayElapsedMs": 2964.775,
+      "replayElapsedMs": 952.626,
       "deterministic": true,
       "outputHash": "1ea3931c2c0d1fedf18449347c968720002464b20b4d5949999fe944f058ac4f",
       "layoutHash": "5df0407527fab01d9da14c444f6f69c0a5609e7389ff1b5eaad927a886804c4d",
@@ -305,18 +305,18 @@
     },
     {
       "seed": "planlab-canonical-02",
-      "elapsedMs": 2983.259,
+      "elapsedMs": 894.366,
       "timingSamplesMs": [
-        2983.259,
-        2904.08,
-        3149.77
+        926.089,
+        890.1,
+        894.366
       ],
       "timingSamplesRawMs": [
-        2983.259399999999,
-        2904.080399999999,
-        3149.7701000000015
+        926.0893000000033,
+        890.0996000000014,
+        894.3657000000021
       ],
-      "replayElapsedMs": 2946.366,
+      "replayElapsedMs": 907.025,
       "deterministic": true,
       "outputHash": "49d57cc9819812c0eacaeb7f0975bd96f79d10249096474f4545e62f0b138073",
       "layoutHash": "1b33c8eaaeafadfbcdca1c624158ae845aee30b06830c0d05792248a61129e62",
@@ -415,18 +415,18 @@
     },
     {
       "seed": "planlab-canonical-03",
-      "elapsedMs": 3400.316,
+      "elapsedMs": 1163.898,
       "timingSamplesMs": [
-        3452.468,
-        3358.423,
-        3400.316
+        1165.26,
+        1139.831,
+        1163.898
       ],
       "timingSamplesRawMs": [
-        3452.467700000001,
-        3358.4230000000025,
-        3400.316300000006
+        1165.2596000000049,
+        1139.8305000000037,
+        1163.8981000000058
       ],
-      "replayElapsedMs": 3213.074,
+      "replayElapsedMs": 1163.944,
       "deterministic": true,
       "outputHash": "a1c213fb0350d39c77458f9c0235d0269852b7f362ca877022b96b4dbbbe6e80",
       "layoutHash": "9bf253db69ab8435707116686a05341829eda1a19442910fc61f1d1f2b10b857",
@@ -525,18 +525,18 @@
     },
     {
       "seed": "planlab-canonical-04",
-      "elapsedMs": 2869.804,
+      "elapsedMs": 870.226,
       "timingSamplesMs": [
-        2933.884,
-        2869.804,
-        2857.703
+        889.868,
+        868.42,
+        870.226
       ],
       "timingSamplesRawMs": [
-        2933.8842000000004,
-        2869.8041999999987,
-        2857.703099999999
+        889.8677000000025,
+        868.4198000000033,
+        870.2258000000002
       ],
-      "replayElapsedMs": 2890.636,
+      "replayElapsedMs": 874.417,
       "deterministic": true,
       "outputHash": "af5afa9b4cb0b193b1ac442eeec5d7b6d3c08b9de88996203ef2cab44c49ea9a",
       "layoutHash": "55f36ddb1485ea6222365df460088ae9614d7301f7517687bbcbf56209333dbb",
@@ -635,18 +635,18 @@
     },
     {
       "seed": "planlab-canonical-05",
-      "elapsedMs": 2809.597,
+      "elapsedMs": 863.434,
       "timingSamplesMs": [
-        2960.029,
-        2809.597,
-        2806.311
+        890.3,
+        863.434,
+        853.906
       ],
       "timingSamplesRawMs": [
-        2960.028999999995,
-        2809.5967999999993,
-        2806.3108000000066
+        890.2998999999982,
+        863.4340999999986,
+        853.9063000000024
       ],
-      "replayElapsedMs": 2892.181,
+      "replayElapsedMs": 890.572,
       "deterministic": true,
       "outputHash": "a19b9cf35b03ca0c8cc1ce2f086436c11c81eceaa8285e59865b3c1c44ae42db",
       "layoutHash": "4809008bf0ba19b8684429305cb768cf644bc64b91225b64fc4339ac31599d26",
@@ -745,18 +745,18 @@
     },
     {
       "seed": "planlab-canonical-06",
-      "elapsedMs": 3253.41,
+      "elapsedMs": 1031.15,
       "timingSamplesMs": [
-        3285.251,
-        3234.738,
-        3253.41
+        1043.517,
+        1031.15,
+        1017.891
       ],
       "timingSamplesRawMs": [
-        3285.2514999999985,
-        3234.7376000000077,
-        3253.410400000008
+        1043.517399999997,
+        1031.149900000004,
+        1017.8909999999887
       ],
-      "replayElapsedMs": 3228.025,
+      "replayElapsedMs": 1027.317,
       "deterministic": true,
       "outputHash": "69e490d7dd0fd889cc5bb4aa2c5d16cb800d78b94c3b4da4874f1bf169dd2ee1",
       "layoutHash": "15e35bcb2bd988499e7499816df807b41c5b2e0f06df360e8987c4c5cbdbe34f",
@@ -855,18 +855,18 @@
     },
     {
       "seed": "planlab-canonical-07",
-      "elapsedMs": 2982.416,
+      "elapsedMs": 796.452,
       "timingSamplesMs": [
-        3060.988,
-        2982.416,
-        2975.118
+        796.452,
+        913.12,
+        761.898
       ],
       "timingSamplesRawMs": [
-        3060.9881999999925,
-        2982.416100000002,
-        2975.118199999997
+        796.4517999999953,
+        913.1199000000051,
+        761.8983000000007
       ],
-      "replayElapsedMs": 2952.087,
+      "replayElapsedMs": 765.702,
       "deterministic": true,
       "outputHash": "9f15fef3b73e4bd8e9f73ec9d008eaa12330f6ce4578244e00ca08656ae723fd",
       "layoutHash": "06c5071ade388a5212ff573b535401f4bcec24264b52d19370005d76caaaa97d",
@@ -965,18 +965,18 @@
     },
     {
       "seed": "planlab-canonical-08",
-      "elapsedMs": 3103.413,
+      "elapsedMs": 1004.193,
       "timingSamplesMs": [
-        3208.831,
-        3072.997,
-        3103.413
+        1092.308,
+        995.615,
+        1004.193
       ],
       "timingSamplesRawMs": [
-        3208.831200000015,
-        3072.9973000000173,
-        3103.413100000005
+        1092.3076999999903,
+        995.6153999999951,
+        1004.1928999999946
       ],
-      "replayElapsedMs": 3129.075,
+      "replayElapsedMs": 1023.909,
       "deterministic": true,
       "outputHash": "560507174e03fef001c0036bc9eadc4e714bc67b2edbc4de280e98b711e4ac39",
       "layoutHash": "4eebd641306271ed1cadef45b63a93b5040c2a675f96a3d8e02d4bd0f4e2f50a",
@@ -1075,18 +1075,18 @@
     },
     {
       "seed": "planlab-canonical-09",
-      "elapsedMs": 2866.102,
+      "elapsedMs": 765.97,
       "timingSamplesMs": [
-        2859.576,
-        2866.102,
-        2876.5
+        799.429,
+        764.591,
+        765.97
       ],
       "timingSamplesRawMs": [
-        2859.576300000015,
-        2866.102499999979,
-        2876.50039999999
+        799.428899999999,
+        764.5911999999953,
+        765.9701999999961
       ],
-      "replayElapsedMs": 2860.618,
+      "replayElapsedMs": 779.373,
       "deterministic": true,
       "outputHash": "f2314ac53e287f8148a97941379974d0387e285ccc5b44019689f16ea246a672",
       "layoutHash": "6fd86169aa71fa544535601a07ee6c9f30e6d33a5c263a6cb67c5a8b1040078e",
@@ -1185,18 +1185,18 @@
     },
     {
       "seed": "planlab-canonical-10",
-      "elapsedMs": 3125.984,
+      "elapsedMs": 1022.951,
       "timingSamplesMs": [
-        3177.431,
-        3125.984,
-        3117.856
+        1038.946,
+        1020.418,
+        1022.951
       ],
       "timingSamplesRawMs": [
-        3177.431199999992,
-        3125.9842000000062,
-        3117.8557999999903
+        1038.9455000000016,
+        1020.4181999999855,
+        1022.9507999999914
       ],
-      "replayElapsedMs": 3073.667,
+      "replayElapsedMs": 1039.438,
       "deterministic": true,
       "outputHash": "e643ccbd2b7e8e38f2feb49621cf4199d54db0dcea28ed7f200dbbc6a68b54cf",
       "layoutHash": "12cb579637c433bd3287f9d3f45fcfab96de8e9f3a0c9a2771b0cd75256b5e69",
@@ -1298,7 +1298,7 @@
     {
       "fixture": "envelopeConsumesSite",
       "seed": "impossible-envelope",
-      "elapsedMs": 0.275,
+      "elapsedMs": 0.288,
       "ok": false,
       "candidateCount": 0,
       "selectedCount": 0,
@@ -1372,7 +1372,7 @@
     {
       "fixture": "programExceedsInstanceLimit",
       "seed": "impossible-program-size",
-      "elapsedMs": 0.041,
+      "elapsedMs": 0.034,
       "ok": false,
       "candidateCount": 0,
       "selectedCount": 0,

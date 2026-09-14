@@ -555,6 +555,47 @@ interface ResolvedCandidates {
   validCandidateCount: number;
 }
 
+type StrategyAssignment = {
+  candidate: ScoredLayoutCandidate;
+  strategy: StrategyProfileId;
+};
+
+/**
+ * Selection needs only the symmetric distance verdict, not the caller-oriented
+ * room-match labels returned by `compareLayoutDiversity`.  Cache that small
+ * immutable projection by candidate object identity.  The joint selector
+ * visits the same pair many times while evaluating O(n^3) assignments; without
+ * this cache it repeatedly reruns Hungarian matching and geometry comparison
+ * for an identical pair, turning a fixed semantic budget into avoidable
+ * wall-clock work.
+ */
+type PairDistance = Readonly<Pick<DiversityComparison, "distance" | "diverse">>;
+type PairDistanceLookup = (
+  first: ScoredLayoutCandidate,
+  second: ScoredLayoutCandidate,
+) => PairDistance;
+
+function createPairDistanceCache(
+  project: NormalizedProject,
+  threshold: number,
+  calibration: ScoringCalibrationSurface,
+): PairDistanceLookup {
+  const cache = new Map<ScoredLayoutCandidate, Map<ScoredLayoutCandidate, PairDistance>>();
+  return (first, second) => {
+    const existing = cache.get(first)?.get(second);
+    if (existing) return existing;
+    const comparison = compareLayoutDiversity(first.layout, second.layout, project, threshold, calibration);
+    const pair = Object.freeze({ distance: comparison.distance, diverse: comparison.diverse });
+    const firstPairs = cache.get(first) ?? new Map<ScoredLayoutCandidate, PairDistance>();
+    const secondPairs = cache.get(second) ?? new Map<ScoredLayoutCandidate, PairDistance>();
+    firstPairs.set(second, pair);
+    secondPairs.set(first, pair);
+    cache.set(first, firstPairs);
+    cache.set(second, secondPairs);
+    return pair;
+  };
+}
+
 function isScoredCandidate(value: CandidateInput): value is ScoredLayoutCandidate {
   return value !== null && typeof value === "object" && "layout" in value && "scorecards" in value;
 }
@@ -610,18 +651,32 @@ function resolveScoredCandidates(
 }
 
 function assignmentObjective(
-  selected: readonly { candidate: ScoredLayoutCandidate; strategy: StrategyProfileId }[],
+  selected: readonly StrategyAssignment[],
   project: NormalizedProject,
   threshold: number,
   calibration: ScoringCalibrationSurface = CALIBRATION_SURFACE,
+  pairDistance?: PairDistanceLookup,
 ): { valid: boolean; objective: number; distances: SelectionPairDistance[] } {
   const distances: SelectionPairDistance[] = [];
   for (let first = 0; first < selected.length; first += 1) {
     for (let second = first + 1; second < selected.length; second += 1) {
-      const a = selected[first].candidate.layout;
-      const b = selected[second].candidate.layout;
-      const comparison = compareLayoutDiversity(a, b, project, threshold, calibration);
-      distances.push({ a: a.id, b: b.id, distance: comparison.distance, diverse: comparison.diverse });
+      const firstCandidate = selected[first].candidate;
+      const secondCandidate = selected[second].candidate;
+      const comparison = pairDistance
+        ? pairDistance(firstCandidate, secondCandidate)
+        : compareLayoutDiversity(
+          firstCandidate.layout,
+          secondCandidate.layout,
+          project,
+          threshold,
+          calibration,
+        );
+      distances.push({
+        a: firstCandidate.layout.id,
+        b: secondCandidate.layout.id,
+        distance: comparison.distance,
+        diverse: comparison.diverse,
+      });
       if (!comparison.diverse) return { valid: false, objective: Number.NEGATIVE_INFINITY, distances };
     }
   }
@@ -695,7 +750,8 @@ export function selectDiverseTriplet(
   const pools = Object.fromEntries(STRATEGY_PROFILE_IDS.map((strategy) => [strategy, [...scored]
     .sort((a, b) => b.scorecards[strategy].overallUtility - a.scorecards[strategy].overallUtility || compareText(a.layout.id, b.layout.id))
     .slice(0, shortlistSize)])) as Record<StrategyProfileId, ScoredLayoutCandidate[]>;
-  let bestTriple: { objective: number; ids: string[]; assignment: { candidate: ScoredLayoutCandidate; strategy: StrategyProfileId }[]; distances: SelectionPairDistance[] } | undefined;
+  const pairDistance = createPairDistanceCache(project, threshold, calibration);
+  let bestTriple: { objective: number; ids: string[]; assignment: StrategyAssignment[]; distances: SelectionPairDistance[] } | undefined;
   for (const first of pools.compactEfficiency) {
     for (const second of pools.bestFlow) {
       if (first.layout.id === second.layout.id) continue;
@@ -706,7 +762,7 @@ export function selectDiverseTriplet(
           { candidate: second, strategy: "bestFlow" as const },
           { candidate: third, strategy: "balanced" as const },
         ];
-        const result = assignmentObjective(assignment, project, threshold, calibration);
+        const result = assignmentObjective(assignment, project, threshold, calibration, pairDistance);
         if (!result.valid) continue;
         const ids = assignment.map((item) => item.candidate.layout.id);
         if (betterAssignment(bestTriple, result.objective, ids)) {
@@ -737,7 +793,7 @@ export function selectDiverseTriplet(
 
   // No diverse triple: retain the best distinct pair that clears the same
   // threshold, then a single best candidate if even that is impossible.
-  let bestPair: { objective: number; ids: string[]; assignment: { candidate: ScoredLayoutCandidate; strategy: StrategyProfileId }[]; distances: SelectionPairDistance[] } | undefined;
+  let bestPair: { objective: number; ids: string[]; assignment: StrategyAssignment[]; distances: SelectionPairDistance[] } | undefined;
   const pairProfiles: [StrategyProfileId, StrategyProfileId][] = [
     ["compactEfficiency", "bestFlow"],
     ["compactEfficiency", "balanced"],
@@ -751,7 +807,7 @@ export function selectDiverseTriplet(
           { candidate: first, strategy: firstStrategy },
           { candidate: second, strategy: secondStrategy },
         ];
-        const result = assignmentObjective(assignment, project, threshold, calibration);
+        const result = assignmentObjective(assignment, project, threshold, calibration, pairDistance);
         if (!result.valid) continue;
         const ids = assignment.map((item) => item.candidate.layout.id);
         if (betterAssignment(bestPair, result.objective, ids)) {

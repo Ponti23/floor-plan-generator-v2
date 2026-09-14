@@ -1,11 +1,13 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import {
+  CALIBRATION_SURFACE,
   CANONICAL_NORMALIZED_PROJECT,
   IMPOSSIBLE_FIXTURES,
   canonicalLayoutKey,
   compareLayoutDiversity,
   generateLayouts,
+  scoreCandidates,
   selectDiverseTriplet,
   type Layout,
   type NormalizedProject,
@@ -143,4 +145,89 @@ test("bounded search with no found layouts remains a non-infeasible no-candidate
   assert.equal(result.selection.reason, "NO_VALID_CANDIDATES");
   assert.ok(result.diagnostics.some((diagnostic) => diagnostic.code === "NO_VALID_LAYOUT"));
   assert.ok(!result.diagnostics.some((diagnostic) => diagnostic.code === "INFEASIBLE"));
+});
+
+test("reported selection distances agree with a direct pairwise comparison", () => {
+  // Joint selection memoises pair comparisons instead of recomputing them for
+  // every candidate ordering.  The memoised verdict must be the verdict the
+  // public comparison produces for the same pair, or selection could accept a
+  // triplet that is not actually diverse.
+  const byId = new Map(generated.layouts.map((candidate) => [candidate.id, candidate]));
+  const selection = selectDiverseTriplet(generated.layouts, project);
+  assert.equal(selection.status, "complete");
+  assert.equal(selection.pairwiseDistances.length, 3);
+  for (const pair of selection.pairwiseDistances) {
+    const first = byId.get(pair.a);
+    const second = byId.get(pair.b);
+    assert.ok(first && second, `selection referenced an unknown layout: ${pair.a} / ${pair.b}`);
+    const direct = compareLayoutDiversity(first!, second!, project, selection.threshold);
+    assert.equal(pair.distance, direct.distance);
+    assert.equal(pair.diverse, direct.diverse);
+    assert.equal(pair.diverse, direct.distance >= selection.threshold);
+    assert.ok(pair.diverse, `selected pair ${pair.a} / ${pair.b} is below the diversity threshold`);
+  }
+});
+
+test("selection agrees with an independent brute-force triplet search", () => {
+  const bonus = CALIBRATION_SURFACE.diversity.selectionDiversityBonus;
+  const threshold = CALIBRATION_SURFACE.diversity.threshold;
+  // Selection keeps one deterministic representative per canonical design, so
+  // mirror/relabel duplicates in the fixture are collapsed the same way here
+  // before the exhaustive enumeration.
+  const representatives = new Map<string, ReturnType<typeof scoreCandidates>[number]>();
+  for (const candidate of scoreCandidates(generated.layouts, project)
+    .slice()
+    .sort((a, b) => a.layout.id < b.layout.id ? -1 : a.layout.id > b.layout.id ? 1 : 0)) {
+    const key = canonicalLayoutKey(candidate.layout, project);
+    if (!representatives.has(key)) representatives.set(key, candidate);
+  }
+  const candidates = [...representatives.values()];
+  // A shortlist that covers the whole pool makes the bounded pools equal to
+  // the candidate set, so the production search is directly comparable with an
+  // exhaustive enumeration of the same ordered triples.
+  assert.ok(candidates.length >= 3);
+  assert.equal(new Set(candidates.map((candidate) => canonicalLayoutKey(candidate.layout, project))).size, candidates.length);
+  const selection = selectDiverseTriplet(candidates, project, { threshold, shortlistSize: candidates.length });
+
+  const strategies = ["compactEfficiency", "bestFlow", "balanced"] as const;
+  let best: { objective: number; ids: string[] } | undefined;
+  for (const first of candidates) {
+    for (const second of candidates) {
+      for (const third of candidates) {
+        const triple = [first, second, third];
+        const ids = triple.map((candidate) => candidate.layout.id);
+        if (new Set(ids).size !== 3) continue;
+        const distances: number[] = [];
+        let diverse = true;
+        for (const [left, right] of [[0, 1], [0, 2], [1, 2]] as const) {
+          const comparison = compareLayoutDiversity(triple[left]!.layout, triple[right]!.layout, project, threshold);
+          if (!comparison.diverse) {
+            diverse = false;
+            break;
+          }
+          distances.push(comparison.distance);
+        }
+        if (!diverse) continue;
+        const score = triple.reduce(
+          (total, candidate, index) => total + candidate.scorecards[strategies[index]!].overallUtility,
+          0,
+        );
+        const objective = score + bonus * (distances.reduce((total, value) => total + value, 0) / distances.length);
+        if (!best || objective > best.objective || objective === best.objective && ids.join("|") < best.ids.join("|")) {
+          best = { objective, ids };
+        }
+      }
+    }
+  }
+
+  assert.ok(best, "fixture should contain at least one diverse triplet");
+  assert.equal(selection.status, "complete");
+  assert.deepEqual(
+    selection.selected.map((item) => item.layout.id),
+    best!.ids,
+  );
+  assert.ok(Math.abs(selection.selected.reduce(
+    (total, item) => total + item.scorecard.overallUtility,
+    0,
+  ) + bonus * (selection.pairwiseDistances.reduce((total, pair) => total + pair.distance, 0) / 3) - best!.objective) < 1e-12);
 });

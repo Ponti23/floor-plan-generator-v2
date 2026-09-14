@@ -1,10 +1,10 @@
 # PlanLab Stage 0 regression benchmark
 
 **Report version:** planlab-stage0-regression-0.1<br>
-**Recorded:** 2026-09-14T10:48:31.534Z<br>
-**Git HEAD at run:** d8dd119509ae4572f5e164de9c56f859918b87c1<br>
-**Benchmark input fingerprint:** `8a9a04bcdeaf64eeb07b00d5d52325ed4b9da18e3d1901c24d004e8ac9a938f8`<br>
-**Overall technical gate:** **FAIL**<br>
+**Recorded:** 2026-09-14T11:23:56.005Z<br>
+**Git HEAD at run:** b2b87de7e9c956d55db7c9661e8a03c6bea95828<br>
+**Benchmark input fingerprint:** `3a8854bbf1223b8cb48a1559c31ddd40958170a8f6a8cd5a82b2bc2e6283a99f`<br>
+**Overall technical gate:** **PASS**<br>
 
 This report re-runs the historical Stage 0 suite in **full** mode. Timing and host data are run evidence; the checked-in regression baseline compares stable result signatures only. The architect usefulness review remains the separate Stage 0 hard gate.
 
@@ -31,18 +31,18 @@ This report re-runs the historical Stage 0 suite in **full** mode. Timing and ho
 
 | Seed | Median time (ms) | Candidates / valid | Selected | Min pairwise | Expansions | Replay | Diagnostics |
 |---|---:|---:|---:|---:|---:|---|---|
-| planlab-canonical-01 | 3011.145 | 300 / 300 | 3 / 3 | 0.320363 | 6,779 | PASS | none |
-| planlab-canonical-02 | 2983.259 | 300 / 300 | 3 / 3 | 0.401476 | 7,108 | PASS | none |
-| planlab-canonical-03 | 3400.316 | 300 / 300 | 3 / 3 | 0.321032 | 8,641 | PASS | none |
-| planlab-canonical-04 | 2869.804 | 300 / 300 | 3 / 3 | 0.401476 | 7,108 | PASS | none |
-| planlab-canonical-05 | 2809.597 | 300 / 300 | 3 / 3 | 0.320363 | 6,779 | PASS | none |
-| planlab-canonical-06 | 3253.410 | 300 / 300 | 3 / 3 | 0.321032 | 8,641 | PASS | none |
-| planlab-canonical-07 | 2982.416 | 300 / 300 | 3 / 3 | 0.401476 | 7,132 | PASS | none |
-| planlab-canonical-08 | 3103.413 | 300 / 300 | 3 / 3 | 0.390843 | 9,250 | PASS | none |
-| planlab-canonical-09 | 2866.102 | 300 / 300 | 3 / 3 | 0.401476 | 7,108 | PASS | none |
-| planlab-canonical-10 | 3125.984 | 300 / 300 | 3 / 3 | 0.401476 | 9,250 | PASS | none |
+| planlab-canonical-01 | 853.954 | 300 / 300 | 3 / 3 | 0.320363 | 6,779 | PASS | none |
+| planlab-canonical-02 | 894.366 | 300 / 300 | 3 / 3 | 0.401476 | 7,108 | PASS | none |
+| planlab-canonical-03 | 1163.898 | 300 / 300 | 3 / 3 | 0.321032 | 8,641 | PASS | none |
+| planlab-canonical-04 | 870.226 | 300 / 300 | 3 / 3 | 0.401476 | 7,108 | PASS | none |
+| planlab-canonical-05 | 863.434 | 300 / 300 | 3 / 3 | 0.320363 | 6,779 | PASS | none |
+| planlab-canonical-06 | 1031.150 | 300 / 300 | 3 / 3 | 0.321032 | 8,641 | PASS | none |
+| planlab-canonical-07 | 796.452 | 300 / 300 | 3 / 3 | 0.401476 | 7,132 | PASS | none |
+| planlab-canonical-08 | 1004.193 | 300 / 300 | 3 / 3 | 0.390843 | 9,250 | PASS | none |
+| planlab-canonical-09 | 765.970 | 300 / 300 | 3 / 3 | 0.401476 | 7,108 | PASS | none |
+| planlab-canonical-10 | 1022.951 | 300 / 300 | 3 / 3 | 0.401476 | 9,250 | PASS | none |
 
-Timing summary across 30 measured generations: median **3036.067 ms**; p95 **3381.464 ms**; min 2806.311 ms; max 3452.468 ms.
+Timing summary across 30 measured generations: median **903.743 ms**; p95 **1153.068 ms**; min 761.898 ms; max 1165.260 ms.
 
 Selected-triplet distances are recorded in full in `benchmark.json`; all three selected layouts are independently revalidated per seed.
 
@@ -65,9 +65,9 @@ Selected-triplet distances are recorded in full in `benchmark.json`; all three s
 
 | Fixture | Time (ms) | Outcome | Candidates | Expansions | Diagnostics |
 |---|---:|---|---:|---:|---|
-| envelopeConsumesSite | 0.275 | no layout | 0 | 0 | NORMALIZATION_FAILED: NON_POSITIVE_EXACT_ENVELOPE: opposing offsets leave no positive exact envelope; INFEASIBLE: the brief is infeasible before candidate search |
+| envelopeConsumesSite | 0.288 | no layout | 0 | 0 | NORMALIZATION_FAILED: NON_POSITIVE_EXACT_ENVELOPE: opposing offsets leave no positive exact envelope; INFEASIBLE: the brief is infeasible before candidate search |
 | roomCannotFitEnvelope | 0.075 | no layout | 0 | 0 | NORMALIZATION_FAILED: ROOM_CANNOT_FIT_ENVELOPE: Impossible Room minimum dimensions/area cannot fit the envelope; INFEASIBLE: the brief is infeasible before candidate search |
-| programExceedsInstanceLimit | 0.041 | no layout | 0 | 0 | NORMALIZATION_FAILED: PROGRAM_TOO_LARGE: the V1 solver supports at most 24 generated space instances; INFEASIBLE: the brief is infeasible before candidate search |
+| programExceedsInstanceLimit | 0.034 | no layout | 0 | 0 | NORMALIZATION_FAILED: PROGRAM_TOO_LARGE: the V1 solver supports at most 24 generated space instances; INFEASIBLE: the brief is infeasible before candidate search |
 
 Each impossible fixture terminated with a typed normalization diagnostic and zero candidates; no search-budget exhaustion was presented as a proof of impossibility.
 
@@ -78,7 +78,7 @@ Each impossible fixture terminated with a typed normalization diagnostic and zer
 - Byte-equivalent replay for every seed: **PASS**
 - Expansion budgets respected: **PASS**
 - Same seeded budget reproduces byte-equivalent output: **PASS**
-- Median < 2 s: **FAIL**
+- Median < 2 s: **PASS**
 - p95 < 4 s: **PASS**
 - All impossible fixtures diagnosed: **PASS**
 - Stable regression baseline (artifacts/planlab/milestone-3/benchmark-baselines/full.json): **not checked (run with --check)**

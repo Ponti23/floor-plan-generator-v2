@@ -1127,7 +1127,13 @@ function searchTopology(
             // Every occupiable room must be a destination off circulation (or a
             // pass-through public room).  Refusing a room with no transit
             // frontier here is the constructive counterpart to the independent
-            // validator's forbidden-pass-through check.
+            // validator's forbidden-pass-through check.  The frontier is
+            // measured against the spaces placed so far, so this is a search
+            // heuristic and not a certified admissibility cut: unlike the
+            // minimum-area cut above it can also discard a valid layout whose
+            // only transit is through a room this order places later.  It can
+            // never emit an invalid layout, because every candidate still faces
+            // independent hard validation.
             pruning.frontierChecks += 1;
             if (frontier < MIN_PORTAL_WIDTH_UNITS) {
               pruning.frontierPruned += 1;
