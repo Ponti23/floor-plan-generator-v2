@@ -1,5 +1,5 @@
 import { centre, formatMmAsMetres, isGridRect, type GridRect } from "./geometry.ts";
-import { GRID_MM } from "./constants.ts";
+import { GRID_MM, GRID_UNIT_METRES } from "./constants.ts";
 import type { NormalizedProject } from "./model.ts";
 import type { Layout, PlacedSpace } from "./layout.ts";
 import {
@@ -43,7 +43,7 @@ function escapeXml(value: string): string {
 }
 
 function formatArea(units2: number): string {
-  return `${(units2 * (GRID_MM / 1_000) ** 2).toFixed(2)} m²`;
+  return `${(units2 * GRID_UNIT_METRES ** 2).toFixed(2)} m²`;
 }
 
 function validSpaces(layout: Layout): (PlacedSpace & { rect: GridRect })[] {
@@ -150,7 +150,8 @@ export function renderDiagnosticText(
     `Site: ${formatArea(facts.siteAreaUnits2)} | Buildable: ${formatArea(facts.buildableAreaUnits2)}`,
     `Programmed usable: ${formatArea(facts.programmedUsableAreaUnits2)} | Garage: ${formatArea(facts.garageAreaUnits2)} | Circulation: ${formatArea(facts.circulationAreaUnits2)}`,
     `GFA: ${formatArea(facts.footprintAreaUnits2)} | target Δ ${formatArea(facts.gfaDeltaFromTargetUnits2)} | max Δ ${formatArea(facts.gfaDeltaFromMaxUnits2)}`,
-    `Unallocated interior: ${formatArea(facts.unallocatedInteriorAreaUnits2)} (${(facts.unallocatedInteriorRatio * 100).toFixed(1)}%) | Planning efficiency: ${(facts.planningEfficiency * 100).toFixed(1)}%`,
+    `Unallocated interior: ${formatArea(facts.unallocatedInteriorAreaUnits2)} (${(facts.unallocatedInteriorRatio * 100).toFixed(1)}%) | Planning efficiency: ${(facts.planningEfficiency * 100).toFixed(1)}% | Allocation ratio (diagnostic): ${(facts.allocationRatio * 100).toFixed(1)}%`,
+    `Circulation ratio: ${(facts.circulationRatio * 100).toFixed(1)}%`,
     `Reachability: ${facts.reachableRequiredRoomCount}/${facts.requiredRoomCount} required rooms | Dead ends: ${facts.deadEndCount}`,
     `Portals: ${Array.isArray(layout.portals) ? layout.portals.length : 0}`,
     "Spaces:",

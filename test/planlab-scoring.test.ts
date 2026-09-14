@@ -2,21 +2,31 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import {
   CANONICAL_NORMALIZED_PROJECT,
+  METRIC_CONFIG,
   DEFAULT_DIVERSITY_THRESHOLD,
   METRIC_CATEGORIES,
   STRATEGY_PROFILE_IDS,
+  adjacencyUtility,
+  allocationRatio,
   aspectUtility,
   compareLayoutDiversity,
   computeLayoutFacts,
+  circulationRatioUtility,
   createCrudeDiagnostic,
   evaluateLayoutMetrics,
+  exteriorUtility,
   generateLayouts,
   intersection,
+  nearnessUtility,
   preferredAreaUtility,
+  planningEfficiencyRatio,
+  planningEfficiencyUtility,
   scoreCandidates,
   scoreLayout,
   scoreLayoutProfiles,
+  separationUtility,
   selectDiverseTriplet,
+  unallocatedUtility,
   validateLayout,
   area,
   unionArea,
@@ -96,6 +106,46 @@ test("approved utility breakpoints are bounded and monotone", () => {
   }
 });
 
+test("all configurable utility breakpoints are named and saturate at the documented bounds", () => {
+  assert.equal(Object.isFrozen(METRIC_CONFIG), true);
+  for (const value of Object.values(METRIC_CONFIG)) {
+    assert.equal(Number.isFinite(value), true);
+    assert.ok(value >= 0);
+  }
+
+  const increasing = [0, 0.5, 1, 2].map((multiplier) =>
+    adjacencyUtility(multiplier * METRIC_CONFIG.defaultAdjacencyTargetUnits),
+  );
+  assert.deepEqual(increasing, [0, 0.5, 1, 1]);
+  assert.equal(exteriorUtility(METRIC_CONFIG.defaultExteriorTargetUnits), 1);
+  assert.equal(exteriorUtility(METRIC_CONFIG.defaultExteriorTargetUnits * 2), 1);
+  assert.equal(nearnessUtility(0), 1);
+  assert.equal(nearnessUtility(METRIC_CONFIG.defaultNearTargetUnits), 0);
+  assert.equal(nearnessUtility(METRIC_CONFIG.defaultNearTargetUnits * 2), 0);
+  assert.equal(circulationRatioUtility(METRIC_CONFIG.targetCirculationRatio), 1);
+  assert.equal(circulationRatioUtility(METRIC_CONFIG.unacceptableCirculationRatio), 0);
+  assert.equal(circulationRatioUtility(METRIC_CONFIG.unacceptableCirculationRatio * 2), 0);
+  assert.equal(unallocatedUtility(0), 1);
+  assert.equal(unallocatedUtility(1), 0);
+  assert.equal(unallocatedUtility(2), 0);
+  assert.equal(separationUtility(METRIC_CONFIG.defaultNearTargetUnits), 1);
+  assert.equal(separationUtility(METRIC_CONFIG.defaultNearTargetUnits * 2), 1);
+  assert.equal(preferredAreaUtility(100, 0), 0);
+  assert.throws(() => nearnessUtility(1, -1), RangeError);
+  assert.throws(() => circulationRatioUtility(0, 0.35, 0.15), RangeError);
+});
+
+test("planning efficiency excludes garage while allocation ratio remains a separate diagnostic", () => {
+  assert.equal(planningEfficiencyRatio(60, 100, 20), 0.75);
+  assert.equal(planningEfficiencyUtility(60, 100, 20), 0.75);
+  assert.equal(allocationRatio(60, 20, 10, 100), 0.9);
+  // Adding garage area is not habitable/programmed area and must not change
+  // the numerator used for planning efficiency.
+  assert.equal(planningEfficiencyRatio(60, 100, 0), 0.6);
+  assert.equal(planningEfficiencyRatio(60, 100, 20), 60 / (100 - 20));
+  assert.equal(allocationRatio(60, 0, 10, 100), 0.7);
+});
+
 test("facts preserve the approved area identities and one shared context", () => {
   const validation = generated.analyses[0]?.validation;
   const facts = computeLayoutFacts(layout, project, validation);
@@ -108,6 +158,23 @@ test("facts preserve the approved area identities and one shared context", () =>
     Math.max(0, facts.footprintAreaUnits2 - unionArea(layout.spaces.map((space) => space.rect))),
   );
   assert.equal(facts.overlapAreaUnits2, 0);
+  assert.equal(
+    facts.planningEfficiency,
+    planningEfficiencyRatio(
+      facts.programmedUsableAreaUnits2,
+      facts.footprintAreaUnits2,
+      facts.garageAreaUnits2,
+    ),
+  );
+  assert.equal(
+    facts.allocationRatio,
+    allocationRatio(
+      facts.programmedUsableAreaUnits2,
+      facts.garageAreaUnits2,
+      facts.circulationAreaUnits2,
+      facts.footprintAreaUnits2,
+    ),
+  );
   assert.equal(facts.gfaDeltaFromTargetUnits2, facts.footprintAreaUnits2 - facts.targetGfaUnits2);
   assert.equal(facts.gfaDeltaFromMaxUnits2, facts.footprintAreaUnits2 - facts.maxGfaUnits2);
   assert.equal(facts.requiredRoomCount, project.rooms.filter((room) => room.inclusion === "required").length);
@@ -202,6 +269,21 @@ test("invalid geometry is never rescued by a design score", () => {
   assert.equal(malformedScorecard.overallScore, 0);
 });
 
+test("a cached PASS cannot be reused after geometry is mutated", () => {
+  const validation = validateLayout(layout, project);
+  assert.equal(validation.valid, true);
+  const mutated = structuredClone(layout);
+  const rooms = mutated.spaces.filter((space) => space.role === "room");
+  assert.ok(rooms.length >= 2);
+  rooms[1]!.rect = rooms[0]!.rect;
+
+  const scorecard = scoreLayout(mutated, project, "balanced", undefined, validation);
+  assert.equal(scorecard.valid, false);
+  assert.equal(scorecard.designScore, null);
+  assert.equal(scorecard.overallScore, 0);
+  assert.ok(scorecard.validation.violations.some((violation) => violation.code === "SPACE_OVERLAP"));
+});
+
 test("interchangeable room relabelling and mirrors do not create diversity", () => {
   const relabelled = relabelBedrooms(layout);
   const relabelledComparison = compareLayoutDiversity(layout, relabelled, project);
@@ -272,6 +354,9 @@ test("diagnostic rendering stays crude, deterministic, and inspectable", () => {
   assert.match(diagnostic.svg, /<title/);
   assert.match(diagnostic.text, /Validity: PASS/);
   assert.match(diagnostic.text, /Planning efficiency:/);
+  assert.match(diagnostic.text, /Allocation ratio \(diagnostic\):/);
+  assert.match(diagnostic.text, /Circulation ratio:/);
+  assert.doesNotMatch(diagnostic.text, /compliance|compliant/i);
   assert.match(diagnostic.text, /Scores:/);
   assert.equal(diagnostic.text, createCrudeDiagnostic(layout, project).text);
 });

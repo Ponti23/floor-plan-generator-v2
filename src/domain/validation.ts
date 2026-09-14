@@ -54,6 +54,43 @@ export interface ValidationResult {
   reachableSpaceIds: string[];
 }
 
+/**
+ * Validation is commonly passed along with a facts object to avoid repeating
+ * work.  Keep the cache metadata out of the serialised result, but remember
+ * the exact geometry input that produced each result so a caller cannot reuse
+ * a PASS after mutating a layout in place.
+ */
+const VALIDATION_METADATA = new WeakMap<ValidationResult, {
+  project: NormalizedProject;
+  inputKey: string | undefined;
+}>();
+
+function validationInputKey(layout: Layout): string | undefined {
+  try {
+    return JSON.stringify({
+      id: layout.id,
+      footprint: layout.footprint,
+      spaces: Array.isArray(layout.spaces) ? layout.spaces : [],
+      portals: Array.isArray(layout.portals) ? layout.portals : [],
+    });
+  } catch {
+    // A cyclic malformed candidate will be rejected by the validator.  It
+    // must not be considered a matching cached validation result.
+    return undefined;
+  }
+}
+
+/** True only when a validation result was produced for this project/input. */
+export function validationMatchesInput(
+  validation: ValidationResult,
+  layout: Layout,
+  project: NormalizedProject,
+): boolean {
+  const metadata = VALIDATION_METADATA.get(validation);
+  return metadata !== undefined && metadata.project === project &&
+    metadata.inputKey !== undefined && metadata.inputKey === validationInputKey(layout);
+}
+
 // Portal graph and reachability helpers historically lived here and remain
 // available through this module for backward compatibility.
 export {
@@ -135,13 +172,15 @@ export function validateLayout(
     .filter((evaluation) => evaluation.status === "fail")
     .map(evaluationToViolation);
 
-  return {
+  const result: ValidationResult = {
     valid: violations.length === 0,
     violations,
     counts: { errors: violations.length, warnings: 0 },
     graph: context.graph,
     reachableSpaceIds: [...context.reachable],
   };
+  VALIDATION_METADATA.set(result, { project, inputKey: validationInputKey(layout) });
+  return result;
 }
 
 export const hardValidateLayout = validateLayout;

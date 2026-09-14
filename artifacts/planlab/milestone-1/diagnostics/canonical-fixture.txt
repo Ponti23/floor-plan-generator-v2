@@ -1,7 +1,7 @@
 PlanLab project inspection planlab-project-inspection-1
 Project: canonical-planlab-project (PlanLab canonical prototype)
 Schema: v1 | Seed: canonical-0
-Fingerprint: sha256:95d89f35db8b7eea5bc52196cb70f49a8885cf37bbdde5a82a5caff50cbc061d
+Fingerprint: sha256:b8f11f6232fbc26b15a49b610c391b62dffb4b002a2e57935bc74d70d44dbf03
 
 Discretization (grid 250 mm)
 Project: canonical-planlab-project

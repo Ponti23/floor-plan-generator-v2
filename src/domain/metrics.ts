@@ -19,11 +19,11 @@ import {
 import {
   GRID_UNIT_METRES,
   GRID_M2,
+  TARGET_GFA_M2,
   MAX_GFA_M2,
   MIN_MEANINGFUL_SHARED_WALL_UNITS,
 } from "./constants.ts";
 import {
-  roomSelectorKey,
   type NormalizedProject,
   type RoomInstance,
   type RoomSelector,
@@ -187,7 +187,7 @@ export interface LayoutMetrics {
   observations: MetricObservation[];
 }
 
-export const METRICS_VERSION = "planlab-metrics-0.5";
+export const METRICS_VERSION = "planlab-metrics-0.6";
 
 /** Named breakpoints for the intentionally small prototype utility model. */
 export interface MetricConfig {
@@ -198,9 +198,17 @@ export interface MetricConfig {
   defaultAdjacencyTargetUnits: number;
   defaultNearTargetUnits: number;
   defaultExteriorTargetUnits: number;
+  routeDistanceTargetUnits: number;
+  garageDistanceTargetUnits: number;
+  northOpportunityTargetUnits: number;
+  wetClusteringDistanceTargetUnits: number;
+  exteriorTargetHighUnits: number;
+  exteriorTargetMediumUnits: number;
+  exteriorTargetLowUnits: number;
   targetCirculationRatio: number;
   unacceptableCirculationRatio: number;
   privateDepthTargetUnits: number;
+  deadEndBaselineComponents: number;
 }
 
 export const METRIC_CONFIG: Readonly<MetricConfig> = Object.freeze({
@@ -211,9 +219,17 @@ export const METRIC_CONFIG: Readonly<MetricConfig> = Object.freeze({
   defaultAdjacencyTargetUnits: MIN_MEANINGFUL_SHARED_WALL_UNITS,
   defaultNearTargetUnits: 12,
   defaultExteriorTargetUnits: 12,
+  routeDistanceTargetUnits: 48,
+  garageDistanceTargetUnits: 24,
+  northOpportunityTargetUnits: 12,
+  wetClusteringDistanceTargetUnits: 12,
+  exteriorTargetHighUnits: 16,
+  exteriorTargetMediumUnits: 12,
+  exteriorTargetLowUnits: 8,
   targetCirculationRatio: 0.15,
   unacceptableCirculationRatio: 0.35,
   privateDepthTargetUnits: 16,
+  deadEndBaselineComponents: 1,
 });
 
 function clamp01(value: number): number {
@@ -221,8 +237,11 @@ function clamp01(value: number): number {
   return Math.max(0, Math.min(1, value));
 }
 
-function finitePositive(value: number | undefined, fallback: number): number {
-  return value !== undefined && Number.isFinite(value) && value > 0 ? value : fallback;
+function nonNegativeBreakpoint(value: number, name: string): number {
+  if (!Number.isFinite(value) || value < 0) {
+    throw new RangeError(`${name} must be a finite non-negative number`);
+  }
+  return value;
 }
 
 /**
@@ -237,7 +256,7 @@ export function preferredAreaUtility(
   zeroUtilityRatio = METRIC_CONFIG.preferredAreaZeroUtilityRatio,
 ): number {
   if (!Number.isFinite(actualArea) || actualArea <= 0) return 0;
-  if (!Number.isFinite(preferredArea) || preferredArea <= 0) return 1;
+  if (!Number.isFinite(preferredArea) || preferredArea <= 0) return 0;
   if (!Number.isFinite(oversizeTolerance) || oversizeTolerance < 1) {
     throw new RangeError("oversizeTolerance must be at least 1");
   }
@@ -279,10 +298,10 @@ export function aspectUtility(
     : Math.max(first, second) / Math.max(1e-9, Math.min(first, second));
   const preferred = fourth === undefined ? second : third;
   const hard = fourth === undefined ? third : fourth;
-  if (!Number.isFinite(ratio) || ratio <= 0) return 0;
   if (!Number.isFinite(preferred) || !Number.isFinite(hard) || preferred <= 0 || hard <= 0 || hard < preferred) {
     throw new RangeError("hard aspect ratio must be at least the preferred ratio");
   }
+  if (!Number.isFinite(ratio) || ratio <= 0) return 0;
   if (ratio <= preferred) return 1;
   // A square-only constraint has no decline interval.  A square remains fully
   // useful, while any non-square rectangle fails the hard aspect breakpoint.
@@ -295,7 +314,8 @@ export function adjacencyUtility(
   targetLengthUnits = METRIC_CONFIG.defaultAdjacencyTargetUnits,
 ): number {
   if (!Number.isFinite(sharedLengthUnits) || sharedLengthUnits <= 0) return 0;
-  return clamp01(sharedLengthUnits / finitePositive(targetLengthUnits, 1));
+  const target = nonNegativeBreakpoint(targetLengthUnits, "target shared wall length");
+  return target === 0 ? 1 : clamp01(sharedLengthUnits / target);
 }
 
 export function nearnessUtility(
@@ -303,7 +323,8 @@ export function nearnessUtility(
   targetDistanceUnits = METRIC_CONFIG.defaultNearTargetUnits,
 ): number {
   if (!Number.isFinite(edgeDistanceUnits) || edgeDistanceUnits < 0) return 0;
-  const target = finitePositive(targetDistanceUnits, 1);
+  const target = nonNegativeBreakpoint(targetDistanceUnits, "target distance");
+  if (target === 0) return edgeDistanceUnits === 0 ? 1 : 0;
   return clamp01(1 - edgeDistanceUnits / target);
 }
 
@@ -312,7 +333,8 @@ export function exteriorUtility(
   targetContactUnits = METRIC_CONFIG.defaultExteriorTargetUnits,
 ): number {
   if (!Number.isFinite(contactUnits) || contactUnits <= 0) return 0;
-  return clamp01(contactUnits / finitePositive(targetContactUnits, 1));
+  const target = nonNegativeBreakpoint(targetContactUnits, "target exterior contact");
+  return target === 0 ? 1 : clamp01(contactUnits / target);
 }
 
 export function circulationRatioUtility(
@@ -321,11 +343,13 @@ export function circulationRatioUtility(
   unacceptableRatio = METRIC_CONFIG.unacceptableCirculationRatio,
 ): number {
   if (!Number.isFinite(ratio) || ratio < 0) return 0;
-  if (unacceptableRatio <= targetRatio) {
+  const target = nonNegativeBreakpoint(targetRatio, "target circulation ratio");
+  const unacceptable = nonNegativeBreakpoint(unacceptableRatio, "unacceptable circulation ratio");
+  if (unacceptable <= target) {
     throw new RangeError("unacceptable circulation ratio must exceed target ratio");
   }
-  if (ratio <= targetRatio) return 1;
-  return clamp01(1 - (ratio - targetRatio) / (unacceptableRatio - targetRatio));
+  if (ratio <= target) return 1;
+  return clamp01(1 - (ratio - target) / (unacceptable - target));
 }
 
 export function unallocatedUtility(unallocatedRatio: number): number {
@@ -338,8 +362,60 @@ export function separationUtility(
   targetDistanceUnits = METRIC_CONFIG.defaultNearTargetUnits,
 ): number {
   if (!Number.isFinite(edgeDistanceUnits) || edgeDistanceUnits < 0) return 0;
-  return clamp01(edgeDistanceUnits / finitePositive(targetDistanceUnits, 1));
+  const target = nonNegativeBreakpoint(targetDistanceUnits, "target separation distance");
+  return target === 0 ? (edgeDistanceUnits > 0 ? 1 : 0) : clamp01(edgeDistanceUnits / target);
 }
+
+/**
+ * Planning efficiency is a reporting ratio, not allocation coverage.  Garage
+ * area is excluded from both sides so the habitable comparison is made only
+ * against the non-garage portion of the footprint.
+ */
+export function planningEfficiencyRatio(
+  programmedUsableAreaUnits2: number,
+  footprintAreaUnits2: number,
+  garageAreaUnits2: number,
+): number {
+  if (!Number.isFinite(programmedUsableAreaUnits2) || programmedUsableAreaUnits2 < 0) return 0;
+  if (!Number.isFinite(footprintAreaUnits2) || footprintAreaUnits2 <= 0) return 0;
+  if (!Number.isFinite(garageAreaUnits2) || garageAreaUnits2 < 0) return 0;
+  const denominator = footprintAreaUnits2 - garageAreaUnits2;
+  return denominator <= 0 ? 0 : programmedUsableAreaUnits2 / denominator;
+}
+
+/** The bounded utility used when the reporting ratio is included in scoring. */
+export function planningEfficiencyUtility(
+  programmedUsableAreaUnits2: number,
+  footprintAreaUnits2: number,
+  garageAreaUnits2: number,
+): number {
+  return clamp01(planningEfficiencyRatio(
+    programmedUsableAreaUnits2,
+    footprintAreaUnits2,
+    garageAreaUnits2,
+  ));
+}
+
+/**
+ * Allocation ratio diagnoses how much of the footprint is assigned to rooms,
+ * garage, and circulation.  It is intentionally not a quality utility: an
+ * overlap can make this additive diagnostic exceed one and remains a hard
+ * validation failure.
+ */
+export function allocationRatio(
+  programmedUsableAreaUnits2: number,
+  garageAreaUnits2: number,
+  circulationAreaUnits2: number,
+  footprintAreaUnits2: number,
+): number {
+  if (!Number.isFinite(footprintAreaUnits2) || footprintAreaUnits2 <= 0) return 0;
+  if (![programmedUsableAreaUnits2, garageAreaUnits2, circulationAreaUnits2]
+    .every((value) => Number.isFinite(value) && value >= 0)) return 0;
+  return (programmedUsableAreaUnits2 + garageAreaUnits2 + circulationAreaUnits2) / footprintAreaUnits2;
+}
+
+export const calculatePlanningEfficiency = planningEfficiencyRatio;
+export const calculateAllocationRatio = allocationRatio;
 
 function average(values: readonly number[], empty = 1): number {
   return values.length === 0 ? empty : values.reduce((sum, value) => sum + value, 0) / values.length;
@@ -570,12 +646,17 @@ function roomSelection(
   facts: readonly RoomFact[],
   selector: RoomSelector,
 ): RoomFact[] {
-  const key = roomSelectorKey(selector);
-  const ids = new Set(
-    project.rooms
-      .filter((room) => room.id === key || room.requirementId === key || room.kind === key)
-      .map((room) => room.id),
-  );
+  const ids = typeof selector === "string"
+    ? new Set(
+      project.rooms
+        .filter((room) => room.id === selector || room.requirementId === selector || room.kind === selector)
+        .map((room) => room.id),
+    )
+    : selector.type === "instance"
+      ? new Set([selector.id])
+      : selector.type === "requirement"
+        ? new Set(project.rooms.filter((room) => room.requirementId === selector.id).map((room) => room.id))
+        : new Set(project.rooms.filter((room) => room.kind === selector.kind).map((room) => room.id));
   return facts.filter((fact) => ids.has(fact.instanceId));
 }
 
@@ -740,20 +821,19 @@ function bedroomGroupingUtility(facts: LayoutFacts, project: NormalizedProject):
 function wetClusteringUtility(facts: LayoutFacts): number {
   const wet = facts.roomFacts.filter((fact) => fact.wet);
   if (wet.length < 2) return 1;
-  const diagonal = Math.max(1, Math.hypot(
-    facts.footprintAreaUnits2 > 0 ? Math.sqrt(facts.footprintAreaUnits2) : 1,
-    facts.footprintAreaUnits2 > 0 ? Math.sqrt(facts.footprintAreaUnits2) : 1,
-  ));
   const values: number[] = [];
   for (let first = 0; first < wet.length; first += 1) {
     for (let second = first + 1; second < wet.length; second += 1) {
       const shared = facts.sharedWalls.find(
         (candidate) => candidate.a === (wet[first].instanceId < wet[second].instanceId ? wet[first].instanceId : wet[second].instanceId) &&
           candidate.b === (wet[first].instanceId < wet[second].instanceId ? wet[second].instanceId : wet[first].instanceId),
-      )?.lengthUnits ?? 0;
+        )?.lengthUnits ?? 0;
       const distance = distanceFor(facts.roomDistances, wet[first].instanceId, wet[second].instanceId);
-      const distanceUtility = Number.isFinite(distance) ? 1 - clamp01(distance / diagonal) : 0;
-      values.push(Math.max(adjacencyUtility(shared), distanceUtility));
+      const distanceUtility = nearnessUtility(distance, METRIC_CONFIG.wetClusteringDistanceTargetUnits);
+      // A useful shared wall is a positive clustering bonus.  Keep both
+      // signals bounded so a pair cannot contribute more than one unit of
+      // utility when it is both adjacent and near.
+      values.push(clamp01(adjacencyUtility(shared) + distanceUtility));
     }
   }
   return average(values);
@@ -761,9 +841,9 @@ function wetClusteringUtility(facts: LayoutFacts): number {
 
 function roomTargetExterior(room: RoomInstance): number {
   switch (room.traits.exteriorPreference) {
-    case "high": return 16;
-    case "medium": return 12;
-    case "low": return 8;
+    case "high": return METRIC_CONFIG.exteriorTargetHighUnits;
+    case "medium": return METRIC_CONFIG.exteriorTargetMediumUnits;
+    case "low": return METRIC_CONFIG.exteriorTargetLowUnits;
     default: return 0;
   }
 }
@@ -853,14 +933,8 @@ export function computeLayoutFacts(
   // the union, so a malformed space that spills outside cannot make an interior
   // void disappear from facts.  Both numbers come from the shared index.
   const unallocatedInteriorAreaUnits2 = indexes.unallocatedInteriorAreaUnits2;
-  const denominator = footprintArea - garageAreaUnits2;
-  // Keep the category totals additive for the allocation diagnostic.  Unlike
-  // unallocated area (which is based on geometric union), this intentionally
-  // does not subtract cross-category overlaps; an invalid layout must not look
-  // well allocated merely because union coverage hid the double allocation.
-  const allocatedAreaUnits2 = programmedUsableAreaUnits2 + garageAreaUnits2 + circulationAreaUnits2;
   const targetGfaUnits2 = Math.floor(
-    (project.planning.targetGfaMm2 ?? 180 * 1_000_000) / (GRID_M2 * 1_000_000),
+    (project.planning.targetGfaMm2 ?? TARGET_GFA_M2 * 1_000_000) / (GRID_M2 * 1_000_000),
   );
   const maxGfaUnits2 = Math.floor(
     Math.min(
@@ -888,8 +962,17 @@ export function computeLayoutFacts(
     unallocatedInteriorAreaM2: unallocatedInteriorAreaUnits2 * GRID_M2,
     unallocatedInteriorRatio: footprintArea === 0 ? 1 : unallocatedInteriorAreaUnits2 / footprintArea,
     overlapAreaUnits2: indexes.overlapAreaUnits2,
-    allocationRatio: footprintArea === 0 ? 0 : allocatedAreaUnits2 / footprintArea,
-    planningEfficiency: denominator <= 0 ? 0 : programmedUsableAreaUnits2 / denominator,
+    allocationRatio: allocationRatio(
+      programmedUsableAreaUnits2,
+      garageAreaUnits2,
+      circulationAreaUnits2,
+      footprintArea,
+    ),
+    planningEfficiency: planningEfficiencyRatio(
+      programmedUsableAreaUnits2,
+      footprintArea,
+      garageAreaUnits2,
+    ),
     targetGfaUnits2,
     maxGfaUnits2,
     gfaDeltaFromTargetUnits2: footprintArea - targetGfaUnits2,
@@ -927,7 +1010,7 @@ export function computeLayoutFacts(
 export const calculateLayoutFacts = computeLayoutFacts;
 export const deriveLayoutFacts = computeLayoutFacts;
 
-function targetFootprintUtility(facts: LayoutFacts): number {
+export function targetFootprintUtility(facts: LayoutFacts): number {
   if (facts.targetGfaUnits2 <= 0) return 0;
   return clamp01(1 - Math.abs(facts.gfaDeltaFromTargetUnits2) / facts.targetGfaUnits2);
 }
@@ -1008,7 +1091,7 @@ export function evaluateLayoutMetrics(
   const routeValues = project.rooms
     .map((room) => facts.routeDistancesUnits[room.id])
     .filter((distance): distance is number => distance !== null && Number.isFinite(distance));
-  const routeUtilities = routeValues.map((distance) => nearnessUtility(distance, 48));
+  const routeUtilities = routeValues.map((distance) => nearnessUtility(distance, METRIC_CONFIG.routeDistanceTargetUnits));
   const circulation = category("flow", [
     makeMetric(
       "flow",
@@ -1040,7 +1123,10 @@ export function evaluateLayoutMetrics(
     makeMetric(
       "flow",
       "deadEnds",
-      1 - clamp01(facts.deadEndCount / Math.max(1, facts.circulationComponentCount + 1)),
+      1 - clamp01(facts.deadEndCount / Math.max(
+        METRIC_CONFIG.deadEndBaselineComponents,
+        facts.circulationComponentCount + METRIC_CONFIG.deadEndBaselineComponents,
+      )),
       facts.deadEndCount,
       { deadEndCount: facts.deadEndCount, circulationComponents: facts.circulationComponentCount },
       ["circulation:deadEnds"],
@@ -1078,7 +1164,7 @@ export function evaluateLayoutMetrics(
   const orientationRooms = placedRooms.filter((fact) => fact.kind === "living" || fact.kind === "dining");
   const northUtilities = orientationRooms.map((fact) => exteriorUtility(
     fact.exteriorContactBySide.north,
-    Math.max(1, Math.min(fact.rect.width, 12)),
+    Math.max(1, Math.min(fact.rect.width, METRIC_CONFIG.northOpportunityTargetUnits)),
   ));
   const privateRooms = placedRooms.filter((fact) => fact.zone === "private");
   const privateDepthUtilities = privateRooms.map((fact) => {
@@ -1128,10 +1214,16 @@ export function evaluateLayoutMetrics(
   const serviceRooms = placedRooms.filter((fact) => fact.wet || fact.zone === "service");
   const garageUtilities = garages.flatMap((garage) => {
     const related = placedRooms.filter((fact) => ["kitchen", "laundry"].includes(fact.kind));
-    const near = related.map((fact) => nearnessUtility(distanceFor(facts.roomDistances, garage.instanceId, fact.instanceId), 24));
+    const near = related.map((fact) => nearnessUtility(
+      distanceFor(facts.roomDistances, garage.instanceId, fact.instanceId),
+      METRIC_CONFIG.garageDistanceTargetUnits,
+    ));
     const entryNear = entryFacts.length === 0
       ? 1
-      : Math.max(...entryFacts.map((fact) => nearnessUtility(boundaryDistance(garage.rect, fact.rect), 24)));
+      : Math.max(...entryFacts.map((fact) => nearnessUtility(
+        boundaryDistance(garage.rect, fact.rect),
+        METRIC_CONFIG.garageDistanceTargetUnits,
+      )));
     return [average(near), entryNear];
   });
   const footprint = isGridRect(layout.footprint) ? layout.footprint : undefined;
@@ -1170,7 +1262,11 @@ export function evaluateLayoutMetrics(
     makeMetric(
       "servicesSite",
       "planningEfficiency",
-      clamp01(facts.planningEfficiency),
+      planningEfficiencyUtility(
+        facts.programmedUsableAreaUnits2,
+        facts.footprintAreaUnits2,
+        facts.garageAreaUnits2,
+      ),
       facts.planningEfficiency,
       { programmedUsableAreaUnits2: facts.programmedUsableAreaUnits2, footprintMinusGarageUnits2: facts.footprintAreaUnits2 - facts.garageAreaUnits2 },
       ["area:planningEfficiency"],

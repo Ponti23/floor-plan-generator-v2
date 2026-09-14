@@ -13,11 +13,12 @@ import {
 } from "./metrics.ts";
 import {
   validateLayout,
+  validationMatchesInput,
   type ValidationResult,
   type ValidationViolation,
 } from "./validation.ts";
 
-export const SCORING_VERSION = "planlab-scoring-0.4";
+export const SCORING_VERSION = "planlab-scoring-0.5";
 
 export type StrategyProfileId = "compactEfficiency" | "bestFlow" | "balanced";
 
@@ -309,7 +310,9 @@ export function scoreLayout(
   validation?: ValidationResult,
 ): LayoutScorecard {
   const id = profileId(strategy);
-  const hard = validation ?? validateLayout(layout, project);
+  const hard = validation && validationMatchesInput(validation, layout, project)
+    ? validation
+    : validateLayout(layout, project);
   const derivedFacts = facts ?? computeLayoutFacts(layout, project, hard);
   const metrics = evaluateLayoutMetrics(layout, project, derivedFacts);
   return createScorecard(layout, hard, derivedFacts, metrics, id);
@@ -325,7 +328,9 @@ export function scoreLayoutProfiles(
   facts?: LayoutFacts,
   validation?: ValidationResult,
 ): LayoutScorecardSet {
-  const hard = validation ?? validateLayout(layout, project);
+  const hard = validation && validationMatchesInput(validation, layout, project)
+    ? validation
+    : validateLayout(layout, project);
   const derivedFacts = facts ?? computeLayoutFacts(layout, project, hard);
   const metrics = evaluateLayoutMetrics(layout, project, derivedFacts);
   const scorecards = Object.fromEntries(
