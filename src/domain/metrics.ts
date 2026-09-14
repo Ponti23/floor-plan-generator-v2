@@ -3,7 +3,7 @@ import {
   boundaryDistance,
   centre,
   exteriorContactBySide,
-  intersectionArea,
+  intersection,
   isGridRect,
   sharedWallLength,
   unionArea,
@@ -165,7 +165,7 @@ export interface LayoutMetrics {
   observations: MetricObservation[];
 }
 
-export const METRICS_VERSION = "planlab-metrics-0.3";
+export const METRICS_VERSION = "planlab-metrics-0.4";
 
 /** Named breakpoints for the intentionally small prototype utility model. */
 export const METRIC_CONFIG = Object.freeze({
@@ -331,31 +331,127 @@ function emptyGraph(layout: Layout): PortalGraph {
   return { nodes, edges: [], adjacency };
 }
 
+interface PortalRouteNode {
+  id: string;
+  point: { x: number; y: number };
+  spaces: string[];
+}
+
+function portalMidpoint(
+  portal: Layout["portals"][number],
+  rectById: ReadonlyMap<string, GridRect>,
+): { x: number; y: number } | null {
+  const hostId = portal.a === EXTERIOR_SPACE_ID ? portal.b : portal.a;
+  const host = rectById.get(hostId);
+  if (!host) return null;
+  const midpoint = portal.start + portal.length / 2;
+  switch (portal.wall) {
+    case "north": return { x: midpoint, y: host.y };
+    case "east": return { x: host.x + host.width, y: midpoint };
+    case "south": return { x: midpoint, y: host.y + host.depth };
+    case "west": return { x: host.x, y: midpoint };
+  }
+}
+
+function manhattan(
+  first: { x: number; y: number },
+  second: { x: number; y: number },
+): number {
+  return Math.abs(first.x - second.x) + Math.abs(first.y - second.y);
+}
+
 function graphRouteDistances(
   layout: Layout,
   graph: PortalGraph,
 ): { distances: Record<string, number | null>; reachable: string[] } {
   const rectById = new Map(rectsFor(layout).map((space) => [space.instanceId, space.rect]));
-  const distances = new Map<string, number>([[EXTERIOR_SPACE_ID, 0]]);
-  const pending = [EXTERIOR_SPACE_ID];
-  for (let index = 0; index < pending.length; index += 1) {
-    const current = pending[index];
-    const currentDistance = distances.get(current) ?? 0;
-    for (const next of graph.adjacency[current] ?? []) {
-      const currentRect = rectById.get(current);
-      const nextRect = rectById.get(next);
-      const edgeLength = currentRect && nextRect
-        ? Math.max(1, boundaryDistance(currentRect, nextRect))
-        : 1;
-      const proposed = currentDistance + edgeLength;
-      if ((distances.get(next) ?? Number.POSITIVE_INFINITY) <= proposed) continue;
-      distances.set(next, proposed);
-      pending.push(next);
+  const portalById = new Map(
+    (Array.isArray(layout.portals) ? layout.portals : []).map((portal) => [portal.id, portal]),
+  );
+  const portalNodes: PortalRouteNode[] = graph.edges.flatMap((edge) => {
+    const portal = portalById.get(edge.portalId);
+    if (!portal) return [];
+    const point = portalMidpoint(portal, rectById);
+    if (!point) return [];
+    return [{
+      id: edge.portalId,
+      point,
+      spaces: [edge.a, edge.b].filter((spaceId) => spaceId !== EXTERIOR_SPACE_ID),
+    }];
+  });
+  const nodeById = new Map(portalNodes.map((node) => [node.id, node]));
+  const portalsBySpace = new Map<string, string[]>();
+  for (const node of portalNodes) {
+    for (const spaceId of node.spaces) {
+      const ids = portalsBySpace.get(spaceId) ?? [];
+      ids.push(node.id);
+      portalsBySpace.set(spaceId, ids);
+    }
+  }
+  const neighbours = new Map(portalNodes.map((node) => [node.id, [] as Array<{ id: string; cost: number }>]));
+  for (const ids of portalsBySpace.values()) {
+    for (let first = 0; first < ids.length; first += 1) {
+      for (let second = first + 1; second < ids.length; second += 1) {
+        const a = nodeById.get(ids[first]!);
+        const b = nodeById.get(ids[second]!);
+        if (!a || !b) continue;
+        const cost = manhattan(a.point, b.point);
+        neighbours.get(a.id)?.push({ id: b.id, cost });
+        neighbours.get(b.id)?.push({ id: a.id, cost });
+      }
+    }
+  }
+  const entranceNode = graph.edges.find((edge) =>
+    edge.portalId === layout.entrancePortalId &&
+      (edge.a === EXTERIOR_SPACE_ID || edge.b === EXTERIOR_SPACE_ID),
+  ) ?? graph.edges.find((edge) => edge.a === EXTERIOR_SPACE_ID || edge.b === EXTERIOR_SPACE_ID);
+  const portalDistances = new Map(portalNodes.map((node) => [node.id, Number.POSITIVE_INFINITY]));
+  if (entranceNode && portalDistances.has(entranceNode.portalId)) {
+    portalDistances.set(entranceNode.portalId, 0);
+  }
+  const pending = new Set(portalNodes.map((node) => node.id));
+  while (pending.size > 0) {
+    let current: string | undefined;
+    let currentDistance = Number.POSITIVE_INFINITY;
+    for (const node of portalNodes) {
+      if (!pending.has(node.id)) continue;
+      const distance = portalDistances.get(node.id) ?? Number.POSITIVE_INFINITY;
+      if (distance < currentDistance) {
+        current = node.id;
+        currentDistance = distance;
+      }
+    }
+    if (!current || !Number.isFinite(currentDistance)) break;
+    pending.delete(current);
+    for (const next of neighbours.get(current) ?? []) {
+      if (!pending.has(next.id)) continue;
+      const proposed = currentDistance + next.cost;
+      if (proposed < (portalDistances.get(next.id) ?? Number.POSITIVE_INFINITY)) {
+        portalDistances.set(next.id, proposed);
+      }
     }
   }
   const serialised: Record<string, number | null> = {};
-  for (const node of graph.nodes) serialised[node] = distances.get(node) ?? null;
-  return { distances: serialised, reachable: [...distances.keys()] };
+  const reachable: string[] = [];
+  for (const spaceId of graph.nodes) {
+    if (spaceId === EXTERIOR_SPACE_ID) {
+      serialised[spaceId] = 0;
+      reachable.push(spaceId);
+      continue;
+    }
+    const rect = rectById.get(spaceId);
+    const centrePoint = rect ? centre(rect) : undefined;
+    const distance = Math.min(...(portalsBySpace.get(spaceId) ?? []).map((portalId) => {
+      const node = nodeById.get(portalId);
+      const portalDistance = portalDistances.get(portalId) ?? Number.POSITIVE_INFINITY;
+      return node && centrePoint && Number.isFinite(portalDistance)
+        ? portalDistance + manhattan(node.point, centrePoint)
+        : Number.POSITIVE_INFINITY;
+    }));
+    serialised[spaceId] = Number.isFinite(distance) ? distance : null;
+    if (Number.isFinite(distance)) reachable.push(spaceId);
+  }
+  return { distances: serialised, reachable };
 }
 
 function componentCount(
@@ -390,14 +486,10 @@ function countDeadEnds(spaces: readonly PlacedSpace[], graph: PortalGraph): numb
   ).length;
 }
 
-function overlapArea(rectangles: readonly GridRect[]): number {
-  let total = 0;
-  for (let first = 0; first < rectangles.length; first += 1) {
-    for (let second = first + 1; second < rectangles.length; second += 1) {
-      total += intersectionArea(rectangles[first], rectangles[second]);
-    }
-  }
-  return total;
+function multiplyAllocatedArea(rectangles: readonly GridRect[]): number {
+  // Sum-minus-union measures every extra allocation exactly once. Pairwise
+  // intersection totals overstate a region covered by three or more spaces.
+  return Math.max(0, rectangles.reduce((sum, rect) => sum + area(rect), 0) - unionArea(rectangles));
 }
 
 function sharedWallsForRooms(roomFacts: readonly RoomFact[]): SharedWallFact[] {
@@ -632,11 +724,6 @@ function wetClusteringUtility(facts: LayoutFacts): number {
   return average(values);
 }
 
-function roomAreaUtility(fact: RoomFact, room: RoomInstance): number {
-  const minimum = finitePositive(room.dimensions.minAreaUnits2, 1);
-  return clamp01(fact.areaUnits2 / minimum);
-}
-
 function roomTargetExterior(room: RoomInstance): number {
   switch (room.traits.exteriorPreference) {
     case "high": return 16;
@@ -724,7 +811,12 @@ export function computeLayoutFacts(
     return room ? isGarage(room) : false;
   });
   const programmedFacts = roomFacts.filter((fact) => !garageFacts.includes(fact));
-  const coveredArea = unionArea(spaces.map((space) => space.rect));
+  // Coverage is an interior measure. A malformed space that spills outside
+  // the footprint must not make an interior void disappear from facts.
+  const coveredArea = unionArea(spaces.flatMap((space) => {
+    const covered = intersection(space.rect, footprint);
+    return covered ? [covered] : [];
+  }));
   const footprintArea = area(footprint);
   const garageAreaUnits2 = unionArea(garageFacts.map((fact) => fact.rect));
   const circulationAreaUnits2 = unionArea(transitSpaces.map((space) => space.rect));
@@ -741,7 +833,10 @@ export function computeLayoutFacts(
     (project.planning.targetGfaMm2 ?? 180 * 1_000_000) / (GRID_M2 * 1_000_000),
   );
   const maxGfaUnits2 = Math.floor(
-    (project.planning.maxGfaMm2 ?? MAX_GFA_M2 * 1_000_000) / (GRID_M2 * 1_000_000),
+    Math.min(
+      project.planning.maxGfaMm2 ?? MAX_GFA_M2 * 1_000_000,
+      MAX_GFA_M2 * 1_000_000,
+    ) / (GRID_M2 * 1_000_000),
   );
   return {
     factsVersion: METRICS_VERSION,
@@ -762,7 +857,7 @@ export function computeLayoutFacts(
     unallocatedInteriorAreaUnits2,
     unallocatedInteriorAreaM2: unallocatedInteriorAreaUnits2 * GRID_M2,
     unallocatedInteriorRatio: footprintArea === 0 ? 1 : unallocatedInteriorAreaUnits2 / footprintArea,
-    overlapAreaUnits2: overlapArea(spaces.map((space) => space.rect)),
+    overlapAreaUnits2: multiplyAllocatedArea(spaces.map((space) => space.rect)),
     allocationRatio: footprintArea === 0 ? 0 : allocatedAreaUnits2 / footprintArea,
     planningEfficiency: denominator <= 0 ? 0 : programmedUsableAreaUnits2 / denominator,
     targetGfaUnits2,
@@ -810,7 +905,6 @@ export function evaluateLayoutMetrics(
 ): LayoutMetrics {
   const roomById = new Map(project.rooms.map((room) => [room.id, room]));
   const placedRooms = facts.roomFacts.filter((fact) => roomById.has(fact.instanceId));
-  const minAreaUtilities = placedRooms.map((fact) => roomAreaUtility(fact, roomById.get(fact.instanceId)!));
   const preferredRooms = placedRooms.filter((fact) => {
     const preferred = roomById.get(fact.instanceId)?.dimensions.preferredAreaUnits2;
     return preferred !== undefined;
@@ -830,14 +924,6 @@ export function evaluateLayoutMetrics(
     );
   });
   const program = category("programSpace", [
-    makeMetric(
-      "programSpace",
-      "minimumArea",
-      average(minAreaUtilities),
-      average(minAreaUtilities),
-      { rooms: placedRooms.length, requiredRooms: facts.requiredRoomCount },
-      placedRooms.length > 0 ? ["program:minimumArea"] : ["program:minimumArea:notApplicable"],
-    ),
     makeMetric(
       "programSpace",
       "preferredArea",

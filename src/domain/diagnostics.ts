@@ -15,7 +15,7 @@ import {
   type ValidationResult,
 } from "./validation.ts";
 
-export const DIAGNOSTIC_VERSION = "planlab-diagnostic-0.3";
+export const DIAGNOSTIC_VERSION = "planlab-diagnostic-0.4";
 
 export interface DiagnosticRenderOptions {
   includeGrid?: boolean;

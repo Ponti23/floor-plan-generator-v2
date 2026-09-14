@@ -18,20 +18,20 @@ Spaces:
 - Kitchen [room] @ 26,16 1.50 × 8.50 (12.75 m²)
 - Bathroom [room] @ 20,33 1.50 × 4.25 (6.38 m²)
 - Laundry [room] @ 20,16 1.50 × 4.25 (6.38 m²)
-Score model: planlab-scoring-0.3
+Score model: planlab-scoring-0.4
 Scores:
-- Compact Efficiency: 83/100 | programSpace 88, flow 98, relationships 60, liveability 70, servicesSite 80
+- Compact Efficiency: 80/100 | programSpace 85, flow 78, relationships 60, liveability 96, servicesSite 80
   + validation.hard.pass [validation:hard]
-  + programSpace.minimumArea.strong [program:minimumArea]
   + programSpace.targetFootprint.strong [footprint:targetGfa]
   + programSpace.unallocatedInterior.strong [footprint:unallocated]
-- Best Flow: 82/100 | programSpace 88, flow 98, relationships 60, liveability 70, servicesSite 80
+  − programSpace.proportion.weak [room:garage-1:aspect, room:living-1:aspect, room:bedroom-1:aspect, room:bedroom-2:aspect, room:bedroom-3:aspect, room:kitchen-1:aspect, room:bathroom-1:aspect, room:laundry-1:aspect]
+- Best Flow: 77/100 | programSpace 85, flow 78, relationships 60, liveability 96, servicesSite 80
   + validation.hard.pass [validation:hard]
-  + programSpace.minimumArea.strong [program:minimumArea]
   + programSpace.targetFootprint.strong [footprint:targetGfa]
   + programSpace.unallocatedInterior.strong [footprint:unallocated]
-- Balanced: 80/100 | programSpace 88, flow 98, relationships 60, liveability 70, servicesSite 80
+  − programSpace.proportion.weak [room:garage-1:aspect, room:living-1:aspect, room:bedroom-1:aspect, room:bedroom-2:aspect, room:bedroom-3:aspect, room:kitchen-1:aspect, room:bathroom-1:aspect, room:laundry-1:aspect]
+- Balanced: 80/100 | programSpace 85, flow 78, relationships 60, liveability 96, servicesSite 80
   + validation.hard.pass [validation:hard]
-  + programSpace.minimumArea.strong [program:minimumArea]
   + programSpace.targetFootprint.strong [footprint:targetGfa]
   + programSpace.unallocatedInterior.strong [footprint:unallocated]
+  − programSpace.proportion.weak [room:garage-1:aspect, room:living-1:aspect, room:bedroom-1:aspect, room:bedroom-2:aspect, room:bedroom-3:aspect, room:kitchen-1:aspect, room:bathroom-1:aspect, room:laundry-1:aspect]

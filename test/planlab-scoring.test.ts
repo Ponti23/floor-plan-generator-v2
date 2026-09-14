@@ -11,11 +11,14 @@ import {
   createCrudeDiagnostic,
   evaluateLayoutMetrics,
   generateLayouts,
+  intersection,
   preferredAreaUtility,
   scoreCandidates,
   scoreLayout,
   scoreLayoutProfiles,
   selectDiverseTriplet,
+  validateLayout,
+  area,
   unionArea,
   type Layout,
   type NormalizedProject,
@@ -112,6 +115,52 @@ test("facts preserve the approved area identities and one shared context", () =>
   assert.equal(facts.reachableRequiredRoomCount, facts.requiredRoomCount);
 });
 
+test("route-distance evidence uses portal-to-centre grid distance rather than portal hops", () => {
+  const facts = computeLayoutFacts(layout, project);
+  // Bedroom 1 is reached through the long circulation spine. The old
+  // topological-hop proxy reported only a few edges; this is a real grid-unit
+  // distance suitable for the 12 m (48-unit) flow breakpoint.
+  assert.ok((facts.routeDistancesUnits["bedroom-1"] ?? 0) > 10);
+  assert.ok(Object.values(facts.routeDistancesUnits).some((distance) =>
+    distance !== null && !Number.isInteger(distance),
+  ));
+});
+
+test("overlap evidence counts extra allocations rather than triple-counting their shared area", () => {
+  const overlapping = structuredClone(layout);
+  const rooms = overlapping.spaces.filter((space) => space.role === "room");
+  assert.ok(rooms.length >= 3);
+  const sharedRect = { ...rooms[0]!.rect };
+  rooms[1]!.rect = { ...sharedRect };
+  rooms[2]!.rect = { ...sharedRect };
+
+  const facts = computeLayoutFacts(overlapping, project);
+  assert.equal(facts.overlapAreaUnits2, 2 * area(sharedRect));
+  assert.equal(
+    facts.overlapAreaUnits2,
+    overlapping.spaces.reduce((sum, space) => sum + area(space.rect), 0) -
+      unionArea(overlapping.spaces.map((space) => space.rect)),
+  );
+});
+
+test("spaces outside the footprint cannot conceal unallocated interior area", () => {
+  const outside = structuredClone(layout);
+  const bedroom = outside.spaces.find((space) => space.instanceId === "bedroom-1");
+  assert.ok(bedroom);
+  bedroom!.rect.x = outside.footprint.x - bedroom!.rect.width;
+
+  const facts = computeLayoutFacts(outside, project);
+  const coveredInside = unionArea(outside.spaces.flatMap((space) => {
+    const covered = intersection(space.rect, outside.footprint);
+    return covered ? [covered] : [];
+  }));
+  assert.equal(facts.unallocatedInteriorAreaUnits2, facts.footprintAreaUnits2 - coveredInside);
+  assert.ok(facts.unallocatedInteriorRatio > project.planning.maxUnallocatedInteriorRatio);
+  const validation = validateLayout(outside, project);
+  assert.ok(validation.violations.some((violation) => violation.code === "SPACE_OUTSIDE_FOOTPRINT"));
+  assert.ok(validation.violations.some((violation) => violation.code === "UNALLOCATED_INTERIOR_EXCEEDS_CAP"));
+});
+
 test("all five categories and all three profiles use bounded metrics and evidence", () => {
   const scorecards = scoreLayoutProfiles(layout, project);
   assert.deepEqual(Object.keys(scorecards.scorecards), STRATEGY_PROFILE_IDS);
@@ -128,6 +177,9 @@ test("all five categories and all three profiles use bounded metrics and evidenc
   }
   assert.ok(scorecards.profiles.every((item) => item.valid));
   assert.ok(scorecards.profiles.every((item) => item.explanations.every((item) => item.message && item.evidenceRefs.length > 0)));
+  // Minimum-area compliance is a hard-rule pass, not a score contribution.
+  assert.equal(scorecards.metrics.categories.programSpace.metrics.some((metric) => metric.id === "minimumArea"), false);
+  assert.ok(scorecards.profiles.every((item) => item.explanations.some((explanation) => explanation.key === "validation.hard.pass")));
 });
 
 test("invalid geometry is never rescued by a design score", () => {
@@ -162,6 +214,39 @@ test("interchangeable room relabelling and mirrors do not create diversity", () 
   assert.equal(mirroredComparison.mirroredComparison, true);
 });
 
+test("a valid one-grid near-duplicate stays below the diversity threshold", () => {
+  const nearDuplicate = structuredClone(layout);
+  nearDuplicate.id = `${layout.id}-near-duplicate`;
+  const bedroom = nearDuplicate.spaces.find((space) => space.instanceId === "bedroom-1");
+  const bedroomPortal = nearDuplicate.portals.find((portal) =>
+    portal.kind === "pedestrian" && (portal.a === "bedroom-1" || portal.b === "bedroom-1"),
+  );
+  assert.ok(bedroom);
+  assert.ok(bedroomPortal);
+  bedroom!.rect.depth -= 1;
+  bedroomPortal!.length -= 1;
+  assert.equal(validateLayout(nearDuplicate, project).valid, true);
+
+  const comparison = compareLayoutDiversity(layout, nearDuplicate, project);
+  assert.ok(comparison.distance < DEFAULT_DIVERSITY_THRESHOLD);
+  assert.equal(comparison.diverse, false);
+});
+
+test("interchangeable matching charges an omitted optional instance instead of ignoring it", () => {
+  const optionalProject = structuredClone(project);
+  optionalProject.rooms.find((room) => room.id === "bedroom-3")!.inclusion = "optional";
+  const missingOptional = structuredClone(layout);
+  missingOptional.id = `${layout.id}-without-optional-bedroom`;
+  missingOptional.spaces = missingOptional.spaces.filter((space) => space.instanceId !== "bedroom-3");
+  missingOptional.portals = missingOptional.portals.filter((portal) =>
+    portal.a !== "bedroom-3" && portal.b !== "bedroom-3",
+  );
+
+  const comparison = compareLayoutDiversity(layout, missingOptional, optionalProject);
+  assert.ok(comparison.components.centroid > 0);
+  assert.ok(comparison.distance > 0);
+});
+
 test("joint selection returns a diverse triplet or an honest partial result", () => {
   const selection = generated.selection;
   if (selection.complete) {
@@ -181,7 +266,7 @@ test("joint selection returns a diverse triplet or an honest partial result", ()
 
 test("diagnostic rendering stays crude, deterministic, and inspectable", () => {
   const diagnostic = createCrudeDiagnostic(layout, project);
-  assert.equal(diagnostic.version, "planlab-diagnostic-0.3");
+  assert.equal(diagnostic.version, "planlab-diagnostic-0.4");
   assert.match(diagnostic.svg, /^<svg /);
   assert.match(diagnostic.svg, /data-space-id="/);
   assert.match(diagnostic.svg, /<title/);

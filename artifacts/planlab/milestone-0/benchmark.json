@@ -1,12 +1,88 @@
 {
-  "reportVersion": "planlab-milestone-0-benchmark-0.4",
-  "suiteVersion": "planlab-stage0-seed-suite-0.4",
-  "recordedAt": "2026-09-13T15:47:23.902Z",
-  "engineVersion": "planlab-generator-0.2",
-  "ruleVersion": "planlab-core-1",
+  "reportVersion": "planlab-milestone-0-benchmark-0.5",
+  "suiteVersion": "planlab-stage0-seed-suite-0.5",
+  "recordedAt": "2026-09-14T00:28:48.932Z",
+  "engineVersion": "planlab-generator-0.4",
+  "ruleVersion": "planlab-core-2",
   "environment": {
-    "sourceRevision": "d89814f56a85ee70c7810c5c492eac8707023d8d",
-    "workingTreeStatus": "A  artifacts/planlab/milestone-0/benchmark.json\nA  artifacts/planlab/milestone-0/benchmark.md\nA  artifacts/planlab/milestone-0/diagnostics/README.md\nA  artifacts/planlab/milestone-0/diagnostics/canonical-planlab-canonical-01-balanced.svg\nA  artifacts/planlab/milestone-0/diagnostics/canonical-planlab-canonical-01-balanced.txt\nA  artifacts/planlab/milestone-0/diagnostics/canonical-planlab-canonical-01-bestFlow.svg\nA  artifacts/planlab/milestone-0/diagnostics/canonical-planlab-canonical-01-bestFlow.txt\nA  artifacts/planlab/milestone-0/diagnostics/canonical-planlab-canonical-01-compactEfficiency.svg\nA  artifacts/planlab/milestone-0/diagnostics/canonical-planlab-canonical-01-compactEfficiency.txt\nM  package.json\nAM scripts/benchmark-stage0.mjs\nM  src/domain/generator.ts",
+    "gitHeadAtRun": "0dcbde29d3b5c5237e22579c59848e132b95e578",
+    "workingTreeStatusAtRun": "M artifacts/planlab/milestone-0/benchmark.json\n M artifacts/planlab/milestone-0/benchmark.md\n M artifacts/planlab/milestone-0/diagnostics/canonical-planlab-canonical-01-balanced.svg\n M artifacts/planlab/milestone-0/diagnostics/canonical-planlab-canonical-01-balanced.txt\n M artifacts/planlab/milestone-0/diagnostics/canonical-planlab-canonical-01-bestFlow.svg\n M artifacts/planlab/milestone-0/diagnostics/canonical-planlab-canonical-01-bestFlow.txt\n M artifacts/planlab/milestone-0/diagnostics/canonical-planlab-canonical-01-compactEfficiency.svg\n M artifacts/planlab/milestone-0/diagnostics/canonical-planlab-canonical-01-compactEfficiency.txt\n M scripts/benchmark-stage0.mjs\n M src/domain/diagnostics.ts\n M src/domain/diversity.ts\n M src/domain/generator.ts\n M src/domain/metrics.ts\n M src/domain/normalization.ts\n M src/domain/scoring.ts\n M src/domain/validation.ts\n M test/domain-harness.test.ts\n M test/generator.test.ts\n M test/planlab-scoring.test.ts",
+    "workingTreeCleanAtRun": false,
+    "benchmarkInputFingerprint": "5914900b9515d7825baf0e0f6b4f9a1c4187c91924121aeaefb0efc7eeaf55f4",
+    "benchmarkInputFiles": [
+      {
+        "path": "package.json",
+        "sha256": "b908717bf0a9d7f533dd9fc6782e3d59245a4e4ae2bb61ba4e8213412b306eea"
+      },
+      {
+        "path": "scripts/benchmark-stage0.mjs",
+        "sha256": "c97ca4440706a24613002e8f2b5bcf14557c04dd42fb846f4d6bb7d469baae77"
+      },
+      {
+        "path": "src/domain/constants.ts",
+        "sha256": "024b63f542d3543c2f994d6a848fc814ea669451a61bf682abdf370a6c2a7de7"
+      },
+      {
+        "path": "src/domain/diagnostics.ts",
+        "sha256": "5e19dae658c9fed9fd89f7e51651f0efc7d3576b7a7131ffdb29c200be60685b"
+      },
+      {
+        "path": "src/domain/diversity.ts",
+        "sha256": "5f2b8c530de43c94fa2b9b52ea1042aa8b2a847db020c21aad5d5fa34104d657"
+      },
+      {
+        "path": "src/domain/fixtures.ts",
+        "sha256": "4cdc4677b4df1aee5a50fe89cb22dd606b3f60760627bd6ade802f62fcffda10"
+      },
+      {
+        "path": "src/domain/generate.ts",
+        "sha256": "b99831e1ba4f90104252af24d8ce035d98b9145f36585c7818df4ac3fd269452"
+      },
+      {
+        "path": "src/domain/generator.ts",
+        "sha256": "449b3a341a29461674f038bc72b827c604ae3dd0ef16d2371fe489fb06f1b47c"
+      },
+      {
+        "path": "src/domain/geometry.ts",
+        "sha256": "9a86edb75dcef1d269e573e6909cc8beec7dd09773d6a0d21551369f66d709b2"
+      },
+      {
+        "path": "src/domain/index.ts",
+        "sha256": "97587f5c34f6276886d9faaa7b3fa80e06d64c253dfc0546d89fa49bb6727364"
+      },
+      {
+        "path": "src/domain/layout.ts",
+        "sha256": "c54052869d71c23a7e9a509f836f25830f170dee2a66bff3b8c8b9ac8015b779"
+      },
+      {
+        "path": "src/domain/metrics.ts",
+        "sha256": "1517c26dc764af212bc6226e39524e14d3b5b4dd75488f188acb10cc5898fcaf"
+      },
+      {
+        "path": "src/domain/model.ts",
+        "sha256": "3374cbb177d2e0a31340fd2a9125193c10c81ef0c3e1987cbfdb982c08fe0843"
+      },
+      {
+        "path": "src/domain/normalization.ts",
+        "sha256": "463697622fec75ec70916296a41a1eb13bfdfc32588348cc42e028e5da70ba0e"
+      },
+      {
+        "path": "src/domain/prng.ts",
+        "sha256": "69b9d7257d9208a8f136463c8de8a975a4c5a240a802c2d010917103623d6462"
+      },
+      {
+        "path": "src/domain/scoring.ts",
+        "sha256": "abb58179d685ba455cfeda533e543591755d1d21f80a3a4f0b0132581c558637"
+      },
+      {
+        "path": "src/domain/validateLayout.ts",
+        "sha256": "fe829509fb6634b614c2dc9a983005dd00e208e5532bc9fefbae420fa268e3a0"
+      },
+      {
+        "path": "src/domain/validation.ts",
+        "sha256": "b62e7321ba6224ab091a47aa56b7bae1a29e5af4ed47582b4b75a78b68e3192d"
+      }
+    ],
     "os": "win32 10.0.26200 (Windows 11 Home)",
     "arch": "x64",
     "cpuModel": "AMD Ryzen 5 9500F 6-Core Processor             ",
@@ -16,7 +92,7 @@
     "cwd": "E:\\Projects\\floorplan-generator"
   },
   "methodology": {
-    "seedSuiteVersion": "planlab-stage0-seed-suite-0.4",
+    "seedSuiteVersion": "planlab-stage0-seed-suite-0.5",
     "seedCount": 10,
     "seeds": [
       "planlab-canonical-01",
@@ -31,7 +107,8 @@
       "planlab-canonical-10"
     ],
     "warmupRuns": 1,
-    "timedRuns": 10,
+    "timedRunsPerSeed": 3,
+    "timedRuns": 30,
     "replayRuns": 10,
     "input": "createCanonicalProject(seed), passed to generateLayouts with the explicit seed",
     "timingClock": "node:perf_hooks performance.now",
@@ -42,19 +119,19 @@
       "maxCandidatesPerTopology": 100,
       "maxTotalCandidates": 300
     },
-    "diversityVersion": "planlab-diversity-0.3",
+    "diversityVersion": "planlab-diversity-0.4",
     "diversityThreshold": 0.2,
-    "percentileMethod": "linear interpolation over sorted ten-sample timings",
+    "percentileMethod": "linear interpolation over sorted measured timings",
     "timingTargetsMs": {
       "median": 2000,
       "p95": 4000
     }
   },
   "summary": {
-    "medianMs": 1777.336,
-    "p95Ms": 1920.76,
-    "minimumMs": 1693.287,
-    "maximumMs": 1945.245
+    "medianMs": 1810.531,
+    "p95Ms": 1939.007,
+    "minimumMs": 1679.031,
+    "maximumMs": 1976.939
   },
   "gate": {
     "threeValidLayoutsPerSeed": true,
@@ -69,11 +146,21 @@
   "canonical": [
     {
       "seed": "planlab-canonical-01",
-      "elapsedMs": 1945.245,
-      "replayElapsedMs": 1897.955,
+      "elapsedMs": 1905.153,
+      "timingSamplesMs": [
+        1976.939,
+        1905.153,
+        1876.66
+      ],
+      "timingSamplesRawMs": [
+        1976.9385000000002,
+        1905.1534000000001,
+        1876.6603000000005
+      ],
+      "replayElapsedMs": 1967.239,
       "deterministic": true,
-      "outputHash": "207e55c6eb384facb23c7201735ec1f25be144421505e7267f73dccb033c8fe2",
-      "replayHash": "207e55c6eb384facb23c7201735ec1f25be144421505e7267f73dccb033c8fe2",
+      "outputHash": "2e25c2f1375142b5e634ece7ad83c14a3edc7690267f2eb7d283c3268a25ef5a",
+      "replayHash": "2e25c2f1375142b5e634ece7ad83c14a3edc7690267f2eb7d283c3268a25ef5a",
       "ok": true,
       "candidateCount": 300,
       "independentlyValidCandidateCount": 300,
@@ -84,6 +171,7 @@
       "selectionReason": null,
       "diversityThreshold": 0.2,
       "minimumSelectedPairwiseDistance": 0.395163,
+      "minimumSelectedPairwiseDistanceRaw": 0.3951627695743315,
       "selectedPairwiseDistances": [
         {
           "a": "layout-straight-footprint-40x72-28",
@@ -124,8 +212,8 @@
           "label": "Compact Efficiency",
           "layoutId": "layout-straight-footprint-40x72-28",
           "valid": true,
-          "overallScore": 86,
-          "overallUtility": 0.8564118890327881,
+          "overallScore": 83,
+          "overallUtility": 0.8313108225645341,
           "topology": "straight",
           "footprintVariant": "footprint-40x72"
         },
@@ -134,8 +222,8 @@
           "label": "Best Flow",
           "layoutId": "layout-straight-footprint-40x72-23",
           "valid": true,
-          "overallScore": 82,
-          "overallUtility": 0.8182390763833736,
+          "overallScore": 77,
+          "overallUtility": 0.7719890763833736,
           "topology": "straight",
           "footprintVariant": "footprint-40x72"
         },
@@ -145,7 +233,7 @@
           "layoutId": "layout-L-footprint-48x60-164",
           "valid": true,
           "overallScore": 82,
-          "overallUtility": 0.822990308872367,
+          "overallUtility": 0.8218564113029225,
           "topology": "L",
           "footprintVariant": "footprint-48x60"
         }
@@ -153,11 +241,21 @@
     },
     {
       "seed": "planlab-canonical-02",
-      "elapsedMs": 1701.558,
-      "replayElapsedMs": 1696.69,
+      "elapsedMs": 1699.111,
+      "timingSamplesMs": [
+        1719.68,
+        1679.031,
+        1699.111
+      ],
+      "timingSamplesRawMs": [
+        1719.6798999999992,
+        1679.0313999999998,
+        1699.1110000000008
+      ],
+      "replayElapsedMs": 1704.971,
       "deterministic": true,
-      "outputHash": "6a56b1626457f0582e0946296566844a2138f64f2e5cb331f8bdcc996db6b50c",
-      "replayHash": "6a56b1626457f0582e0946296566844a2138f64f2e5cb331f8bdcc996db6b50c",
+      "outputHash": "a958915b82414d49507b8e342c390071424b2d27fc36c5837a0a8d07e27d3bae",
+      "replayHash": "a958915b82414d49507b8e342c390071424b2d27fc36c5837a0a8d07e27d3bae",
       "ok": true,
       "candidateCount": 300,
       "independentlyValidCandidateCount": 300,
@@ -167,24 +265,25 @@
       "selectionComplete": true,
       "selectionReason": null,
       "diversityThreshold": 0.2,
-      "minimumSelectedPairwiseDistance": 0.227451,
+      "minimumSelectedPairwiseDistance": 0.320363,
+      "minimumSelectedPairwiseDistanceRaw": 0.3203629583969335,
       "selectedPairwiseDistances": [
         {
-          "a": "layout-L-footprint-48x60-171",
+          "a": "layout-L-footprint-48x60-172",
+          "b": "layout-L-footprint-48x60-117",
+          "distance": 0.320363,
+          "diverse": true
+        },
+        {
+          "a": "layout-L-footprint-48x60-172",
           "b": "layout-straight-footprint-40x72-24",
-          "distance": 0.538148,
-          "diverse": true
-        },
-        {
-          "a": "layout-L-footprint-48x60-171",
-          "b": "layout-L-footprint-48x60-172",
-          "distance": 0.227451,
-          "diverse": true
-        },
-        {
-          "a": "layout-straight-footprint-40x72-24",
-          "b": "layout-L-footprint-48x60-172",
           "distance": 0.537394,
+          "diverse": true
+        },
+        {
+          "a": "layout-L-footprint-48x60-117",
+          "b": "layout-straight-footprint-40x72-24",
+          "distance": 0.546635,
           "diverse": true
         }
       ],
@@ -206,42 +305,52 @@
         {
           "strategy": "compactEfficiency",
           "label": "Compact Efficiency",
-          "layoutId": "layout-L-footprint-48x60-171",
+          "layoutId": "layout-L-footprint-48x60-172",
           "valid": true,
-          "overallScore": 86,
-          "overallUtility": 0.8584444460639975,
+          "overallScore": 82,
+          "overallUtility": 0.8228242668224264,
           "topology": "L",
           "footprintVariant": "footprint-48x60"
         },
         {
           "strategy": "bestFlow",
           "label": "Best Flow",
-          "layoutId": "layout-straight-footprint-40x72-24",
+          "layoutId": "layout-L-footprint-48x60-117",
           "valid": true,
-          "overallScore": 82,
-          "overallUtility": 0.8181525440941336,
-          "topology": "straight",
-          "footprintVariant": "footprint-40x72"
+          "overallScore": 78,
+          "overallUtility": 0.7758740738859361,
+          "topology": "L",
+          "footprintVariant": "footprint-48x60"
         },
         {
           "strategy": "balanced",
           "label": "Balanced",
-          "layoutId": "layout-L-footprint-48x60-172",
+          "layoutId": "layout-straight-footprint-40x72-24",
           "valid": true,
-          "overallScore": 81,
-          "overallUtility": 0.8141454634021239,
-          "topology": "L",
-          "footprintVariant": "footprint-48x60"
+          "overallScore": 80,
+          "overallUtility": 0.8012936126562593,
+          "topology": "straight",
+          "footprintVariant": "footprint-40x72"
         }
       ]
     },
     {
       "seed": "planlab-canonical-03",
-      "elapsedMs": 1829.608,
-      "replayElapsedMs": 1794.135,
+      "elapsedMs": 1834.609,
+      "timingSamplesMs": [
+        1966.706,
+        1834.609,
+        1827.746
+      ],
+      "timingSamplesRawMs": [
+        1966.7059000000008,
+        1834.6085999999996,
+        1827.7459000000017
+      ],
+      "replayElapsedMs": 1832.919,
       "deterministic": true,
-      "outputHash": "5b3656475e19a8c1335954cf1eef53bf6522ee4e8df46e64276d6cef696d58e8",
-      "replayHash": "5b3656475e19a8c1335954cf1eef53bf6522ee4e8df46e64276d6cef696d58e8",
+      "outputHash": "ec0c221b17a5d29ea8aa4913a3805fb7f717d762e4db198d7e6f79f06c807a56",
+      "replayHash": "ec0c221b17a5d29ea8aa4913a3805fb7f717d762e4db198d7e6f79f06c807a56",
       "ok": true,
       "candidateCount": 300,
       "independentlyValidCandidateCount": 300,
@@ -251,24 +360,25 @@
       "selectionComplete": true,
       "selectionReason": null,
       "diversityThreshold": 0.2,
-      "minimumSelectedPairwiseDistance": 0.227451,
+      "minimumSelectedPairwiseDistance": 0.320363,
+      "minimumSelectedPairwiseDistanceRaw": 0.3203629583969335,
       "selectedPairwiseDistances": [
         {
-          "a": "layout-L-footprint-48x60-171",
+          "a": "layout-L-footprint-48x60-172",
+          "b": "layout-L-footprint-48x60-117",
+          "distance": 0.320363,
+          "diverse": true
+        },
+        {
+          "a": "layout-L-footprint-48x60-172",
           "b": "layout-straight-footprint-40x72-24",
-          "distance": 0.538148,
-          "diverse": true
-        },
-        {
-          "a": "layout-L-footprint-48x60-171",
-          "b": "layout-L-footprint-48x60-172",
-          "distance": 0.227451,
-          "diverse": true
-        },
-        {
-          "a": "layout-straight-footprint-40x72-24",
-          "b": "layout-L-footprint-48x60-172",
           "distance": 0.537394,
+          "diverse": true
+        },
+        {
+          "a": "layout-L-footprint-48x60-117",
+          "b": "layout-straight-footprint-40x72-24",
+          "distance": 0.546635,
           "diverse": true
         }
       ],
@@ -290,42 +400,52 @@
         {
           "strategy": "compactEfficiency",
           "label": "Compact Efficiency",
-          "layoutId": "layout-L-footprint-48x60-171",
+          "layoutId": "layout-L-footprint-48x60-172",
           "valid": true,
-          "overallScore": 86,
-          "overallUtility": 0.8584444460639975,
+          "overallScore": 82,
+          "overallUtility": 0.8228242668224264,
           "topology": "L",
           "footprintVariant": "footprint-48x60"
         },
         {
           "strategy": "bestFlow",
           "label": "Best Flow",
-          "layoutId": "layout-straight-footprint-40x72-24",
+          "layoutId": "layout-L-footprint-48x60-117",
           "valid": true,
-          "overallScore": 82,
-          "overallUtility": 0.8181525440941336,
-          "topology": "straight",
-          "footprintVariant": "footprint-40x72"
+          "overallScore": 78,
+          "overallUtility": 0.7758740738859361,
+          "topology": "L",
+          "footprintVariant": "footprint-48x60"
         },
         {
           "strategy": "balanced",
           "label": "Balanced",
-          "layoutId": "layout-L-footprint-48x60-172",
+          "layoutId": "layout-straight-footprint-40x72-24",
           "valid": true,
-          "overallScore": 81,
-          "overallUtility": 0.8141454634021239,
-          "topology": "L",
-          "footprintVariant": "footprint-48x60"
+          "overallScore": 80,
+          "overallUtility": 0.8012936126562593,
+          "topology": "straight",
+          "footprintVariant": "footprint-40x72"
         }
       ]
     },
     {
       "seed": "planlab-canonical-04",
-      "elapsedMs": 1796.773,
-      "replayElapsedMs": 1792.235,
+      "elapsedMs": 1814.751,
+      "timingSamplesMs": [
+        1820.751,
+        1814.751,
+        1790.992
+      ],
+      "timingSamplesRawMs": [
+        1820.7513999999937,
+        1814.750600000014,
+        1790.992499999993
+      ],
+      "replayElapsedMs": 1797.053,
       "deterministic": true,
-      "outputHash": "4857aad47ef135f97a8336a04aaa4e43a87871f0b83a51e267718021b31198ca",
-      "replayHash": "4857aad47ef135f97a8336a04aaa4e43a87871f0b83a51e267718021b31198ca",
+      "outputHash": "bb93aff6aed6e03356ffd71b0aa24c75c0301806f9943627e30a155ecb50c05e",
+      "replayHash": "bb93aff6aed6e03356ffd71b0aa24c75c0301806f9943627e30a155ecb50c05e",
       "ok": true,
       "candidateCount": 300,
       "independentlyValidCandidateCount": 300,
@@ -336,6 +456,7 @@
       "selectionReason": null,
       "diversityThreshold": 0.2,
       "minimumSelectedPairwiseDistance": 0.395163,
+      "minimumSelectedPairwiseDistanceRaw": 0.3951627695743315,
       "selectedPairwiseDistances": [
         {
           "a": "layout-straight-footprint-40x72-28",
@@ -376,8 +497,8 @@
           "label": "Compact Efficiency",
           "layoutId": "layout-straight-footprint-40x72-28",
           "valid": true,
-          "overallScore": 86,
-          "overallUtility": 0.8564118890327881,
+          "overallScore": 83,
+          "overallUtility": 0.8313108225645341,
           "topology": "straight",
           "footprintVariant": "footprint-40x72"
         },
@@ -386,8 +507,8 @@
           "label": "Best Flow",
           "layoutId": "layout-straight-footprint-40x72-23",
           "valid": true,
-          "overallScore": 82,
-          "overallUtility": 0.8182390763833736,
+          "overallScore": 77,
+          "overallUtility": 0.7719890763833736,
           "topology": "straight",
           "footprintVariant": "footprint-40x72"
         },
@@ -397,7 +518,7 @@
           "layoutId": "layout-L-footprint-48x60-164",
           "valid": true,
           "overallScore": 82,
-          "overallUtility": 0.822990308872367,
+          "overallUtility": 0.8218564113029225,
           "topology": "L",
           "footprintVariant": "footprint-48x60"
         }
@@ -405,11 +526,21 @@
     },
     {
       "seed": "planlab-canonical-05",
-      "elapsedMs": 1790.429,
-      "replayElapsedMs": 1792.816,
+      "elapsedMs": 1813.412,
+      "timingSamplesMs": [
+        1830.425,
+        1807.491,
+        1813.412
+      ],
+      "timingSamplesRawMs": [
+        1830.4245000000083,
+        1807.4907000000094,
+        1813.4119999999966
+      ],
+      "replayElapsedMs": 1818.694,
       "deterministic": true,
-      "outputHash": "dc78c42c21fd5a7d7846c9a713044c14a70af1449fd444776b3893e8ce2a953f",
-      "replayHash": "dc78c42c21fd5a7d7846c9a713044c14a70af1449fd444776b3893e8ce2a953f",
+      "outputHash": "eefd52e3baedf222751b2caeebea752b309525afc4e32213576807377ca55e39",
+      "replayHash": "eefd52e3baedf222751b2caeebea752b309525afc4e32213576807377ca55e39",
       "ok": true,
       "candidateCount": 300,
       "independentlyValidCandidateCount": 300,
@@ -419,24 +550,25 @@
       "selectionComplete": true,
       "selectionReason": null,
       "diversityThreshold": 0.2,
-      "minimumSelectedPairwiseDistance": 0.227451,
+      "minimumSelectedPairwiseDistance": 0.320363,
+      "minimumSelectedPairwiseDistanceRaw": 0.3203629583969335,
       "selectedPairwiseDistances": [
         {
-          "a": "layout-L-footprint-48x60-171",
+          "a": "layout-L-footprint-48x60-172",
+          "b": "layout-L-footprint-48x60-117",
+          "distance": 0.320363,
+          "diverse": true
+        },
+        {
+          "a": "layout-L-footprint-48x60-172",
           "b": "layout-straight-footprint-40x72-24",
-          "distance": 0.538148,
-          "diverse": true
-        },
-        {
-          "a": "layout-L-footprint-48x60-171",
-          "b": "layout-L-footprint-48x60-172",
-          "distance": 0.227451,
-          "diverse": true
-        },
-        {
-          "a": "layout-straight-footprint-40x72-24",
-          "b": "layout-L-footprint-48x60-172",
           "distance": 0.537394,
+          "diverse": true
+        },
+        {
+          "a": "layout-L-footprint-48x60-117",
+          "b": "layout-straight-footprint-40x72-24",
+          "distance": 0.546635,
           "diverse": true
         }
       ],
@@ -458,42 +590,52 @@
         {
           "strategy": "compactEfficiency",
           "label": "Compact Efficiency",
-          "layoutId": "layout-L-footprint-48x60-171",
+          "layoutId": "layout-L-footprint-48x60-172",
           "valid": true,
-          "overallScore": 86,
-          "overallUtility": 0.8584444460639975,
+          "overallScore": 82,
+          "overallUtility": 0.8228242668224264,
           "topology": "L",
           "footprintVariant": "footprint-48x60"
         },
         {
           "strategy": "bestFlow",
           "label": "Best Flow",
-          "layoutId": "layout-straight-footprint-40x72-24",
+          "layoutId": "layout-L-footprint-48x60-117",
           "valid": true,
-          "overallScore": 82,
-          "overallUtility": 0.8181525440941336,
-          "topology": "straight",
-          "footprintVariant": "footprint-40x72"
+          "overallScore": 78,
+          "overallUtility": 0.7758740738859361,
+          "topology": "L",
+          "footprintVariant": "footprint-48x60"
         },
         {
           "strategy": "balanced",
           "label": "Balanced",
-          "layoutId": "layout-L-footprint-48x60-172",
+          "layoutId": "layout-straight-footprint-40x72-24",
           "valid": true,
-          "overallScore": 81,
-          "overallUtility": 0.8141454634021239,
-          "topology": "L",
-          "footprintVariant": "footprint-48x60"
+          "overallScore": 80,
+          "overallUtility": 0.8012936126562593,
+          "topology": "straight",
+          "footprintVariant": "footprint-40x72"
         }
       ]
     },
     {
       "seed": "planlab-canonical-06",
-      "elapsedMs": 1693.287,
-      "replayElapsedMs": 1680.617,
+      "elapsedMs": 1697.561,
+      "timingSamplesMs": [
+        1712.247,
+        1689.94,
+        1697.561
+      ],
+      "timingSamplesRawMs": [
+        1712.2465999999986,
+        1689.9402999999875,
+        1697.5610999999917
+      ],
+      "replayElapsedMs": 1686.686,
       "deterministic": true,
-      "outputHash": "7f4dd0407456ffdbb46d367c884885a774ad401561fda0fc9befab24e56dfcd3",
-      "replayHash": "7f4dd0407456ffdbb46d367c884885a774ad401561fda0fc9befab24e56dfcd3",
+      "outputHash": "f899e35c28b80cc92507bd333b6ee1be04267650b0e4bbbb59937d8dd70e764e",
+      "replayHash": "f899e35c28b80cc92507bd333b6ee1be04267650b0e4bbbb59937d8dd70e764e",
       "ok": true,
       "candidateCount": 300,
       "independentlyValidCandidateCount": 300,
@@ -503,24 +645,25 @@
       "selectionComplete": true,
       "selectionReason": null,
       "diversityThreshold": 0.2,
-      "minimumSelectedPairwiseDistance": 0.227451,
+      "minimumSelectedPairwiseDistance": 0.320363,
+      "minimumSelectedPairwiseDistanceRaw": 0.3203629583969335,
       "selectedPairwiseDistances": [
         {
-          "a": "layout-L-footprint-48x60-171",
+          "a": "layout-L-footprint-48x60-172",
+          "b": "layout-L-footprint-48x60-117",
+          "distance": 0.320363,
+          "diverse": true
+        },
+        {
+          "a": "layout-L-footprint-48x60-172",
           "b": "layout-straight-footprint-40x72-24",
-          "distance": 0.538148,
-          "diverse": true
-        },
-        {
-          "a": "layout-L-footprint-48x60-171",
-          "b": "layout-L-footprint-48x60-172",
-          "distance": 0.227451,
-          "diverse": true
-        },
-        {
-          "a": "layout-straight-footprint-40x72-24",
-          "b": "layout-L-footprint-48x60-172",
           "distance": 0.537394,
+          "diverse": true
+        },
+        {
+          "a": "layout-L-footprint-48x60-117",
+          "b": "layout-straight-footprint-40x72-24",
+          "distance": 0.546635,
           "diverse": true
         }
       ],
@@ -542,42 +685,52 @@
         {
           "strategy": "compactEfficiency",
           "label": "Compact Efficiency",
-          "layoutId": "layout-L-footprint-48x60-171",
+          "layoutId": "layout-L-footprint-48x60-172",
           "valid": true,
-          "overallScore": 86,
-          "overallUtility": 0.8584444460639975,
+          "overallScore": 82,
+          "overallUtility": 0.8228242668224264,
           "topology": "L",
           "footprintVariant": "footprint-48x60"
         },
         {
           "strategy": "bestFlow",
           "label": "Best Flow",
-          "layoutId": "layout-straight-footprint-40x72-24",
+          "layoutId": "layout-L-footprint-48x60-117",
           "valid": true,
-          "overallScore": 82,
-          "overallUtility": 0.8181525440941336,
-          "topology": "straight",
-          "footprintVariant": "footprint-40x72"
+          "overallScore": 78,
+          "overallUtility": 0.7758740738859361,
+          "topology": "L",
+          "footprintVariant": "footprint-48x60"
         },
         {
           "strategy": "balanced",
           "label": "Balanced",
-          "layoutId": "layout-L-footprint-48x60-172",
+          "layoutId": "layout-straight-footprint-40x72-24",
           "valid": true,
-          "overallScore": 81,
-          "overallUtility": 0.8141454634021239,
-          "topology": "L",
-          "footprintVariant": "footprint-48x60"
+          "overallScore": 80,
+          "overallUtility": 0.8012936126562593,
+          "topology": "straight",
+          "footprintVariant": "footprint-40x72"
         }
       ]
     },
     {
       "seed": "planlab-canonical-07",
-      "elapsedMs": 1723.857,
-      "replayElapsedMs": 1753.154,
+      "elapsedMs": 1792.854,
+      "timingSamplesMs": [
+        1807.649,
+        1765.978,
+        1792.854
+      ],
+      "timingSamplesRawMs": [
+        1807.6494999999995,
+        1765.977600000013,
+        1792.8540999999968
+      ],
+      "replayElapsedMs": 1783.856,
       "deterministic": true,
-      "outputHash": "236a34aa1490bf07955e0b0ccb34cf3685a658ee169a3e26936fd109f196597e",
-      "replayHash": "236a34aa1490bf07955e0b0ccb34cf3685a658ee169a3e26936fd109f196597e",
+      "outputHash": "c91e362cbfd862010a17ee6daa356a6ca28261a77abf90c75e5e0ca0fb9478b3",
+      "replayHash": "c91e362cbfd862010a17ee6daa356a6ca28261a77abf90c75e5e0ca0fb9478b3",
       "ok": true,
       "candidateCount": 300,
       "independentlyValidCandidateCount": 300,
@@ -587,24 +740,25 @@
       "selectionComplete": true,
       "selectionReason": null,
       "diversityThreshold": 0.2,
-      "minimumSelectedPairwiseDistance": 0.323788,
+      "minimumSelectedPairwiseDistance": 0.321032,
+      "minimumSelectedPairwiseDistanceRaw": 0.3210322404029886,
       "selectedPairwiseDistances": [
+        {
+          "a": "layout-L-footprint-48x60-167",
+          "b": "layout-L-footprint-48x60-174",
+          "distance": 0.321032,
+          "diverse": true
+        },
+        {
+          "a": "layout-L-footprint-48x60-167",
+          "b": "layout-straight-footprint-40x72-24",
+          "distance": 0.53503,
+          "diverse": true
+        },
         {
           "a": "layout-L-footprint-48x60-174",
           "b": "layout-straight-footprint-40x72-24",
           "distance": 0.546635,
-          "diverse": true
-        },
-        {
-          "a": "layout-L-footprint-48x60-174",
-          "b": "layout-L-footprint-48x60-140",
-          "distance": 0.323788,
-          "diverse": true
-        },
-        {
-          "a": "layout-straight-footprint-40x72-24",
-          "b": "layout-L-footprint-48x60-140",
-          "distance": 0.53459,
           "diverse": true
         }
       ],
@@ -626,42 +780,52 @@
         {
           "strategy": "compactEfficiency",
           "label": "Compact Efficiency",
-          "layoutId": "layout-L-footprint-48x60-174",
+          "layoutId": "layout-L-footprint-48x60-167",
           "valid": true,
-          "overallScore": 84,
-          "overallUtility": 0.8408409651795961,
+          "overallScore": 82,
+          "overallUtility": 0.8228242668224264,
           "topology": "L",
           "footprintVariant": "footprint-48x60"
         },
         {
           "strategy": "bestFlow",
           "label": "Best Flow",
-          "layoutId": "layout-straight-footprint-40x72-24",
+          "layoutId": "layout-L-footprint-48x60-174",
           "valid": true,
-          "overallScore": 82,
-          "overallUtility": 0.8181525440941336,
-          "topology": "straight",
-          "footprintVariant": "footprint-40x72"
+          "overallScore": 78,
+          "overallUtility": 0.7758740738859361,
+          "topology": "L",
+          "footprintVariant": "footprint-48x60"
         },
         {
           "strategy": "balanced",
           "label": "Balanced",
-          "layoutId": "layout-L-footprint-48x60-140",
+          "layoutId": "layout-straight-footprint-40x72-24",
           "valid": true,
-          "overallScore": 81,
-          "overallUtility": 0.813793628914282,
-          "topology": "L",
-          "footprintVariant": "footprint-48x60"
+          "overallScore": 80,
+          "overallUtility": 0.8012936126562593,
+          "topology": "straight",
+          "footprintVariant": "footprint-40x72"
         }
       ]
     },
     {
       "seed": "planlab-canonical-08",
-      "elapsedMs": 1708.145,
-      "replayElapsedMs": 1690.59,
+      "elapsedMs": 1701.75,
+      "timingSamplesMs": [
+        1707.299,
+        1701.75,
+        1688.09
+      ],
+      "timingSamplesRawMs": [
+        1707.2986999999848,
+        1701.7504999999946,
+        1688.090200000006
+      ],
+      "replayElapsedMs": 1702.186,
       "deterministic": true,
-      "outputHash": "d7d0eae9d5dc915d52da9412d6f221eb16799d49a73fe9adae138531efd7f02c",
-      "replayHash": "d7d0eae9d5dc915d52da9412d6f221eb16799d49a73fe9adae138531efd7f02c",
+      "outputHash": "14e8fcfc20f53b9b00bf78dad5db67323cd26ee9c32a846e7342e12b2dfdd56e",
+      "replayHash": "14e8fcfc20f53b9b00bf78dad5db67323cd26ee9c32a846e7342e12b2dfdd56e",
       "ok": true,
       "candidateCount": 300,
       "independentlyValidCandidateCount": 300,
@@ -671,24 +835,25 @@
       "selectionComplete": true,
       "selectionReason": null,
       "diversityThreshold": 0.2,
-      "minimumSelectedPairwiseDistance": 0.227451,
+      "minimumSelectedPairwiseDistance": 0.320363,
+      "minimumSelectedPairwiseDistanceRaw": 0.3203629583969335,
       "selectedPairwiseDistances": [
         {
-          "a": "layout-L-footprint-48x60-171",
+          "a": "layout-L-footprint-48x60-172",
+          "b": "layout-L-footprint-48x60-117",
+          "distance": 0.320363,
+          "diverse": true
+        },
+        {
+          "a": "layout-L-footprint-48x60-172",
           "b": "layout-straight-footprint-40x72-24",
-          "distance": 0.538148,
-          "diverse": true
-        },
-        {
-          "a": "layout-L-footprint-48x60-171",
-          "b": "layout-L-footprint-48x60-172",
-          "distance": 0.227451,
-          "diverse": true
-        },
-        {
-          "a": "layout-straight-footprint-40x72-24",
-          "b": "layout-L-footprint-48x60-172",
           "distance": 0.537394,
+          "diverse": true
+        },
+        {
+          "a": "layout-L-footprint-48x60-117",
+          "b": "layout-straight-footprint-40x72-24",
+          "distance": 0.546635,
           "diverse": true
         }
       ],
@@ -710,42 +875,52 @@
         {
           "strategy": "compactEfficiency",
           "label": "Compact Efficiency",
-          "layoutId": "layout-L-footprint-48x60-171",
+          "layoutId": "layout-L-footprint-48x60-172",
           "valid": true,
-          "overallScore": 86,
-          "overallUtility": 0.8584444460639975,
+          "overallScore": 82,
+          "overallUtility": 0.8228242668224264,
           "topology": "L",
           "footprintVariant": "footprint-48x60"
         },
         {
           "strategy": "bestFlow",
           "label": "Best Flow",
-          "layoutId": "layout-straight-footprint-40x72-24",
+          "layoutId": "layout-L-footprint-48x60-117",
           "valid": true,
-          "overallScore": 82,
-          "overallUtility": 0.8181525440941336,
-          "topology": "straight",
-          "footprintVariant": "footprint-40x72"
+          "overallScore": 78,
+          "overallUtility": 0.7758740738859361,
+          "topology": "L",
+          "footprintVariant": "footprint-48x60"
         },
         {
           "strategy": "balanced",
           "label": "Balanced",
-          "layoutId": "layout-L-footprint-48x60-172",
+          "layoutId": "layout-straight-footprint-40x72-24",
           "valid": true,
-          "overallScore": 81,
-          "overallUtility": 0.8141454634021239,
-          "topology": "L",
-          "footprintVariant": "footprint-48x60"
+          "overallScore": 80,
+          "overallUtility": 0.8012936126562593,
+          "topology": "straight",
+          "footprintVariant": "footprint-40x72"
         }
       ]
     },
     {
       "seed": "planlab-canonical-09",
-      "elapsedMs": 1764.242,
-      "replayElapsedMs": 1789.562,
+      "elapsedMs": 1825.402,
+      "timingSamplesMs": [
+        1847.149,
+        1798.666,
+        1825.402
+      ],
+      "timingSamplesRawMs": [
+        1847.1492000000144,
+        1798.666099999973,
+        1825.4015000000072
+      ],
+      "replayElapsedMs": 1799.641,
       "deterministic": true,
-      "outputHash": "0020fb94b8869b71a88d7a652ee7df1fc6d28a6ffadaaa274c35899f599cda26",
-      "replayHash": "0020fb94b8869b71a88d7a652ee7df1fc6d28a6ffadaaa274c35899f599cda26",
+      "outputHash": "21e865f4345e7b7ed3e1942bd5469c8bb58c4a495466ed8779a196277515788d",
+      "replayHash": "21e865f4345e7b7ed3e1942bd5469c8bb58c4a495466ed8779a196277515788d",
       "ok": true,
       "candidateCount": 300,
       "independentlyValidCandidateCount": 300,
@@ -756,6 +931,7 @@
       "selectionReason": null,
       "diversityThreshold": 0.2,
       "minimumSelectedPairwiseDistance": 0.395163,
+      "minimumSelectedPairwiseDistanceRaw": 0.3951627695743315,
       "selectedPairwiseDistances": [
         {
           "a": "layout-straight-footprint-40x72-28",
@@ -796,8 +972,8 @@
           "label": "Compact Efficiency",
           "layoutId": "layout-straight-footprint-40x72-28",
           "valid": true,
-          "overallScore": 86,
-          "overallUtility": 0.8564118890327881,
+          "overallScore": 83,
+          "overallUtility": 0.8313108225645341,
           "topology": "straight",
           "footprintVariant": "footprint-40x72"
         },
@@ -806,8 +982,8 @@
           "label": "Best Flow",
           "layoutId": "layout-straight-footprint-40x72-23",
           "valid": true,
-          "overallScore": 82,
-          "overallUtility": 0.8182390763833736,
+          "overallScore": 77,
+          "overallUtility": 0.7719890763833736,
           "topology": "straight",
           "footprintVariant": "footprint-40x72"
         },
@@ -817,7 +993,7 @@
           "layoutId": "layout-L-footprint-48x60-164",
           "valid": true,
           "overallScore": 82,
-          "overallUtility": 0.822990308872367,
+          "overallUtility": 0.8218564113029225,
           "topology": "L",
           "footprintVariant": "footprint-48x60"
         }
@@ -825,11 +1001,21 @@
     },
     {
       "seed": "planlab-canonical-10",
-      "elapsedMs": 1890.835,
-      "replayElapsedMs": 1844.465,
+      "elapsedMs": 1890.009,
+      "timingSamplesMs": [
+        1890.009,
+        1882.203,
+        1903.415
+      ],
+      "timingSamplesRawMs": [
+        1890.008600000001,
+        1882.2029000000039,
+        1903.4150000000081
+      ],
+      "replayElapsedMs": 1908.836,
       "deterministic": true,
-      "outputHash": "0bf931a7d67eb7dd2c9690a3982374ddb91151a75a332cc3f83c82e998d87a0f",
-      "replayHash": "0bf931a7d67eb7dd2c9690a3982374ddb91151a75a332cc3f83c82e998d87a0f",
+      "outputHash": "09b622a143038ec474b0146591694b7dcc78c7cc7dba907c777298c9b74e4184",
+      "replayHash": "09b622a143038ec474b0146591694b7dcc78c7cc7dba907c777298c9b74e4184",
       "ok": true,
       "candidateCount": 300,
       "independentlyValidCandidateCount": 300,
@@ -839,24 +1025,25 @@
       "selectionComplete": true,
       "selectionReason": null,
       "diversityThreshold": 0.2,
-      "minimumSelectedPairwiseDistance": 0.323788,
+      "minimumSelectedPairwiseDistance": 0.321032,
+      "minimumSelectedPairwiseDistanceRaw": 0.3210322404029886,
       "selectedPairwiseDistances": [
+        {
+          "a": "layout-L-footprint-48x60-167",
+          "b": "layout-L-footprint-48x60-174",
+          "distance": 0.321032,
+          "diverse": true
+        },
+        {
+          "a": "layout-L-footprint-48x60-167",
+          "b": "layout-straight-footprint-40x72-24",
+          "distance": 0.53503,
+          "diverse": true
+        },
         {
           "a": "layout-L-footprint-48x60-174",
           "b": "layout-straight-footprint-40x72-24",
           "distance": 0.546635,
-          "diverse": true
-        },
-        {
-          "a": "layout-L-footprint-48x60-174",
-          "b": "layout-L-footprint-48x60-140",
-          "distance": 0.323788,
-          "diverse": true
-        },
-        {
-          "a": "layout-straight-footprint-40x72-24",
-          "b": "layout-L-footprint-48x60-140",
-          "distance": 0.53459,
           "diverse": true
         }
       ],
@@ -878,32 +1065,32 @@
         {
           "strategy": "compactEfficiency",
           "label": "Compact Efficiency",
-          "layoutId": "layout-L-footprint-48x60-174",
+          "layoutId": "layout-L-footprint-48x60-167",
           "valid": true,
-          "overallScore": 84,
-          "overallUtility": 0.8408409651795961,
+          "overallScore": 82,
+          "overallUtility": 0.8228242668224264,
           "topology": "L",
           "footprintVariant": "footprint-48x60"
         },
         {
           "strategy": "bestFlow",
           "label": "Best Flow",
-          "layoutId": "layout-straight-footprint-40x72-24",
+          "layoutId": "layout-L-footprint-48x60-174",
           "valid": true,
-          "overallScore": 82,
-          "overallUtility": 0.8181525440941336,
-          "topology": "straight",
-          "footprintVariant": "footprint-40x72"
+          "overallScore": 78,
+          "overallUtility": 0.7758740738859361,
+          "topology": "L",
+          "footprintVariant": "footprint-48x60"
         },
         {
           "strategy": "balanced",
           "label": "Balanced",
-          "layoutId": "layout-L-footprint-48x60-140",
+          "layoutId": "layout-straight-footprint-40x72-24",
           "valid": true,
-          "overallScore": 81,
-          "overallUtility": 0.813793628914282,
-          "topology": "L",
-          "footprintVariant": "footprint-48x60"
+          "overallScore": 80,
+          "overallUtility": 0.8012936126562593,
+          "topology": "straight",
+          "footprintVariant": "footprint-40x72"
         }
       ]
     }
@@ -912,7 +1099,7 @@
     {
       "fixture": "envelopeConsumesSite",
       "seed": "impossible-envelope",
-      "elapsedMs": 0.188,
+      "elapsedMs": 0.18,
       "ok": false,
       "candidateCount": 0,
       "selectedCount": 0,
@@ -939,7 +1126,7 @@
     {
       "fixture": "roomCannotFitEnvelope",
       "seed": "impossible-room",
-      "elapsedMs": 0.046,
+      "elapsedMs": 0.047,
       "ok": false,
       "candidateCount": 0,
       "selectedCount": 0,
@@ -966,7 +1153,7 @@
     {
       "fixture": "programExceedsInstanceLimit",
       "seed": "impossible-program-size",
-      "elapsedMs": 0.031,
+      "elapsedMs": 0.027,
       "ok": false,
       "candidateCount": 0,
       "selectedCount": 0,

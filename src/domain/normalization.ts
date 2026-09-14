@@ -188,6 +188,18 @@ function normalizeRequirement(
     });
     return null;
   }
+  if (
+    requirement.kind === "garage" &&
+    (requirement.traits.frontage?.kind !== "vehicle" ||
+      requirement.traits.frontage.side !== "south")
+  ) {
+    issues.push({
+      code: "INVALID_REQUIREMENT",
+      path: `${path}.traits.frontage`,
+      message: "a garage must declare south vehicle frontage in the Stage 0 model",
+      subjectId: requirement.id,
+    });
+  }
   const dimensions = normalizeDimensions(requirement.dimensions, `${path}.dimensions`, issues);
   return dimensions === null ? null : { requirement, dimensions };
 }
@@ -357,7 +369,10 @@ export function normalizeRoomRequirements(
             : `${requirement.label} ${ordinal}`,
         kind: requirement.kind,
         inclusion: requirement.inclusion,
-        dimensions: result.dimensions,
+        // Instances are independently addressable after quantity expansion.
+        // Keep their normalized dimensions isolated too, so an edit to one
+        // room cannot silently change every sibling of the requirement.
+        dimensions: { ...result.dimensions },
         traits: {
           ...requirement.traits,
           ...(requirement.traits.frontage
@@ -384,6 +399,7 @@ function validatePlanningSettings(
   planning: ProjectBrief["planning"],
   issues: NormalizationIssue[],
 ): void {
+  const approvedMaxGfaMm2 = MAX_GFA_M2 * 1_000_000;
   if (
     !isSafePositiveInteger(planning.minimumCirculationWidthMm) ||
     planning.maxUnallocatedInteriorRatio < 0 ||
@@ -419,15 +435,32 @@ function validatePlanningSettings(
     });
   }
   if (
-    planning.targetGfaMm2 !== undefined &&
     planning.maxGfaMm2 !== undefined &&
-    planning.targetGfaMm2 > planning.maxGfaMm2
+    isSafePositiveInteger(planning.maxGfaMm2) &&
+    planning.maxGfaMm2 > approvedMaxGfaMm2
+  ) {
+    issues.push({
+      code: "INVALID_PLANNING_SETTINGS",
+      path: "planning.maxGfaMm2",
+      message: `maximum GFA cannot exceed the approved ${MAX_GFA_M2} m² hard cap`,
+      expected: approvedMaxGfaMm2,
+      actual: planning.maxGfaMm2,
+    });
+  }
+  const effectiveMaxGfaMm2 = Math.min(
+    planning.maxGfaMm2 ?? approvedMaxGfaMm2,
+    approvedMaxGfaMm2,
+  );
+  if (
+    planning.targetGfaMm2 !== undefined &&
+    isSafePositiveInteger(planning.targetGfaMm2) &&
+    planning.targetGfaMm2 > effectiveMaxGfaMm2
   ) {
     issues.push({
       code: "INVALID_PLANNING_SETTINGS",
       path: "planning",
-      message: "target GFA cannot exceed maximum GFA",
-      expected: planning.maxGfaMm2,
+      message: "target GFA cannot exceed the effective maximum GFA",
+      expected: effectiveMaxGfaMm2,
       actual: planning.targetGfaMm2,
     });
   }
@@ -435,22 +468,23 @@ function validatePlanningSettings(
 
 function roomCanFitEnvelope(room: RoomInstance, envelope: GridRect): boolean {
   const { dimensions } = room;
-  const width = envelope.width;
-  const depth = envelope.depth;
-  if (
+  const directOrientation =
+    (dimensions.minWidthUnits === undefined || dimensions.minWidthUnits <= envelope.width) &&
+    (dimensions.minDepthUnits === undefined || dimensions.minDepthUnits <= envelope.depth);
+  const rotatedOrientation =
     dimensions.minWidthUnits !== undefined &&
     dimensions.minDepthUnits !== undefined &&
-    ((dimensions.minWidthUnits > width || dimensions.minDepthUnits > depth) &&
-      (dimensions.minWidthUnits > depth || dimensions.minDepthUnits > width))
-  ) {
-    return false;
-  }
-  if (
-    dimensions.minShortSideUnits !== undefined &&
-    dimensions.minShortSideUnits > Math.max(width, depth)
-  ) {
-    return false;
-  }
+    dimensions.minWidthUnits <= envelope.depth &&
+    dimensions.minDepthUnits <= envelope.width;
+  // A short-side constraint applies to both rectangle axes.  Comparing it to
+  // only the larger envelope dimension can accept a room that cannot fit in
+  // either orientation, then misclassify a known input contradiction as a
+  // search failure.
+  const shortSideFits =
+    dimensions.minShortSideUnits === undefined ||
+    (dimensions.minShortSideUnits <= envelope.width &&
+      dimensions.minShortSideUnits <= envelope.depth);
+  if (!shortSideFits || (!directOrientation && !rotatedOrientation)) return false;
   if (dimensions.minAreaUnits2 > envelope.width * envelope.depth) return false;
   return true;
 }

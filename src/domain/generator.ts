@@ -37,13 +37,14 @@ import {
 } from "./scoring.ts";
 import {
   DEFAULT_DIVERSITY_THRESHOLD,
+  DIVERSITY_VERSION,
   selectDiverseTriplet,
   type SelectedLayout,
   type TripletSelection,
 } from "./diversity.ts";
 
-export const GENERATOR_ENGINE_VERSION = "planlab-generator-0.2";
-export const GENERATOR_RULE_VERSION = "planlab-core-1";
+export const GENERATOR_ENGINE_VERSION = "planlab-generator-0.4";
+export const GENERATOR_RULE_VERSION = "planlab-core-2";
 
 export interface GenerationBudget {
   beamWidth: number;
@@ -162,13 +163,12 @@ function minimumRoomSpan(project: NormalizedProject): number {
   let span = project.planning.minimumCirculationWidthUnits;
   for (const room of project.rooms) {
     if (room.inclusion !== "required") continue;
-    const dimensions = room.dimensions;
-    span = Math.max(
-      span,
-      dimensions.minShortSideUnits ?? 1,
-      dimensions.minWidthUnits ?? 1,
-      dimensions.minDepthUnits ?? 1,
-    );
+    // Do not collapse width/depth constraints to their largest value here.
+    // When both are present the validator permits a rotated room, so a 20 m ×
+    // 3 m requirement can fit a 17 m × 22 m envelope as 3 m × 20 m. This
+    // scalar only sets the smallest explored footprint axis; asymmetric
+    // constraints are still checked by roomRectValid during placement.
+    span = Math.max(span, room.dimensions.minShortSideUnits ?? 1);
   }
   return span;
 }
@@ -219,9 +219,10 @@ export function deriveFootprintVariants(
     ? projectOrBrief
     : normalizeProject(projectOrBrief);
   const envelope = project.site.envelope;
+  const approvedMaxGfaMm2 = MAX_GFA_M2 * 1_000_000;
   const maxArea = Math.min(
     area(envelope),
-    Math.floor((project.planning.maxGfaMm2 ?? MAX_GFA_M2 * 1_000_000) / GRID_MM2),
+    Math.floor(Math.min(project.planning.maxGfaMm2 ?? approvedMaxGfaMm2, approvedMaxGfaMm2) / GRID_MM2),
   );
   const required = requiredRoomArea(project);
   const circulationReserve = project.planning.minimumCirculationWidthUnits *
@@ -236,10 +237,10 @@ export function deriveFootprintVariants(
     0,
   );
   // The footprint target is gross area: circulation/entry (and an anchor
-  // garage when present) still need room inside it.  Reserve two corridor
-  // widths plus the entry so a target that merely equals room minima does not
-  // produce a structurally impossible footprint.
-  const minimumArea = Math.max(required + circulationReserve + largestRoomArea, target);
+  // garage when present) still need room inside it. Reserve two corridor
+  // widths plus the entry, but do not add a room minimum twice: every required
+  // room, including the largest, is already part of `required`.
+  const minimumArea = Math.max(required + circulationReserve, target);
   const span = minimumRoomSpan(project);
   if (minimumArea > maxArea || span > envelope.width || span > envelope.depth) return [];
 
@@ -1122,7 +1123,7 @@ function emptyTripletSelection(
   code: "NO_VALID_CANDIDATES" | "INSUFFICIENT_CANDIDATES" = "NO_VALID_CANDIDATES",
 ): TripletSelection {
   return {
-    version: "planlab-diversity-0.3",
+    version: DIVERSITY_VERSION,
     status: "partial",
     complete: false,
     partial: true,

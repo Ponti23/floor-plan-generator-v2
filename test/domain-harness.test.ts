@@ -173,6 +173,9 @@ test("quantity expansion produces stable room instances and preserves traits", (
   ]);
   assert.equal(instances.every((room) => room.requirementId === "bedroom"), true);
   assert.equal(instances.every((room) => room.dimensions.minShortSideUnits === 12), true);
+  assert.notEqual(instances[0]!.dimensions, instances[1]!.dimensions);
+  instances[0]!.dimensions.minAreaUnits2 = 999;
+  assert.equal(instances[1]!.dimensions.minAreaUnits2, 160);
 });
 
 test("impossible fixtures return structured normalization diagnostics", () => {
@@ -193,6 +196,50 @@ test("impossible fixtures return structured normalization diagnostics", () => {
   assert.equal(sizeResult.ok, false);
   if (!sizeResult.ok) {
     assert.equal(sizeResult.issues[0].code, "PROGRAM_TOO_LARGE");
+  }
+});
+
+test("a minimum short side that exceeds either envelope axis is a typed input contradiction", () => {
+  const project = structuredClone(CANONICAL_PROJECT);
+  project.program[0]!.dimensions = {
+    minAreaMm2: 1_000_000,
+    // The 17 m envelope width cannot accommodate an 18 m minimum short side,
+    // even though the 22 m envelope depth can.
+    minShortSideMm: 18_000,
+  };
+  const result = tryNormalizeProject(project);
+  assert.equal(result.ok, false);
+  if (!result.ok) {
+    assert.ok(result.issues.some((issue) => issue.code === "ROOM_CANNOT_FIT_ENVELOPE"));
+    assert.ok(result.issues.some((issue) => issue.subjectId === "bedroom-1"));
+  }
+});
+
+test("the approved 200 m² hard GFA cap cannot be relaxed by project settings", () => {
+  const project = structuredClone(CANONICAL_PROJECT);
+  project.planning.maxGfaMm2 = 300_000_000;
+  project.planning.targetGfaMm2 = 250_000_000;
+  const result = tryNormalizeProject(project);
+  assert.equal(result.ok, false);
+  if (!result.ok) {
+    assert.ok(result.issues.some((issue) =>
+      issue.code === "INVALID_PLANNING_SETTINGS" && issue.path === "planning.maxGfaMm2",
+    ));
+    assert.ok(result.issues.some((issue) =>
+      issue.code === "INVALID_PLANNING_SETTINGS" && issue.path === "planning",
+    ));
+  }
+});
+
+test("a Stage 0 garage must declare the approved south vehicle frontage", () => {
+  const project = structuredClone(CANONICAL_PROJECT);
+  project.program.find((room) => room.id === "garage")!.traits.frontage = undefined;
+  const result = tryNormalizeProject(project);
+  assert.equal(result.ok, false);
+  if (!result.ok) {
+    assert.ok(result.issues.some((issue) =>
+      issue.code === "INVALID_REQUIREMENT" && issue.subjectId === "garage",
+    ));
   }
 });
 

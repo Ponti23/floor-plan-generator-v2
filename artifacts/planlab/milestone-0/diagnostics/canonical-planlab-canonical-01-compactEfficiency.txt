@@ -18,20 +18,20 @@ Spaces:
 - Kitchen [room] @ 26,30 1.50 × 8.50 (12.75 m²)
 - Bathroom [room] @ 20,30 1.50 × 8.50 (12.75 m²)
 - Laundry [room] @ 32,57 3.00 × 1.75 (5.25 m²)
-Score model: planlab-scoring-0.3
+Score model: planlab-scoring-0.4
 Scores:
-- Compact Efficiency: 86/100 | programSpace 91, flow 98, relationships 68, liveability 60, servicesSite 89
+- Compact Efficiency: 83/100 | programSpace 89, flow 77, relationships 68, liveability 86, servicesSite 89
   + validation.hard.pass [validation:hard]
-  + programSpace.minimumArea.strong [program:minimumArea]
   + programSpace.targetFootprint.strong [footprint:targetGfa]
   + programSpace.unallocatedInterior.strong [footprint:unallocated]
-- Best Flow: 84/100 | programSpace 91, flow 98, relationships 68, liveability 60, servicesSite 89
+  + flow.circulationRatio.strong [circulation:area]
+- Best Flow: 79/100 | programSpace 89, flow 77, relationships 68, liveability 86, servicesSite 89
   + validation.hard.pass [validation:hard]
-  + programSpace.minimumArea.strong [program:minimumArea]
   + programSpace.targetFootprint.strong [footprint:targetGfa]
   + programSpace.unallocatedInterior.strong [footprint:unallocated]
-- Balanced: 82/100 | programSpace 91, flow 98, relationships 68, liveability 60, servicesSite 89
+  + flow.circulationRatio.strong [circulation:area]
+- Balanced: 81/100 | programSpace 89, flow 77, relationships 68, liveability 86, servicesSite 89
   + validation.hard.pass [validation:hard]
-  + programSpace.minimumArea.strong [program:minimumArea]
   + programSpace.targetFootprint.strong [footprint:targetGfa]
   + programSpace.unallocatedInterior.strong [footprint:unallocated]
+  + flow.circulationRatio.strong [circulation:area]

@@ -17,7 +17,7 @@ import {
   type ValidationViolation,
 } from "./validation.ts";
 
-export const SCORING_VERSION = "planlab-scoring-0.3";
+export const SCORING_VERSION = "planlab-scoring-0.4";
 
 export type StrategyProfileId = "compactEfficiency" | "bestFlow" | "balanced";
 

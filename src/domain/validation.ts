@@ -2,6 +2,7 @@ import {
   area,
   containsRect,
   edgeSegment,
+  intersection,
   intersectionArea,
   isGridRect,
   sharedWallSegments,
@@ -58,17 +59,23 @@ export interface PortalGraph {
   adjacency: Record<string, string[]>;
 }
 
+export interface PortalGraphOptions {
+  /** Restrict the graph to portal kinds that support the operation at hand. */
+  kinds?: readonly AccessPortal["kind"][];
+}
+
 export type AccessGraph = PortalGraph;
 
 export interface ValidationResult {
   valid: boolean;
   violations: ValidationViolation[];
   counts: { errors: number; warnings: number };
+  /** Pedestrian-only access graph used to establish human reachability. */
   graph: PortalGraph;
   reachableSpaceIds: string[];
 }
 
-const RULE_VERSION = 1;
+const RULE_VERSION = 2;
 const RULE_PREFIX = "planlab-core";
 const DEFAULT_MAX_UNALLOCATED_RATIO = 0.05;
 
@@ -125,7 +132,11 @@ function addAdjacency(adjacency: Record<string, string[]>, a: string, b: string)
 }
 
 /** Build the graph represented by portals, preserving stable insertion order. */
-export function buildPortalGraph(layout: Layout): PortalGraph {
+export function buildPortalGraph(
+  layout: Layout,
+  options: PortalGraphOptions = {},
+): PortalGraph {
+  const permittedKinds = options.kinds === undefined ? undefined : new Set(options.kinds);
   const nodes = [
     EXTERIOR_SPACE_ID,
     ...layout.spaces.map((space) => space.instanceId),
@@ -134,6 +145,7 @@ export function buildPortalGraph(layout: Layout): PortalGraph {
   for (const node of nodes) adjacency[node] = [];
   const edges: PortalGraphEdge[] = [];
   for (const portal of layout.portals) {
+    if (permittedKinds !== undefined && !permittedKinds.has(portal.kind)) continue;
     if (!(portal.a in adjacency) || !(portal.b in adjacency)) continue;
     addAdjacency(adjacency, portal.a, portal.b);
     edges.push({
@@ -144,6 +156,11 @@ export function buildPortalGraph(layout: Layout): PortalGraph {
     });
   }
   return { nodes, edges, adjacency };
+}
+
+/** Vehicle frontage is not a pedestrian route through the plan. */
+export function buildPedestrianPortalGraph(layout: Layout): PortalGraph {
+  return buildPortalGraph(layout, { kinds: ["pedestrian"] });
 }
 
 export const buildAccessGraph = buildPortalGraph;
@@ -228,7 +245,7 @@ function interiorPortalValid(
 }
 
 function roomSelectorMatches(room: RoomInstance, selector: string): boolean {
-  return room.id === selector || room.requirementId === selector;
+  return room.id === selector || room.requirementId === selector || room.kind === selector;
 }
 
 function selectedSpaces(
@@ -343,8 +360,16 @@ function roomDimensionsValid(room: RoomInstance, rect: GridRect): boolean {
   return true;
 }
 
+function isGarageRoom(room: RoomInstance): boolean {
+  return room.kind === "garage" || room.traits.frontage?.kind === "vehicle";
+}
+
 function maxGfaUnits(project: NormalizedProject): number {
-  const maxGfaMm2 = project.planning.maxGfaMm2 ?? MAX_GFA_M2 * 1_000_000;
+  const approvedMaxGfaMm2 = MAX_GFA_M2 * 1_000_000;
+  const maxGfaMm2 = Math.min(
+    project.planning.maxGfaMm2 ?? approvedMaxGfaMm2,
+    approvedMaxGfaMm2,
+  );
   return Math.floor(maxGfaMm2 / (GRID_MM * GRID_MM));
 }
 
@@ -430,22 +455,25 @@ export function validateLayout(
     if (!roomDimensionsValid(room, space.rect)) {
       issue(violations, "ROOM_DIMENSIONS_INVALID", [room.id]);
     }
-    if (
-      room.traits.frontage?.kind === "vehicle" &&
-      (space.rect.width < GARAGE_MIN_WIDTH_UNITS || space.rect.depth < GARAGE_MIN_DEPTH_UNITS)
-    ) {
-      issue(violations, "GARAGE_PRESET_DIMENSIONS_INVALID", [room.id], {
-        minimumWidthUnits: GARAGE_MIN_WIDTH_UNITS,
-        minimumDepthUnits: GARAGE_MIN_DEPTH_UNITS,
-      });
-    }
-    if (
-      room.traits.frontage?.side === "south" &&
-      room.traits.frontage.kind === "vehicle" &&
-      isGridRect(footprint) &&
-      space.rect.y + space.rect.depth !== footprint.y + footprint.depth
-    ) {
-      issue(violations, "GARAGE_MISSING_SOUTH_FRONTAGE", [room.id]);
+    if (isGarageRoom(room)) {
+      if (
+        room.traits.frontage?.kind !== "vehicle" ||
+        room.traits.frontage.side !== "south"
+      ) {
+        issue(violations, "GARAGE_FRONTAGE_POLICY_INVALID", [room.id]);
+      }
+      if (space.rect.width < GARAGE_MIN_WIDTH_UNITS || space.rect.depth < GARAGE_MIN_DEPTH_UNITS) {
+        issue(violations, "GARAGE_PRESET_DIMENSIONS_INVALID", [room.id], {
+          minimumWidthUnits: GARAGE_MIN_WIDTH_UNITS,
+          minimumDepthUnits: GARAGE_MIN_DEPTH_UNITS,
+        });
+      }
+      if (
+        isGridRect(footprint) &&
+        space.rect.y + space.rect.depth !== footprint.y + footprint.depth
+      ) {
+        issue(violations, "GARAGE_MISSING_SOUTH_FRONTAGE", [room.id]);
+      }
     }
   }
   const circulationMinimum = project.planning.minimumCirculationWidthUnits;
@@ -469,7 +497,10 @@ export function validateLayout(
     const coveredArea = unionArea(
       spaces.filter((space): space is PlacedSpace & { rect: GridRect } =>
         isGridRect(space.rect),
-      ).map((space) => space.rect),
+      ).flatMap((space) => {
+        const covered = intersection(space.rect, footprint);
+        return covered ? [covered] : [];
+      }),
     );
     const unallocated = Math.max(0, footprintArea - coveredArea);
     const ratio = footprintArea === 0 ? 1 : unallocated / footprintArea;
@@ -583,12 +614,20 @@ export function validateLayout(
   }
 
   // 6. Graph reachability and pass-through policy.
-  const graph = buildPortalGraph({ ...layout, portals: validPortals });
+  // A vehicle portal proves vehicle frontage only.  It must never make a
+  // garage (or any other occupiable room) appear human-reachable from the
+  // pedestrian entrance.
+  const graph = buildPedestrianPortalGraph({ ...layout, portals: validPortals });
   const reachable = bfs(graph);
   const transitReachable = transitReachability(graph, spaces, roomById);
   for (const room of project.rooms) {
-    if (room.inclusion !== "required" || !roomSpaces.has(room.id)) continue;
-    const roomSpace = roomSpaces.get(room.id)!;
+    const roomSpace = roomSpaces.get(room.id);
+    if (!roomSpace) {
+      // Missing required rooms were recorded above. Optional rooms may be
+      // omitted, but once placed they are occupiable and need the same safe
+      // pedestrian access and pass-through checks as required rooms.
+      continue;
+    }
     if (!isTransitNode(roomSpace, room)) {
       // A private/service destination may have one pedestrian edge to the
       // circulation graph, but two or more pedestrian edges would make it a

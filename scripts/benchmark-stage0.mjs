@@ -12,13 +12,14 @@
 import { createHash } from "node:crypto";
 import { cpus, EOL, platform, release, version as osVersion } from "node:os";
 import { execFileSync } from "node:child_process";
-import { mkdirSync, writeFileSync } from "node:fs";
+import { mkdirSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
 import { dirname, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { performance } from "node:perf_hooks";
 
 import {
   DEFAULT_DIVERSITY_THRESHOLD,
+  DIVERSITY_VERSION,
   DEFAULT_GENERATION_BUDGET,
   GENERATOR_ENGINE_VERSION,
   GENERATOR_RULE_VERSION,
@@ -49,8 +50,9 @@ export const CANONICAL_BENCHMARK_SEEDS = Object.freeze([
   "planlab-canonical-10",
 ]);
 
-const SUITE_VERSION = "planlab-stage0-seed-suite-0.4";
-const REPORT_VERSION = "planlab-milestone-0-benchmark-0.4";
+const SUITE_VERSION = "planlab-stage0-seed-suite-0.5";
+const REPORT_VERSION = "planlab-milestone-0-benchmark-0.5";
+const TIMING_REPETITIONS = 3;
 const TIMING_TARGETS_MS = Object.freeze({ median: 2_000, p95: 4_000 });
 
 function round(value, places = 3) {
@@ -84,6 +86,34 @@ function stableJson(value) {
 
 function sha256(value) {
   return createHash("sha256").update(value).digest("hex");
+}
+
+function collectFiles(directory) {
+  return readdirSync(directory, { withFileTypes: true }).flatMap((entry) => {
+    const path = resolve(directory, entry.name);
+    return entry.isDirectory() ? collectFiles(path) : [path];
+  });
+}
+
+/**
+ * A Git HEAD alone is not sufficient provenance when a benchmark is run from
+ * a worktree before its generated artifacts are committed. Hash every local
+ * source input that can affect the Stage 0 result instead.
+ */
+function benchmarkInputManifest() {
+  const files = [
+    resolve(REPO_ROOT, "package.json"),
+    resolve(REPO_ROOT, "scripts", "benchmark-stage0.mjs"),
+    ...collectFiles(resolve(REPO_ROOT, "src", "domain")),
+  ].sort((a, b) => a < b ? -1 : a > b ? 1 : 0)
+    .map((path) => ({
+      path: relative(REPO_ROOT, path).replaceAll("\\", "/"),
+      sha256: sha256(readFileSync(path)),
+    }));
+  return {
+    files,
+    fingerprint: sha256(files.map((file) => `${file.path}\0${file.sha256}`).join("\n")),
+  };
 }
 
 function gitValue(args) {
@@ -131,20 +161,26 @@ function selectedSummary(result, project) {
 }
 
 function makeCanonicalRecord(seed, budget) {
-  const project = createCanonicalProject(seed);
-  const start = performance.now();
-  const result = generateLayouts(project, { seed, budget });
-  const elapsedMs = performance.now() - start;
+  const timedRuns = Array.from({ length: TIMING_REPETITIONS }, () => {
+    const start = performance.now();
+    const result = generateLayouts(createCanonicalProject(seed), { seed, budget });
+    return { result, elapsedMs: performance.now() - start };
+  });
+  const result = timedRuns[0].result;
+  const timingSamplesRawMs = timedRuns.map((run) => run.elapsedMs);
+  const timingSamplesMs = timingSamplesRawMs.map((elapsedMs) => round(elapsedMs));
+  const elapsedMs = percentile(timingSamplesRawMs, 0.5);
 
   const replayStart = performance.now();
   const replay = generateLayouts(createCanonicalProject(seed), { seed, budget });
   const replayElapsedMs = performance.now() - replayStart;
   const firstBytes = stableJson(result);
+  const repeatedBytes = timedRuns.map((run) => stableJson(run.result));
   const replayBytes = stableJson(replay);
 
   // The result contains normalized geometry but intentionally does not carry a
   // project reference. Recreate the normalized brief once, outside timing.
-  const normalizedProject = normalizeProject(project);
+  const normalizedProject = normalizeProject(createCanonicalProject(seed));
   const validLayouts = result.layouts.filter((layout) => validateLayout(layout, normalizedProject).valid);
   const validSelected = result.selection.layouts.filter((layout) => validateLayout(layout, normalizedProject).valid);
   const pairwiseDistances = result.selection.pairwiseDistances.map((pair) => ({
@@ -153,15 +189,19 @@ function makeCanonicalRecord(seed, budget) {
     distance: round(pair.distance, 6),
     diverse: pair.diverse,
   }));
-  const minimumPairwiseDistance = pairwiseDistances.length > 0
-    ? Math.min(...pairwiseDistances.map((pair) => pair.distance))
+  const minimumPairwiseDistanceRaw = result.selection.pairwiseDistances.length > 0
+    ? Math.min(...result.selection.pairwiseDistances.map((pair) => pair.distance))
     : null;
 
   return {
     seed,
+    // The table reports the seed's median; the gate uses every recorded timed
+    // run rather than silently cherry-picking the fastest invocation.
     elapsedMs: round(elapsedMs),
+    timingSamplesMs,
+    timingSamplesRawMs,
     replayElapsedMs: round(replayElapsedMs),
-    deterministic: firstBytes === replayBytes,
+    deterministic: repeatedBytes.every((bytes) => bytes === firstBytes) && firstBytes === replayBytes,
     outputHash: sha256(firstBytes),
     replayHash: sha256(replayBytes),
     ok: result.ok,
@@ -173,7 +213,10 @@ function makeCanonicalRecord(seed, budget) {
     selectionComplete: result.selection.complete,
     selectionReason: result.selection.reason ?? null,
     diversityThreshold: result.selection.threshold,
-    minimumSelectedPairwiseDistance: minimumPairwiseDistance,
+    minimumSelectedPairwiseDistance: minimumPairwiseDistanceRaw === null
+      ? null
+      : round(minimumPairwiseDistanceRaw, 6),
+    minimumSelectedPairwiseDistanceRaw: minimumPairwiseDistanceRaw,
     selectedPairwiseDistances: pairwiseDistances,
     expansions: expansionSummary(result),
     diagnostics: diagnosticSummary(result),
@@ -251,10 +294,11 @@ function makeMarkdownReport(benchmark) {
     "",
     `**Report version:** ${benchmark.reportVersion}<br>`,
     `**Recorded:** ${benchmark.recordedAt}<br>`,
-    `**Source revision at run:** ${benchmark.environment.sourceRevision}<br>`,
+    `**Git HEAD at run:** ${benchmark.environment.gitHeadAtRun}<br>`,
+    `**Benchmark input fingerprint:** \`${benchmark.environment.benchmarkInputFingerprint}\`<br>`,
     `**Overall technical gate:** **${benchmark.gate.pass ? "PASS" : "FAIL"}**<br>`,
     "",
-    "This report covers bucket 0.4 only. The architect usefulness review remains the separate Stage 0 hard gate.",
+    "This report covers the Stage 0 technical benchmark only. The architect usefulness review remains the separate Stage 0 hard gate.",
     "",
     "## Method",
     "",
@@ -262,9 +306,10 @@ function makeMarkdownReport(benchmark) {
     `- Input: the canonical brief generated for each seed; the public generator performs normalization internally.`,
     `- Budget: beam width ${benchmark.methodology.budget.beamWidth}; ${benchmark.methodology.budget.maxExpansionsPerTopology.toLocaleString()} expansions/topology; ${benchmark.methodology.budget.maxCandidatesPerTopology} candidates/topology; ${benchmark.methodology.budget.maxTotalCandidates} total candidates.`,
     `- Warm-up: ${benchmark.methodology.warmupRuns} unmeasured run before the timed suite.`,
-    `- Timing: one timed generation per seed using Node \`performance.now()\`; replay calls verify determinism and are reported separately, not included in the latency summary.`,
-    `- Percentiles: linear interpolation at p50 and p95 over the ten measured seed timings.`,
+    `- Timing: ${benchmark.methodology.timedRunsPerSeed} timed generations per seed using Node \`performance.now()\`; the table reports each seed median and the gate uses all ${benchmark.methodology.timedRuns} samples. Replay calls verify determinism and are reported separately.`,
+    `- Percentiles: linear interpolation at p50 and p95 over all ${benchmark.methodology.timedRuns} measured timings.`,
     `- Diversity: selected-triplet pair distances from ${benchmark.methodology.diversityVersion}, with threshold ${benchmark.methodology.diversityThreshold}.`,
+    `- Provenance: the input fingerprint hashes ${benchmark.environment.benchmarkInputFiles.length} local benchmark inputs (the runner, package manifest, and every domain module), so it remains authoritative even when Git HEAD is a pre-artifact commit.`,
     "",
     "## Reference environment",
     "",
@@ -272,14 +317,15 @@ function makeMarkdownReport(benchmark) {
     `- CPU: ${benchmark.environment.cpuModel} (${benchmark.environment.logicalCores} logical cores)`,
     `- Runtime: Node ${benchmark.environment.node} / V8 ${benchmark.environment.v8}`,
     `- Engine: ${benchmark.engineVersion}; rules: ${benchmark.ruleVersion}`,
+    `- Worktree status at start: ${benchmark.environment.workingTreeCleanAtRun ? "clean" : "dirty; full porcelain status is retained in benchmark.json"}`,
     "",
     "## Canonical 10-seed evidence",
     "",
-    "| Seed | Time (ms) | Candidates / valid | Selected | Min pairwise | Expansions | Replay | Diagnostics |",
+    "| Seed | Median time (ms) | Candidates / valid | Selected | Min pairwise | Expansions | Replay | Diagnostics |",
     "|---|---:|---:|---:|---:|---:|---|---|",
     ...canonical.map((record) => `| ${record.seed} | ${formatNumber(record.elapsedMs)} | ${record.candidateCount} / ${record.independentlyValidCandidateCount} | ${record.selectedCount} / ${record.independentlyValidSelectedCount} | ${formatNumber(record.minimumSelectedPairwiseDistance, 6)} | ${record.expansions.total.toLocaleString()} | ${pass(record.deterministic)} | ${record.diagnostics.length === 0 ? "none" : record.diagnostics.map((item) => item.code).join(", ")} |`),
     "",
-    `Timing summary: median **${formatNumber(summary.medianMs)} ms**; p95 **${formatNumber(summary.p95Ms)} ms**; min ${formatNumber(summary.minimumMs)} ms; max ${formatNumber(summary.maximumMs)} ms.`,
+    `Timing summary across ${benchmark.methodology.timedRuns} measured generations: median **${formatNumber(summary.medianMs)} ms**; p95 **${formatNumber(summary.p95Ms)} ms**; min ${formatNumber(summary.minimumMs)} ms; max ${formatNumber(summary.maximumMs)} ms.`,
     "",
     "Selected-triplet distances are recorded in full in `benchmark.json`; all three selected layouts are independently revalidated per seed.",
     "",
@@ -321,6 +367,9 @@ function main() {
     throw new Error("canonical benchmark suite must contain exactly 10 fixed seeds");
   }
   mkdirSync(DIAGNOSTIC_ROOT, { recursive: true });
+  const inputManifest = benchmarkInputManifest();
+  const gitHeadAtRun = gitValue(["rev-parse", "HEAD"]);
+  const workingTreeStatusAtRun = gitValue(["status", "--short"]);
 
   const budget = { ...DEFAULT_GENERATION_BUDGET };
   // Warm the module/JIT path with an existing suite seed without adding an
@@ -334,7 +383,7 @@ function main() {
 
   const impossibleRecords = Object.entries(IMPOSSIBLE_FIXTURES)
     .map(([name, fixture]) => makeImpossibleRecord(name, fixture));
-  const timings = canonicalRecords.map((record) => record.elapsedMs);
+  const timings = canonicalRecords.flatMap((record) => record.timingSamplesRawMs);
   const medianMs = percentile(timings, 0.5);
   const p95Ms = percentile(timings, 0.95);
   const threshold = DEFAULT_DIVERSITY_THRESHOLD;
@@ -343,8 +392,8 @@ function main() {
     record.independentlyValidSelectedCount === 3 && record.independentlyValidCandidateCount === record.candidateCount,
   );
   const diversityThreshold = canonicalRecords.every((record) =>
-    record.minimumSelectedPairwiseDistance !== null &&
-    record.minimumSelectedPairwiseDistance >= threshold &&
+    record.minimumSelectedPairwiseDistanceRaw !== null &&
+    record.minimumSelectedPairwiseDistanceRaw >= threshold &&
     record.selectedPairwiseDistances.length === 3 &&
     record.selectedPairwiseDistances.every((pair) => pair.diverse),
   );
@@ -364,8 +413,11 @@ function main() {
     engineVersion: GENERATOR_ENGINE_VERSION,
     ruleVersion: GENERATOR_RULE_VERSION,
     environment: {
-      sourceRevision: gitValue(["rev-parse", "HEAD"]),
-      workingTreeStatus: gitValue(["status", "--short"]),
+      gitHeadAtRun,
+      workingTreeStatusAtRun,
+      workingTreeCleanAtRun: workingTreeStatusAtRun === "",
+      benchmarkInputFingerprint: inputManifest.fingerprint,
+      benchmarkInputFiles: inputManifest.files,
       os: `${platform()} ${release()}${osVersion() ? ` (${osVersion()})` : ""}`,
       arch: process.arch,
       cpuModel: cpus()[0]?.model ?? "unavailable",
@@ -379,15 +431,16 @@ function main() {
       seedCount: CANONICAL_BENCHMARK_SEEDS.length,
       seeds: [...CANONICAL_BENCHMARK_SEEDS],
       warmupRuns: 1,
-      timedRuns: canonicalRecords.length,
+      timedRunsPerSeed: TIMING_REPETITIONS,
+      timedRuns: canonicalRecords.length * TIMING_REPETITIONS,
       replayRuns: canonicalRecords.length,
       input: "createCanonicalProject(seed), passed to generateLayouts with the explicit seed",
       timingClock: "node:perf_hooks performance.now",
       replayComparison: "stable-key JSON of the complete GenerationResult",
       budget,
-      diversityVersion: "planlab-diversity-0.3",
+      diversityVersion: DIVERSITY_VERSION,
       diversityThreshold: threshold,
-      percentileMethod: "linear interpolation over sorted ten-sample timings",
+      percentileMethod: "linear interpolation over sorted measured timings",
       timingTargetsMs: { ...TIMING_TARGETS_MS },
     },
     summary: {
@@ -418,6 +471,10 @@ function main() {
 
   writeFileSync(resolve(OUTPUT_ROOT, "benchmark.json"), `${JSON.stringify(benchmark, null, 2)}${EOL}`, "utf8");
   writeFileSync(resolve(OUTPUT_ROOT, "benchmark.md"), `${makeMarkdownReport(benchmark)}${EOL}`, "utf8");
+  const written = JSON.parse(readFileSync(resolve(OUTPUT_ROOT, "benchmark.json"), "utf8"));
+  if (written.environment?.benchmarkInputFingerprint !== inputManifest.fingerprint) {
+    throw new Error("written benchmark artifact does not match its recorded input fingerprint");
+  }
   process.stdout.write(`${JSON.stringify({
     report: relative(REPO_ROOT, resolve(OUTPUT_ROOT, "benchmark.md")),
     json: relative(REPO_ROOT, resolve(OUTPUT_ROOT, "benchmark.json")),

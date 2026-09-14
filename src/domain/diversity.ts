@@ -19,7 +19,7 @@ import {
   type StrategyProfileId,
 } from "./scoring.ts";
 
-export const DIVERSITY_VERSION = "planlab-diversity-0.3";
+export const DIVERSITY_VERSION = "planlab-diversity-0.4";
 export const DEFAULT_DIVERSITY_THRESHOLD = 0.20;
 
 export interface DiversityComponents {
@@ -289,7 +289,12 @@ function centroidDistance(
     const to = transformCentre(second.space.rect, transformB);
     return [clamp01(Math.hypot(from.x - to.x, from.y - to.y) / diagonal)];
   });
-  return average(values, 1);
+  // Required room counts match in every hard-valid candidate, but optional
+  // instances may be deliberately omitted. Treat each unmatched room as the
+  // maximum normalized centroid difference rather than silently excluding it
+  // from the mean and making two different programs appear identical.
+  const unmatchedCount = Math.max(0, aPlacements.length + bPlacements.length - 2 * matches.length);
+  return average([...values, ...Array.from({ length: unmatchedCount }, () => 1)], 1);
 }
 
 function iou(first: GridRect, second: GridRect): number {
