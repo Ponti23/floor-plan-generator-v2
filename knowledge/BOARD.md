@@ -15,11 +15,12 @@ Active design: [`planlab/README.md`](./planlab/README.md) · staged plan: [`../D
 | 1.1 | Versioned domain schema and brief normalization | luna-max | luna-max | done | `main` (`0e8589b`) |
 | 1.2 | Production geometry primitives and property oracles | luna-max | luna-max | done | `main` (`ff99f7c`) |
 | 1.3 | Canonical serialization, fingerprinting, and diagnostics | luna-max | luna-max | done | `main` (`113d1d3`) |
-| 1.4 | Independent domain API review | terra-max | — | todo | `main` |
+| 1.4 | Independent domain API review | terra-max | terra-max | done | `main` (`e1c6f38`) |
 
 ## Handoff rules
 
 - Claim a bucket before editing and do not take work already owned.
 - Each executor verifies and commits its bucket.
 - Stage 1 hardens the approved domain semantics and remains isolated from product UI/scaffolding.
-- Do not begin Milestone 2 until the Stage 1 public domain APIs pass independent review.
+- Stage 1 public domain APIs passed independent review (1.4, `e1c6f38`). Stage
+  Milestone 2 before beginning product implementation.
