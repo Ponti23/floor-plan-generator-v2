@@ -2,7 +2,7 @@
 
 **Active plan:** [`DELEGATION-PLAN.md`](./DELEGATION-PLAN.md) · **Live queue:** [`knowledge/BOARD.md`](./knowledge/BOARD.md) · **Planning package:** [`knowledge/planlab/README.md`](./knowledge/planlab/README.md)
 
-**Status:** Stage 0 is complete; buckets 0.1–0.6 passed, including the user-approved architect usefulness hard gate.
+**Status:** Stage 0 is complete and approved. Stage 1 is active; bucket 1.1 is next.
 
 ## Last checkpoint
 
@@ -10,11 +10,12 @@
 
 ## Next step
 
-1. Treat Milestone 0 as the accepted feasibility baseline.
-2. Activate and stage Milestone 1 from `knowledge/planlab/IMPLEMENTATION_PLAN.md` before starting product implementation.
+1. Execute bucket 1.1: versioned domain schema and brief normalization.
+2. Continue buckets 1.2–1.4 in order through the independent domain API review.
 
 ## Constraints
 
-- Milestone 0 remained a mathematical feasibility spike; no product application scaffolding or polished UI was added.
+- Milestone 0 remains the accepted mathematical feasibility baseline; Stage 1 must preserve its approved semantics while replacing spike-only seams.
+- Stage 1 is production domain/geometry work only; no product application scaffolding or polished UI is in scope.
 - Approved assumptions are recorded in `DELEGATION-PLAN.md`.
 - The architect usefulness gate is cleared; future money/payment and product/UX/copy decisions remain human hard gates.

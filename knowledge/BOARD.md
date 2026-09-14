@@ -12,10 +12,14 @@ Active design: [`planlab/README.md`](./planlab/README.md) · staged plan: [`../D
 | 0.4 | Seed-suite feasibility benchmark | luna-max | luna-max | done | `stage0-planlab-spike` (`4d40d48`) |
 | 0.5 | Independent technical review | terra-max | terra-max | done | `stage0-planlab-spike` (`605eb88`) |
 | 0.6 | Architect usefulness review **(HARD GATE)** | astra-plan | user | done | `stage0-planlab-spike` (GO approved 2026-09-14) |
+| 1.1 | Versioned domain schema and brief normalization | luna-max | luna-max | todo | `main` |
+| 1.2 | Production geometry primitives and property oracles | luna-max | — | todo | `main` |
+| 1.3 | Canonical serialization, fingerprinting, and diagnostics | luna-max | — | todo | `main` |
+| 1.4 | Independent domain API review | terra-max | — | todo | `main` |
 
 ## Handoff rules
 
 - Claim a bucket before editing and do not take work already owned.
 - Each executor verifies and commits its bucket.
-- Stage 0 remains isolated from product UI/scaffolding.
-- Stop at 0.6 and ask the user for the go/no-go decision.
+- Stage 1 hardens the approved domain semantics and remains isolated from product UI/scaffolding.
+- Do not begin Milestone 2 until the Stage 1 public domain APIs pass independent review.
