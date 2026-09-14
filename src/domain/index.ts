@@ -4,6 +4,7 @@ export * from "./model.ts";
 export * from "./normalization.ts";
 export * from "./fixtures.ts";
 export * from "./layout.ts";
+export * from "./facts.ts";
 export * from "./prng.ts";
 export * from "./validation.ts";
 export * from "./metrics.ts";

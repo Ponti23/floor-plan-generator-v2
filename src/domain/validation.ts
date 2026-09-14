@@ -2,14 +2,13 @@ import {
   area,
   containsRect,
   edgeSegment,
-  intersectionArea,
   intervalContainsSpan,
   isGridRect,
   sharedWallSegments,
   sharedWallLength,
-  unallocatedInteriorArea,
   type GridRect,
 } from "./geometry.ts";
+import { buildLayoutIndexes } from "./facts.ts";
 import {
   GRID_MM,
   GRID_UNIT_METRES,
@@ -388,6 +387,9 @@ export function validateLayout(
   const roomById = new Map(project.rooms.map((room) => [room.id, room]));
   const spaceById = new Map<string, PlacedSpace>();
   const roomSpaces = new Map<string, PlacedSpace>();
+  // One geometry pass: overlaps, shared-wall intervals, exterior contact, and
+  // coverage are read from the shared index rather than recomputed per rule.
+  const indexes = buildLayoutIndexes(layout);
 
   // 1. Schema and site/footprint.
   if (project.schemaVersion !== 1) issue(violations, "UNSUPPORTED_SCHEMA_VERSION");
@@ -429,17 +431,10 @@ export function validateLayout(
       }
     }
   }
-  for (let first = 0; first < spaces.length; first += 1) {
-    if (!isGridRect(spaces[first].rect)) continue;
-    for (let second = first + 1; second < spaces.length; second += 1) {
-      if (!isGridRect(spaces[second].rect)) continue;
-      const overlap = intersectionArea(spaces[first].rect, spaces[second].rect);
-      if (overlap > 0) {
-        issue(violations, "SPACE_OVERLAP", [spaces[first].instanceId, spaces[second].instanceId], {
-          overlapUnits2: overlap,
-        });
-      }
-    }
+  for (const overlap of indexes.overlaps) {
+    issue(violations, "SPACE_OVERLAP", [overlap.a, overlap.b], {
+      overlapUnits2: overlap.areaUnits2,
+    });
   }
 
   // 3. Room presence and dimensions.
@@ -487,14 +482,12 @@ export function validateLayout(
   // is never allowed to inflate coverage.
   if (isGridRect(footprint)) {
     // Coverage is the analytical union of every well-formed space clipped to
-    // the footprint; malformed rectangles are skipped so they cannot shrink
-    // or inflate the interior void.  Pairwise overlap checks above remain the
-    // authoritative failure; subtracting pairwise overlaps here would
-    // over-subtract triple intersections.
-    const coverage = spaces.filter((space): space is PlacedSpace & { rect: GridRect } =>
-      isGridRect(space.rect),
-    ).map((space) => space.rect);
-    const unallocated = unallocatedInteriorArea(footprint, coverage);
+    // the footprint, computed once in the shared geometry index; malformed
+    // rectangles are skipped so they cannot shrink or inflate the interior
+    // void.  Pairwise overlap checks above remain the authoritative failure;
+    // subtracting pairwise overlaps here would over-subtract triple
+    // intersections.
+    const unallocated = indexes.unallocatedInteriorAreaUnits2;
     const ratio = unallocated / area(footprint);
     const maximum = Math.min(
       project.planning.maxUnallocatedInteriorRatio ?? DEFAULT_MAX_UNALLOCATED_RATIO,

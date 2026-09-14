@@ -2,15 +2,20 @@ import {
   area,
   boundaryDistance,
   centre,
-  exteriorContactBySide,
   isGridRect,
-  overlapArea,
-  sharedWallLength,
-  unallocatedInteriorArea,
   unionArea,
   type CardinalSide,
   type GridRect,
 } from "./geometry.ts";
+import {
+  buildLayoutIndexes,
+  placedSpaces,
+  spacePairKey,
+  type ExteriorContactFact,
+  type LayoutIndexes,
+  type OverlapFact,
+  type SharedWallIntervalFact,
+} from "./facts.ts";
 import {
   GRID_UNIT_METRES,
   GRID_M2,
@@ -141,6 +146,16 @@ export interface LayoutFacts {
   routeDistancesUnits: Record<string, number | null>;
   roomFacts: RoomFact[];
   spaceFacts: SpaceFact[];
+  /** Pairwise positive-area overlaps, in declaration order (i < j). */
+  overlaps: readonly OverlapFact[];
+  /** Shared-wall intervals behind `sharedWalls`; one pair may own several. */
+  sharedWallIntervals: readonly SharedWallIntervalFact[];
+  /** The same intervals keyed by `a|b` with ids sorted, for pair lookups. */
+  sharedWallIndex: Readonly<Record<string, readonly SharedWallIntervalFact[]>>;
+  /** Exterior contact per placed space, aligned with `spaceFacts`. */
+  exteriorContacts: readonly ExteriorContactFact[];
+  /** The same contacts keyed by instance id; the first occurrence wins. */
+  exteriorContactIndex: Readonly<Record<string, ExteriorContactFact>>;
   sharedWalls: SharedWallFact[];
   roomDistances: RoomDistanceFact[];
   portalGraph: PortalGraph;
@@ -172,7 +187,7 @@ export interface LayoutMetrics {
   observations: MetricObservation[];
 }
 
-export const METRICS_VERSION = "planlab-metrics-0.4";
+export const METRICS_VERSION = "planlab-metrics-0.5";
 
 /** Named breakpoints for the intentionally small prototype utility model. */
 export interface MetricConfig {
@@ -334,18 +349,12 @@ function compareText(a: string, b: string): number {
   return a < b ? -1 : a > b ? 1 : 0;
 }
 
-function rectsFor(layout: Layout): PlacedSpace[] {
-  return (Array.isArray(layout.spaces) ? layout.spaces : []).filter(
-    (space): space is PlacedSpace & { rect: GridRect } => isGridRect(space.rect),
-  );
-}
-
 function roomForSpace(project: NormalizedProject, space: PlacedSpace): RoomInstance | undefined {
   return project.rooms.find((room) => room.id === space.instanceId);
 }
 
 function emptyGraph(layout: Layout): PortalGraph {
-  const nodes = [EXTERIOR_SPACE_ID, ...rectsFor(layout).map((space) => space.instanceId)];
+  const nodes = [EXTERIOR_SPACE_ID, ...placedSpaces(layout).map((space) => space.instanceId)];
   const adjacency: Record<string, string[]> = {};
   for (const node of nodes) adjacency[node] = [];
   return { nodes, edges: [], adjacency };
@@ -384,7 +393,7 @@ function graphRouteDistances(
   layout: Layout,
   graph: PortalGraph,
 ): { distances: Record<string, number | null>; reachable: string[] } {
-  const rectById = new Map(rectsFor(layout).map((space) => [space.instanceId, space.rect]));
+  const rectById = new Map(placedSpaces(layout).map((space) => [space.instanceId, space.rect]));
   const portalById = new Map(
     (Array.isArray(layout.portals) ? layout.portals : []).map((portal) => [portal.id, portal]),
   );
@@ -506,23 +515,34 @@ function countDeadEnds(spaces: readonly PlacedSpace[], graph: PortalGraph): numb
   ).length;
 }
 
-function sharedWallsForRooms(roomFacts: readonly RoomFact[]): SharedWallFact[] {
-  const facts: SharedWallFact[] = [];
-  for (let first = 0; first < roomFacts.length; first += 1) {
-    for (let second = first + 1; second < roomFacts.length; second += 1) {
-      const a = roomFacts[first];
-      const b = roomFacts[second];
-      const lengthUnits = sharedWallLength(a.rect, b.rect);
-      if (lengthUnits <= 0) continue;
-      facts.push({
-        a: a.instanceId < b.instanceId ? a.instanceId : b.instanceId,
-        b: a.instanceId < b.instanceId ? b.instanceId : a.instanceId,
-        lengthUnits,
-        meaningful: lengthUnits >= MIN_MEANINGFUL_SHARED_WALL_UNITS,
-      });
+/**
+ * Room-scoped shared-wall summary derived from the interval index.  A pair's
+ * length is the sum of its intervals, so this summary cannot disagree with the
+ * intervals that access and relationship rules consume.
+ */
+function sharedWallsFromIndex(
+  indexes: LayoutIndexes,
+  roomIds: ReadonlySet<string>,
+): SharedWallFact[] {
+  const byPair = new Map<string, { a: string; b: string; lengthUnits: number }>();
+  for (const interval of indexes.sharedWallIntervals) {
+    if (!roomIds.has(interval.a) || !roomIds.has(interval.b)) continue;
+    const a = interval.a < interval.b ? interval.a : interval.b;
+    const b = interval.a < interval.b ? interval.b : interval.a;
+    const key = spacePairKey(a, b);
+    const existing = byPair.get(key);
+    if (existing) {
+      existing.lengthUnits += interval.lengthUnits;
+    } else {
+      byPair.set(key, { a, b, lengthUnits: interval.lengthUnits });
     }
   }
-  return facts.sort((a, b) => compareText(a.a, b.a) || compareText(a.b, b.b));
+  return [...byPair.values()]
+    .map((pair) => ({
+      ...pair,
+      meaningful: pair.lengthUnits >= MIN_MEANINGFUL_SHARED_WALL_UNITS,
+    }))
+    .sort((first, second) => compareText(first.a, second.a) || compareText(first.b, second.b));
 }
 
 function distancesForRooms(roomFacts: readonly RoomFact[]): RoomDistanceFact[] {
@@ -758,46 +778,44 @@ export function computeLayoutFacts(
   project: NormalizedProject,
   validation?: ValidationResult,
 ): LayoutFacts {
-  const spaces = rectsFor(layout);
-  const footprint = isGridRect(layout.footprint) ? layout.footprint : {
-    x: 0,
-    y: 0,
-    width: 1,
-    depth: 1,
-  };
+  const indexes = buildLayoutIndexes(layout);
+  const spaces = indexes.spaces;
   const roomById = new Map(project.rooms.map((room) => [room.id, room]));
-  const spaceFacts: SpaceFact[] = spaces.map((space) => ({
-    instanceId: space.instanceId,
-    role: space.role,
-    rect: space.rect,
-    areaUnits2: area(space.rect),
-    centre: centre(space.rect),
-    boundaryContact: exteriorContactBySide(space.rect, footprint),
-  }));
-  const roomFacts: RoomFact[] = spaces
-    .filter((space) => space.role === "room" && roomById.has(space.instanceId))
-    .map((space) => {
-      const room = roomById.get(space.instanceId)!;
-      const sides = exteriorContactBySide(space.rect, footprint, spaces.map((candidate) => candidate.rect));
-      return {
-        instanceId: space.instanceId,
-        role: "room" as const,
-        rect: space.rect,
-        areaUnits2: area(space.rect),
-        centre: centre(space.rect),
-        boundaryContact: sides,
-        requirementId: room.requirementId,
-        ordinal: room.ordinal,
-        displayName: room.displayName,
-        kind: room.kind,
-        zone: room.traits.zone,
-        wet: room.traits.wet,
-        exteriorPreference: room.traits.exteriorPreference,
-        aspectRatio: Math.max(space.rect.width / space.rect.depth, space.rect.depth / space.rect.width),
-        exteriorContactUnits: Object.values(sides).reduce((sum, value) => sum + value, 0),
-        exteriorContactBySide: sides,
-      };
-    });
+  const spaceFacts: SpaceFact[] = spaces.map((space, index) => {
+    const contact = indexes.exteriorContacts[index];
+    return {
+      instanceId: space.instanceId,
+      role: space.role,
+      rect: space.rect,
+      areaUnits2: area(space.rect),
+      centre: centre(space.rect),
+      boundaryContact: contact.footprintBySide,
+    };
+  });
+  const roomFacts: RoomFact[] = spaces.flatMap((space, index) => {
+    if (space.role !== "room") return [];
+    const room = roomById.get(space.instanceId);
+    if (!room) return [];
+    const sides = indexes.exteriorContacts[index].exposedBySide;
+    return [{
+      instanceId: space.instanceId,
+      role: "room" as const,
+      rect: space.rect,
+      areaUnits2: area(space.rect),
+      centre: centre(space.rect),
+      boundaryContact: sides,
+      requirementId: room.requirementId,
+      ordinal: room.ordinal,
+      displayName: room.displayName,
+      kind: room.kind,
+      zone: room.traits.zone,
+      wet: room.traits.wet,
+      exteriorPreference: room.traits.exteriorPreference,
+      aspectRatio: Math.max(space.rect.width / space.rect.depth, space.rect.depth / space.rect.width),
+      exteriorContactUnits: indexes.exteriorContacts[index].exposedTotalUnits,
+      exteriorContactBySide: sides,
+    }];
+  });
   let graph: PortalGraph;
   let hardValidation = validation;
   if (!hardValidation) {
@@ -826,16 +844,15 @@ export function computeLayoutFacts(
     return room ? isGarage(room) : false;
   });
   const programmedFacts = roomFacts.filter((fact) => !garageFacts.includes(fact));
-  // Coverage is an interior measure: spaces are clipped to the footprint
-  // before the union, so a malformed space that spills outside cannot make an
-  // interior void disappear from facts.
-  const spaceRects = spaces.map((space) => space.rect);
-  const footprintArea = area(footprint);
+  const footprintArea = indexes.footprintAreaUnits2;
   const garageAreaUnits2 = unionArea(garageFacts.map((fact) => fact.rect));
   const circulationAreaUnits2 = unionArea(transitSpaces.map((space) => space.rect));
   const entryAreaUnits2 = unionArea(entrySpaces.map((space) => space.rect));
   const programmedUsableAreaUnits2 = unionArea(programmedFacts.map((fact) => fact.rect));
-  const unallocatedInteriorAreaUnits2 = unallocatedInteriorArea(footprint, spaceRects);
+  // Coverage is an interior measure: spaces are clipped to the footprint before
+  // the union, so a malformed space that spills outside cannot make an interior
+  // void disappear from facts.  Both numbers come from the shared index.
+  const unallocatedInteriorAreaUnits2 = indexes.unallocatedInteriorAreaUnits2;
   const denominator = footprintArea - garageAreaUnits2;
   // Keep the category totals additive for the allocation diagnostic.  Unlike
   // unallocated area (which is based on geometric union), this intentionally
@@ -851,7 +868,7 @@ export function computeLayoutFacts(
       MAX_GFA_M2 * 1_000_000,
     ) / (GRID_M2 * 1_000_000),
   );
-  return {
+  return Object.freeze({
     factsVersion: METRICS_VERSION,
     layoutId: layout.id,
     siteAreaUnits2: area(project.site.site),
@@ -870,7 +887,7 @@ export function computeLayoutFacts(
     unallocatedInteriorAreaUnits2,
     unallocatedInteriorAreaM2: unallocatedInteriorAreaUnits2 * GRID_M2,
     unallocatedInteriorRatio: footprintArea === 0 ? 1 : unallocatedInteriorAreaUnits2 / footprintArea,
-    overlapAreaUnits2: overlapArea(spaceRects),
+    overlapAreaUnits2: indexes.overlapAreaUnits2,
     allocationRatio: footprintArea === 0 ? 0 : allocatedAreaUnits2 / footprintArea,
     planningEfficiency: denominator <= 0 ? 0 : programmedUsableAreaUnits2 / denominator,
     targetGfaUnits2,
@@ -894,12 +911,17 @@ export function computeLayoutFacts(
     ),
     roomFacts,
     spaceFacts,
-    sharedWalls: sharedWallsForRooms(roomFacts),
+    overlaps: indexes.overlaps,
+    sharedWallIntervals: indexes.sharedWallIntervals,
+    sharedWallIndex: indexes.sharedWallIndex,
+    exteriorContacts: indexes.exteriorContacts,
+    exteriorContactIndex: indexes.exteriorContactIndex,
+    sharedWalls: sharedWallsFromIndex(indexes, new Set(roomFacts.map((fact) => fact.instanceId))),
     roomDistances: distancesForRooms(roomFacts),
     portalGraph: graph,
     reachableSpaceIds: route.reachable,
     hardViolationCodes: [...new Set((hardValidation?.violations ?? []).map((violation) => violation.code))],
-  };
+  });
 }
 
 export const calculateLayoutFacts = computeLayoutFacts;
