@@ -62,9 +62,14 @@ export function buildPortalGraph(
   options: PortalGraphOptions = {},
 ): PortalGraph {
   const permittedKinds = options.kinds === undefined ? undefined : new Set(options.kinds);
+  // A malformed candidate is reported by the validator; it must never crash an
+  // access helper, or one bad candidate would take down generation instead of
+  // being rejected.
+  const layoutSpaces = Array.isArray(layout.spaces) ? layout.spaces : [];
+  const layoutPortals = Array.isArray(layout.portals) ? layout.portals : [];
   const nodes = [
     EXTERIOR_SPACE_ID,
-    ...layout.spaces.map((space) => space.instanceId),
+    ...layoutSpaces.map((space) => space.instanceId),
   ];
   const adjacency: Record<string, string[]> = {};
   for (const node of nodes) adjacency[node] = [];
@@ -76,7 +81,12 @@ export function buildPortalGraph(
     placedSpaces(layout).map((space) => [space.instanceId, space] as const),
   );
   const footprint = isGridRect(layout.footprint) ? layout.footprint : null;
-  for (const portal of layout.portals) {
+  // Duplicate portal ids are a validation finding; the graph keeps the first
+  // occurrence, matching the validator's first-wins loop.
+  const seenPortalIds = new Set<string>();
+  for (const portal of layoutPortals) {
+    if (seenPortalIds.has(portal.id)) continue;
+    seenPortalIds.add(portal.id);
     if (permittedKinds !== undefined && !permittedKinds.has(portal.kind)) continue;
     if (!(portal.a in adjacency) || !(portal.b in adjacency)) continue;
     if (!portalSpanValid(portal, spaceById, footprint)) continue;
@@ -191,6 +201,9 @@ export function portalSpanValid(
 ): boolean {
   if (!portal || typeof portal !== "object") return false;
   if (!["north", "east", "south", "west"].includes(portal.wall)) return false;
+  // Kind is part of the geometry contract, not just a graph filter: a portal
+  // with an unsupported kind is a finding, so it is never a traversable edge.
+  if (portal.kind !== "pedestrian" && portal.kind !== "vehicle") return false;
   if (!Number.isSafeInteger(portal.start) || !Number.isSafeInteger(portal.length)) return false;
   if (portal.length < MIN_PORTAL_WIDTH_UNITS) return false;
 

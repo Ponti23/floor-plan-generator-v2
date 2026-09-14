@@ -322,3 +322,60 @@ test("an open-plan room is a transit node only when the brief opts in", () => {
   // bedroom can only be reached by walking through it.
   assert.ok(optedOut.includes("FORBIDDEN_PASS_THROUGH"));
 });
+
+// Milestone 2 independent review findings.  All three are access-layer holes in
+// which the graph and the validator disagreed about the same portal, so a
+// candidate could look traversable while being reported invalid (or the helper
+// could crash instead of reporting anything at all).
+
+test("the access graph never disagrees with the validator about a portal's kind", () => {
+  const spaces: FixtureSpace[] = [
+    { id: "entry-1", role: "entry", rect: rect(0, 8, 4, 4) },
+    { id: "living-1", role: "room", rect: rect(4, 8, 12, 4) },
+  ];
+  const unsupportedKind = {
+    ...portal("p1", "entry-1", "living-1", "east", 8, 4),
+    kind: "elevator" as AccessPortal["kind"],
+  };
+  const layout = fixture(ACCESS_FOOTPRINT, spaces, [unsupportedKind]);
+
+  assert.equal(portalSpanValid(unsupportedKind, spaceMap(layout), layout.footprint), false);
+  assert.deepEqual(buildPortalGraph(layout).edges, []);
+  assert.equal(reachableSpaceIds(layout).includes("living-1"), false);
+});
+
+test("a repeated portal id cannot add a second route", () => {
+  const spaces: FixtureSpace[] = [
+    { id: "entry-1", role: "entry", rect: rect(0, 8, 4, 4) },
+    { id: "living-1", role: "room", rect: rect(4, 8, 12, 4) },
+  ];
+  const repeated = portal("p1", "entry-1", "living-1", "east", 8, 4);
+  const layout = fixture(ACCESS_FOOTPRINT, spaces, [repeated, { ...repeated }]);
+
+  assert.equal(buildPortalGraph(layout).edges.length, 1);
+  assert.ok(
+    codesOf(layout, brief([
+      requirement("living", "living", "public", false),
+    ])).includes("DUPLICATE_PORTAL_ID"),
+  );
+});
+
+test("a malformed candidate is reported, never thrown", () => {
+  const spaces: FixtureSpace[] = [
+    { id: "entry-1", role: "entry", rect: rect(0, 8, 4, 4) },
+    { id: "living-1", role: "room", rect: rect(4, 8, 12, 4) },
+  ];
+  const withoutPortals = fixture(ACCESS_FOOTPRINT, spaces, []);
+  const malformed = { ...withoutPortals, portals: undefined } as unknown as Layout;
+  const withoutSpaces = { ...withoutPortals, spaces: undefined } as unknown as Layout;
+
+  assert.deepEqual(buildPortalGraph(malformed).edges, []);
+  assert.deepEqual(reachableSpaceIds(malformed), ["exterior"]);
+  assert.deepEqual(reachableSpaceIds(withoutSpaces), ["exterior"]);
+  // The validator still produces findings rather than crashing.
+  const result = validateLayout(malformed, normalizeProject(brief([
+    requirement("living", "living", "public", false),
+  ])));
+  assert.equal(result.valid, false);
+  assert.ok(result.violations.length > 0);
+});

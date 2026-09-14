@@ -30,6 +30,7 @@ import {
   type PlacedSpace,
 } from "./layout.ts";
 import { createSeededPrng, hashSeed, type SeededPrng } from "./prng.ts";
+import { isTransitNode } from "./portalGraph.ts";
 import { validateLayout, type ValidationResult } from "./validation.ts";
 import {
   scoreCandidates,
@@ -682,9 +683,10 @@ function dimensionVariants(
 }
 
 function transitSpace(space: PlacedSpace, project: NormalizedProject): boolean {
-  if (space.role === "entry" || space.role === "circulation") return true;
   const room = project.rooms.find((candidate) => candidate.id === space.instanceId);
-  return room?.traits.mayBePassThrough === true || room?.kind === "hallway";
+  // Search and validation must share one transit policy, or the constructor
+  // would keep exploring routes the validator is guaranteed to reject.
+  return isTransitNode(space, room);
 }
 
 function stateKey(spaces: readonly PlacedSpace[]): string {
