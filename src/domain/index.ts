@@ -6,6 +6,8 @@ export * from "./fixtures.ts";
 export * from "./layout.ts";
 export * from "./facts.ts";
 export * from "./prng.ts";
+export * from "./portalGraph.ts";
+export * from "./rules.ts";
 export * from "./validation.ts";
 export * from "./metrics.ts";
 export * from "./scoring.ts";

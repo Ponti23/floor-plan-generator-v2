@@ -1,40 +1,31 @@
-import {
-  area,
-  containsRect,
-  edgeSegment,
-  intervalContainsSpan,
-  isGridRect,
-  sharedWallSegments,
-  sharedWallLength,
-  type GridRect,
-} from "./geometry.ts";
-import { buildLayoutIndexes, placedSpaces } from "./facts.ts";
-import {
-  GRID_MM,
-  GRID_UNIT_METRES,
-  GARAGE_MIN_DEPTH_UNITS,
-  GARAGE_MIN_WIDTH_UNITS,
-  MAX_UNALLOCATED_INTERIOR_RATIO,
-  MAX_GFA_M2,
-  MIN_PORTAL_WIDTH_UNITS,
-  MIN_MEANINGFUL_SHARED_WALL_UNITS,
-} from "./constants.ts";
-import {
-  roomSelectorKey,
-  type NormalizedProject,
-  type RelationshipRequirement,
-  type RoomKind,
-  type RoomInstance,
-  type RoomSelector,
-} from "./model.ts";
-import {
-  EXTERIOR_SPACE_ID,
-  type AccessPortal,
-  type Layout,
-  type PlacedSpace,
-} from "./layout.ts";
+/**
+ * Independent hard validator.
+ *
+ * Stage 2 bucket 2.3 replaced this module's inline check sequence with the
+ * typed evaluator registry in `rules.ts`.  This file now prepares one shared
+ * `RuleContext` per candidate, runs the ordered `planlab-core` pipeline, and
+ * projects fail evaluations onto the legacy `ValidationResult` shape consumed
+ * by the generator, metrics, scoring, and diagnostics.
+ *
+ * The public result shape is unchanged on purpose: valid canonical layouts
+ * serialize byte-for-byte as they did before the refactor, and every existing
+ * violation code is preserved.
+ */
 
-export type ValidationSeverity = "hard";
+import type { Layout } from "./layout.ts";
+import type { NormalizedProject } from "./model.ts";
+import {
+  type PortalGraph,
+} from "./portalGraph.ts";
+import {
+  evaluatePlanlabCoreRules,
+  prepareRuleContext,
+  type GeometryEvidenceValue,
+  type RuleEvaluation,
+  type ScalarEvidenceValue,
+} from "./rules.ts";
+
+export type ValidationSeverity = "hard" | "soft";
 
 export interface ValidationEvidence {
   [key: string]: string | number | boolean | null | undefined;
@@ -49,28 +40,10 @@ export interface ValidationViolation {
   expected?: string | number | boolean;
   actual?: string | number | boolean;
   evidence?: ValidationEvidence;
+  /** Rectangles relevant to the finding, for UI highlighting. */
+  geometryEvidence?: GeometryEvidenceValue[];
   message: { key: string; values: Record<string, string | number> };
 }
-
-export interface PortalGraphEdge {
-  a: string;
-  b: string;
-  portalId: string;
-  kind: "pedestrian" | "vehicle";
-}
-
-export interface PortalGraph {
-  nodes: string[];
-  edges: PortalGraphEdge[];
-  adjacency: Record<string, string[]>;
-}
-
-export interface PortalGraphOptions {
-  /** Restrict the graph to portal kinds that support the operation at hand. */
-  kinds?: readonly AccessPortal["kind"][];
-}
-
-export type AccessGraph = PortalGraph;
 
 export interface ValidationResult {
   valid: boolean;
@@ -81,30 +54,23 @@ export interface ValidationResult {
   reachableSpaceIds: string[];
 }
 
-const RULE_VERSION = 2;
-const RULE_PREFIX = "planlab-core";
-const DEFAULT_MAX_UNALLOCATED_RATIO = 0.05;
-
-function issue(
-  violations: ValidationViolation[],
-  code: string,
-  subjects: string[] = [],
-  evidence?: ValidationEvidence,
-  expected?: string | number | boolean,
-  actual?: string | number | boolean,
-): void {
-  violations.push({
-    code,
-    ruleId: `${RULE_PREFIX}.${code.toLowerCase()}`,
-    ruleVersion: RULE_VERSION,
-    severity: "hard",
-    subjects,
-    ...(expected !== undefined ? { expected } : {}),
-    ...(actual !== undefined ? { actual } : {}),
-    ...(evidence !== undefined ? { evidence } : {}),
-    message: { key: `validation.${code.toLowerCase()}`, values: {} },
-  });
-}
+// Portal graph and reachability helpers historically lived here and remain
+// available through this module for backward compatibility.
+export {
+  buildAccessGraph,
+  buildPedestrianPortalGraph,
+  buildPortalGraph,
+  computeReachability,
+  createPortalGraph,
+  portalSpanValid,
+  reachableSpaceIds,
+} from "./portalGraph.ts";
+export type {
+  AccessGraph,
+  PortalGraph,
+  PortalGraphEdge,
+  PortalGraphOptions,
+} from "./portalGraph.ts";
 
 function isNormalizedProject(value: unknown): value is NormalizedProject {
   return (
@@ -126,334 +92,29 @@ function resolveArguments(
   return { layout: first as Layout, project: second as NormalizedProject };
 }
 
-function spaceRole(space: PlacedSpace): PlacedSpace["role"] {
-  return space.role ?? "room";
-}
-
-function addAdjacency(adjacency: Record<string, string[]>, a: string, b: string): void {
-  if (!adjacency[a]) adjacency[a] = [];
-  if (!adjacency[b]) adjacency[b] = [];
-  if (!adjacency[a].includes(b)) adjacency[a].push(b);
-  if (!adjacency[b].includes(a)) adjacency[b].push(a);
-}
-
-/** Build the graph represented by portals, preserving stable insertion order. */
-export function buildPortalGraph(
-  layout: Layout,
-  options: PortalGraphOptions = {},
-): PortalGraph {
-  const permittedKinds = options.kinds === undefined ? undefined : new Set(options.kinds);
-  const nodes = [
-    EXTERIOR_SPACE_ID,
-    ...layout.spaces.map((space) => space.instanceId),
-  ];
-  const adjacency: Record<string, string[]> = {};
-  for (const node of nodes) adjacency[node] = [];
-  const edges: PortalGraphEdge[] = [];
-  // Only geometrically real portals become edges.  A portal the validator
-  // rejects — off the shared wall, on a corner, too narrow, pointing at an
-  // unknown space — must not make a room look reachable.
-  const spaceById = new Map(
-    placedSpaces(layout).map((space) => [space.instanceId, space] as const),
-  );
-  const footprint = isGridRect(layout.footprint) ? layout.footprint : null;
-  for (const portal of layout.portals) {
-    if (permittedKinds !== undefined && !permittedKinds.has(portal.kind)) continue;
-    if (!(portal.a in adjacency) || !(portal.b in adjacency)) continue;
-    if (!portalSpanValid(portal, spaceById, footprint)) continue;
-    addAdjacency(adjacency, portal.a, portal.b);
-    edges.push({
-      a: portal.a,
-      b: portal.b,
-      portalId: portal.id,
-      kind: portal.kind,
-    });
-  }
-  return { nodes, edges, adjacency };
-}
-
-/** Vehicle frontage is not a pedestrian route through the plan. */
-export function buildPedestrianPortalGraph(layout: Layout): PortalGraph {
-  return buildPortalGraph(layout, { kinds: ["pedestrian"] });
-}
-
-export const buildAccessGraph = buildPortalGraph;
-export const createPortalGraph = buildPortalGraph;
-
-function bfs(graph: PortalGraph, start = EXTERIOR_SPACE_ID): Set<string> {
-  const visited = new Set<string>();
-  if (!(start in graph.adjacency)) return visited;
-  const queue = [start];
-  visited.add(start);
-  for (let index = 0; index < queue.length; index += 1) {
-    const node = queue[index];
-    for (const next of graph.adjacency[node] ?? []) {
-      if (visited.has(next)) continue;
-      visited.add(next);
-      queue.push(next);
+function evaluationToViolation(evaluation: RuleEvaluation): ValidationViolation {
+  const scalarEvidence: ValidationEvidence = {};
+  const geometryEvidence: GeometryEvidenceValue[] = [];
+  for (const item of evaluation.evidence) {
+    if (item.kind === "scalar") {
+      const scalar = item as ScalarEvidenceValue;
+      scalarEvidence[scalar.key] = scalar.value;
+    } else {
+      geometryEvidence.push(item);
     }
   }
-  return visited;
-}
-
-export function reachableSpaceIds(
-  graphOrLayout: PortalGraph | Layout,
-  start = EXTERIOR_SPACE_ID,
-): string[] {
-  // Reachability in this domain means human reachability.  A vehicle portal
-  // proves frontage, never a route, so a bare layout is resolved through the
-  // pedestrian graph; callers that pass a graph get exactly that graph.
-  const graph = "adjacency" in graphOrLayout
-    ? graphOrLayout
-    : buildPedestrianPortalGraph(graphOrLayout);
-  return [...bfs(graph, start)];
-}
-
-export const computeReachability = reachableSpaceIds;
-
-function exteriorPortalValid(
-  portal: AccessPortal,
-  space: PlacedSpace,
-  footprint: GridRect,
-): boolean {
-  if (portal.wall === "north" && space.rect.y !== footprint.y) return false;
-  if (portal.wall === "east" && space.rect.x + space.rect.width !== footprint.x + footprint.width) {
-    return false;
-  }
-  if (portal.wall === "south" && space.rect.y + space.rect.depth !== footprint.y + footprint.depth) {
-    return false;
-  }
-  if (portal.wall === "west" && space.rect.x !== footprint.x) return false;
-  const edge = edgeSegment(space.rect, portal.wall);
-  const footprintEdge = edgeSegment(footprint, portal.wall);
-  return (
-    edge.fixed === footprintEdge.fixed &&
-    intervalContainsSpan(edge.interval, portal.start, portal.length) &&
-    intervalContainsSpan(footprintEdge.interval, portal.start, portal.length)
-  );
-}
-
-function interiorPortalValid(
-  portal: AccessPortal,
-  a: PlacedSpace,
-  b: PlacedSpace,
-): boolean {
-  const segments = sharedWallSegments(a.rect, b.rect);
-  for (const segment of segments) {
-    const aSide = portal.a === a.instanceId ? segment.aSide : segment.bSide;
-    if (
-      aSide === portal.wall &&
-      intervalContainsSpan(segment.interval, portal.start, portal.length)
-    ) {
-      return true;
-    }
-  }
-  return false;
-}
-
-/**
- * Single source of truth for portal geometry.
- *
- * A portal only exists where the geometry allows one: its interval must lie
- * inside a real shared-wall segment of the declared side (or the footprint
- * boundary for an exterior portal), both endpoints must resolve, and it must be
- * at least `MIN_PORTAL_WIDTH_UNITS` wide.  `validateLayout` and the access graph
- * both call this, so reachability can never be established through a portal
- * that validation simultaneously rejects — and mere adjacency, corner contact
- * included, never becomes a route.
- *
- * `footprint` is `null` when the layout has no well-formed footprint; interior
- * portals are still decidable in that case, exterior ones are not.
- */
-export function portalSpanValid(
-  portal: AccessPortal,
-  spaceById: ReadonlyMap<string, PlacedSpace>,
-  footprint: GridRect | null,
-): boolean {
-  if (!portal || typeof portal !== "object") return false;
-  if (!["north", "east", "south", "west"].includes(portal.wall)) return false;
-  if (!Number.isSafeInteger(portal.start) || !Number.isSafeInteger(portal.length)) return false;
-  if (portal.length < MIN_PORTAL_WIDTH_UNITS) return false;
-
-  const a = portal.a === EXTERIOR_SPACE_ID ? undefined : spaceById.get(portal.a);
-  const b = portal.b === EXTERIOR_SPACE_ID ? undefined : spaceById.get(portal.b);
-  if (portal.a !== EXTERIOR_SPACE_ID && !a) return false;
-  if (portal.b !== EXTERIOR_SPACE_ID && !b) return false;
-
-  if (a === undefined && b !== undefined) {
-    return footprint !== null && exteriorPortalValid(portal, b, footprint);
-  }
-  if (b === undefined && a !== undefined) {
-    return footprint !== null && exteriorPortalValid(portal, a, footprint);
-  }
-  if (a !== undefined && b !== undefined) {
-    return interiorPortalValid(portal, a, b);
-  }
-  // Exterior on both sides is not a portal.
-  return false;
-}
-
-function roomSelectorMatches(room: RoomInstance, selector: RoomSelector): boolean {
-  const key = roomSelectorKey(selector);
-  return room.id === key || room.requirementId === key || room.kind === key;
-}
-
-function selectedSpaces(
-  selector: RoomSelector,
-  project: NormalizedProject,
-  roomSpaces: Map<string, PlacedSpace>,
-): PlacedSpace[] {
-  return project.rooms
-    .filter((room) => roomSelectorMatches(room, selector))
-    .map((room) => roomSpaces.get(room.id))
-    .filter((space): space is PlacedSpace => space !== undefined);
-}
-
-function validateRelationship(
-  relationship: RelationshipRequirement,
-  project: NormalizedProject,
-  roomSpaces: Map<string, PlacedSpace>,
-  violations: ValidationViolation[],
-): void {
-  if (relationship.kind !== "mustShareWall") return;
-  const from = selectedSpaces(relationship.from, project, roomSpaces);
-  const to = selectedSpaces(relationship.to, project, roomSpaces);
-  if (from.length === 0 || to.length === 0) {
-    issue(violations, "RELATIONSHIP_SELECTOR_UNRESOLVED", [relationship.id], {
-      from: roomSelectorKey(relationship.from),
-      to: roomSelectorKey(relationship.to),
-    });
-    return;
-  }
-  const threshold = Math.max(
-    MIN_MEANINGFUL_SHARED_WALL_UNITS,
-    relationship.minSharedWallM === undefined
-      ? 0
-      : Math.ceil(relationship.minSharedWallM / GRID_UNIT_METRES),
-  );
-  let satisfied = false;
-  for (const a of from) {
-    for (const b of to) {
-      if (a.instanceId === b.instanceId) continue;
-      if (sharedWallLength(a.rect, b.rect) >= threshold) satisfied = true;
-    }
-  }
-  if (!satisfied) {
-    issue(violations, "MUST_SHARE_WALL_UNSATISFIED", [relationship.id], {
-      thresholdUnits: threshold,
-    });
-  }
-}
-
-/**
- * Rooms that may never be walked *through*, regardless of what their traits
- * claim.  A bathroom is still a valid destination; it just cannot be someone
- * else's corridor.  `RULE_ENGINE.md` names private, bathroom/WC, garage,
- * laundry and storage explicitly.
- */
-const NEVER_TRANSIT_KINDS: ReadonlySet<RoomKind> = new Set<RoomKind>([
-  "bedroom",
-  "bathroom",
-  "garage",
-  "laundry",
-  "storage",
-]);
-
-/**
- * Rooms that may become transit nodes only when the project policy permits
- * open-plan circulation.  The normalized form of that policy is the room's own
- * `mayBePassThrough` trait, so an authored brief still has to ask for it.
- */
-const OPEN_PLAN_TRANSIT_KINDS: ReadonlySet<RoomKind> = new Set<RoomKind>([
-  "living",
-  "dining",
-  "kitchen",
-]);
-
-/**
- * Transit policy, in one place.
- *
- * Entry and circulation spaces are the designed through-route.  Private and
- * service rooms are destinations only, even if a brief sets their
- * `mayBePassThrough` trait.  Open-plan rooms (living/dining/kitchen) join the
- * through-route only when the brief explicitly opts them in.
- */
-function isTransitNode(space: PlacedSpace, room: RoomInstance | undefined): boolean {
-  if (spaceRole(space) === "entry" || spaceRole(space) === "circulation") return true;
-  if (!room) return false;
-  if (room.kind === "hallway") return true;
-  if (NEVER_TRANSIT_KINDS.has(room.kind)) return false;
-  if (room.traits.zone === "private" || room.traits.zone === "service") return false;
-  return OPEN_PLAN_TRANSIT_KINDS.has(room.kind) && room.traits.mayBePassThrough === true;
-}
-
-/**
- * Reach rooms from the exterior while refusing to traverse private/service
- * rooms.  Merely having an undirected path is insufficient: a bedroom may be
- * a destination but must not be the hallway to another room.
- */
-function transitReachability(
-  graph: PortalGraph,
-  spaces: readonly PlacedSpace[],
-  rooms: Map<string, RoomInstance>,
-): Set<string> {
-  const transit = new Set<string>([EXTERIOR_SPACE_ID]);
-  for (const space of spaces) {
-    if (isTransitNode(space, rooms.get(space.instanceId))) transit.add(space.instanceId);
-  }
-  const visited = new Set<string>([EXTERIOR_SPACE_ID]);
-  const queue = [EXTERIOR_SPACE_ID];
-  for (let index = 0; index < queue.length; index += 1) {
-    const node = queue[index];
-    for (const next of graph.adjacency[node] ?? []) {
-      if (visited.has(next)) continue;
-      visited.add(next);
-      // The destination itself is reachable, but only transit nodes may be
-      // expanded to reach another destination.
-      if (transit.has(next)) queue.push(next);
-    }
-  }
-  return visited;
-}
-
-function roomDimensionsValid(room: RoomInstance, rect: GridRect): boolean {
-  const dimensions = room.dimensions;
-  if (area(rect) < dimensions.minAreaUnits2) return false;
-  if (
-    dimensions.minShortSideUnits !== undefined &&
-    Math.min(rect.width, rect.depth) < dimensions.minShortSideUnits
-  ) {
-    return false;
-  }
-  const directOrientation =
-    (dimensions.minWidthUnits === undefined || rect.width >= dimensions.minWidthUnits) &&
-    (dimensions.minDepthUnits === undefined || rect.depth >= dimensions.minDepthUnits);
-  const rotatedOrientation =
-    dimensions.minWidthUnits !== undefined &&
-    dimensions.minDepthUnits !== undefined &&
-    rect.width >= dimensions.minDepthUnits &&
-    rect.depth >= dimensions.minWidthUnits;
-  if (!directOrientation && !rotatedOrientation) return false;
-  if (
-    dimensions.maxAspectRatio !== undefined &&
-    Math.max(rect.width / rect.depth, rect.depth / rect.width) > dimensions.maxAspectRatio
-  ) {
-    return false;
-  }
-  return true;
-}
-
-function isGarageRoom(room: RoomInstance): boolean {
-  return room.kind === "garage" || room.traits.frontage?.kind === "vehicle";
-}
-
-function maxGfaUnits(project: NormalizedProject): number {
-  const approvedMaxGfaMm2 = MAX_GFA_M2 * 1_000_000;
-  const maxGfaMm2 = Math.min(
-    project.planning.maxGfaMm2 ?? approvedMaxGfaMm2,
-    approvedMaxGfaMm2,
-  );
-  return Math.floor(maxGfaMm2 / (GRID_MM * GRID_MM));
+  return {
+    code: evaluation.code,
+    ruleId: `planlab-core.${evaluation.ruleDefinitionId}`,
+    ruleVersion: evaluation.ruleDefinitionVersion,
+    severity: evaluation.enforcement,
+    subjects: evaluation.subjects.map((subject) => subject.id),
+    ...(evaluation.expected !== undefined ? { expected: evaluation.expected } : {}),
+    ...(evaluation.actual !== undefined ? { actual: evaluation.actual } : {}),
+    ...(Object.keys(scalarEvidence).length > 0 ? { evidence: scalarEvidence } : {}),
+    ...(geometryEvidence.length > 0 ? { geometryEvidence } : {}),
+    message: evaluation.message,
+  };
 }
 
 /**
@@ -468,266 +129,18 @@ export function validateLayout(
   projectOrLayout: Layout | NormalizedProject,
 ): ValidationResult {
   const { layout, project } = resolveArguments(layoutOrProject, projectOrLayout);
-  const violations: ValidationViolation[] = [];
-  const footprint = layout.footprint;
-  const spaces = Array.isArray(layout.spaces) ? layout.spaces : [];
-  const roomById = new Map(project.rooms.map((room) => [room.id, room]));
-  const spaceById = new Map<string, PlacedSpace>();
-  const roomSpaces = new Map<string, PlacedSpace>();
-  // One geometry pass: overlaps, shared-wall intervals, exterior contact, and
-  // coverage are read from the shared index rather than recomputed per rule.
-  const indexes = buildLayoutIndexes(layout);
-
-  // 1. Schema and site/footprint.
-  if (project.schemaVersion !== 1) issue(violations, "UNSUPPORTED_SCHEMA_VERSION");
-  if (!isGridRect(footprint)) {
-    issue(violations, "INVALID_FOOTPRINT_GEOMETRY", [layout.id]);
-  } else {
-    if (!containsRect(project.site.envelope, footprint)) {
-      issue(violations, "FOOTPRINT_OUTSIDE_ENVELOPE", [layout.id]);
-    }
-    if (area(footprint) > maxGfaUnits(project)) {
-      issue(violations, "FOOTPRINT_EXCEEDS_MAX_GFA", [layout.id], {
-        maxGfaUnits: maxGfaUnits(project),
-      }, maxGfaUnits(project), area(footprint));
-    }
-  }
-
-  // 2. Rectangle integrity, containment, duplicate IDs, and overlap.
-  for (const space of spaces) {
-    if (!["room", "circulation", "entry"].includes(space.role)) {
-      issue(violations, "INVALID_SPACE_ROLE", [space.instanceId]);
-    }
-    if (!isGridRect(space.rect)) {
-      issue(violations, "INVALID_SPACE_GEOMETRY", [space.instanceId]);
-      continue;
-    }
-    if (spaceById.has(space.instanceId)) {
-      issue(violations, "DUPLICATE_SPACE_ID", [space.instanceId]);
-    } else {
-      spaceById.set(space.instanceId, space);
-    }
-    if (isGridRect(footprint) && !containsRect(footprint, space.rect)) {
-      issue(violations, "SPACE_OUTSIDE_FOOTPRINT", [space.instanceId]);
-    }
-    if (spaceRole(space) === "room") {
-      if (!roomById.has(space.instanceId)) {
-        issue(violations, "UNKNOWN_ROOM_INSTANCE", [space.instanceId]);
-      } else {
-        roomSpaces.set(space.instanceId, space);
-      }
-    }
-  }
-  for (const overlap of indexes.overlaps) {
-    issue(violations, "SPACE_OVERLAP", [overlap.a, overlap.b], {
-      overlapUnits2: overlap.areaUnits2,
-    });
-  }
-
-  // 3. Room presence and dimensions.
-  for (const room of project.rooms) {
-    const space = roomSpaces.get(room.id);
-    if (!space) {
-      if (room.inclusion === "required") issue(violations, "REQUIRED_ROOM_MISSING", [room.id]);
-      continue;
-    }
-    if (!roomDimensionsValid(room, space.rect)) {
-      issue(violations, "ROOM_DIMENSIONS_INVALID", [room.id]);
-    }
-    if (isGarageRoom(room)) {
-      if (
-        room.traits.frontage?.kind !== "vehicle" ||
-        room.traits.frontage.side !== "south"
-      ) {
-        issue(violations, "GARAGE_FRONTAGE_POLICY_INVALID", [room.id]);
-      }
-      if (space.rect.width < GARAGE_MIN_WIDTH_UNITS || space.rect.depth < GARAGE_MIN_DEPTH_UNITS) {
-        issue(violations, "GARAGE_PRESET_DIMENSIONS_INVALID", [room.id], {
-          minimumWidthUnits: GARAGE_MIN_WIDTH_UNITS,
-          minimumDepthUnits: GARAGE_MIN_DEPTH_UNITS,
-        });
-      }
-      if (
-        isGridRect(footprint) &&
-        space.rect.y + space.rect.depth !== footprint.y + footprint.depth
-      ) {
-        issue(violations, "GARAGE_MISSING_SOUTH_FRONTAGE", [room.id]);
-      }
-    }
-  }
-  const circulationMinimum = project.planning.minimumCirculationWidthUnits;
-  for (const space of spaces) {
-    if (spaceRole(space) !== "circulation" && spaceRole(space) !== "entry") continue;
-    if (Math.min(space.rect.width, space.rect.depth) < circulationMinimum) {
-      issue(violations, "CIRCULATION_WIDTH_INVALID", [space.instanceId], {
-        minimumUnits: circulationMinimum,
-      });
-    }
-  }
-
-  // 4. Coverage/unallocated interior.  Overlap remains a separate failure and
-  // is never allowed to inflate coverage.
-  if (isGridRect(footprint)) {
-    // Coverage is the analytical union of every well-formed space clipped to
-    // the footprint, computed once in the shared geometry index; malformed
-    // rectangles are skipped so they cannot shrink or inflate the interior
-    // void.  Pairwise overlap checks above remain the authoritative failure;
-    // subtracting pairwise overlaps here would over-subtract triple
-    // intersections.
-    const unallocated = indexes.unallocatedInteriorAreaUnits2;
-    const ratio = unallocated / area(footprint);
-    const maximum = Math.min(
-      project.planning.maxUnallocatedInteriorRatio ?? DEFAULT_MAX_UNALLOCATED_RATIO,
-      MAX_UNALLOCATED_INTERIOR_RATIO,
-    );
-    if (ratio > maximum) {
-      issue(violations, "UNALLOCATED_INTERIOR_EXCEEDS_CAP", [layout.id], {
-        unallocatedUnits2: unallocated,
-        ratio,
-      }, maximum, ratio);
-    }
-  }
-
-  // 5. Portal geometry and entrance/frontage anchors.
-  const validPortals: AccessPortal[] = [];
-  const portalIds = new Set<string>();
-  for (const portal of Array.isArray(layout.portals) ? layout.portals : []) {
-    if (portalIds.has(portal.id)) {
-      issue(violations, "DUPLICATE_PORTAL_ID", [portal.id]);
-      continue;
-    }
-    portalIds.add(portal.id);
-    if (!["north", "east", "south", "west"].includes(portal.wall)) {
-      issue(violations, "PORTAL_WALL_INVALID", [portal.id]);
-      continue;
-    }
-    if (portal.kind !== "pedestrian" && portal.kind !== "vehicle") {
-      issue(violations, "PORTAL_KIND_INVALID", [portal.id]);
-      continue;
-    }
-    if (
-      !Number.isSafeInteger(portal.start) ||
-      !Number.isSafeInteger(portal.length) ||
-      portal.length < MIN_PORTAL_WIDTH_UNITS
-    ) {
-      issue(violations, "PORTAL_WIDTH_INVALID", [portal.id], {
-        minimumUnits: MIN_PORTAL_WIDTH_UNITS,
-      });
-      continue;
-    }
-    const a = portal.a === EXTERIOR_SPACE_ID ? undefined : spaceById.get(portal.a);
-    const b = portal.b === EXTERIOR_SPACE_ID ? undefined : spaceById.get(portal.b);
-    if (portal.a !== EXTERIOR_SPACE_ID && !a) {
-      issue(violations, "PORTAL_UNKNOWN_SPACE", [portal.id, portal.a]);
-      continue;
-    }
-    if (portal.b !== EXTERIOR_SPACE_ID && !b) {
-      issue(violations, "PORTAL_UNKNOWN_SPACE", [portal.id, portal.b]);
-      continue;
-    }
-    // Same predicate the access graph uses, so "valid enough to validate" and
-    // "valid enough to walk through" can never drift apart.
-    if (!portalSpanValid(portal, spaceById, isGridRect(footprint) ? footprint : null)) {
-      issue(violations, "PORTAL_NOT_ON_SHARED_EDGE", [portal.id]);
-      continue;
-    }
-    validPortals.push(portal);
-  }
-  const externalPedestrian = validPortals.filter(
-    (portal) =>
-      portal.kind === "pedestrian" &&
-      (portal.a === EXTERIOR_SPACE_ID || portal.b === EXTERIOR_SPACE_ID),
-  );
-  if (externalPedestrian.length !== 1) {
-    issue(violations, "ENTRANCE_COUNT_INVALID", externalPedestrian.map((portal) => portal.id), {
-      expectedCount: 1,
-      actualCount: externalPedestrian.length,
-    });
-  }
-  const entrance = validPortals.find((portal) => portal.id === layout.entrancePortalId);
-  if (
-    !entrance ||
-    entrance.kind !== "pedestrian" ||
-    entrance.a !== EXTERIOR_SPACE_ID && entrance.b !== EXTERIOR_SPACE_ID ||
-    entrance.wall !== "south"
-  ) {
-    issue(violations, "ENTRANCE_PORTAL_INVALID", [layout.entrancePortalId]);
-  } else {
-    const entranceTargetId = entrance.a === EXTERIOR_SPACE_ID ? entrance.b : entrance.a;
-    const entranceTarget = spaceById.get(entranceTargetId);
-    if (
-      !entranceTarget ||
-      (spaceRole(entranceTarget) !== "entry" && spaceRole(entranceTarget) !== "circulation")
-    ) {
-      issue(violations, "ENTRANCE_TARGET_INVALID", [layout.entrancePortalId, entranceTargetId]);
-    }
-  }
-  const vehicleExternal = validPortals.filter(
-    (portal) =>
-      portal.kind === "vehicle" &&
-      (portal.a === EXTERIOR_SPACE_ID || portal.b === EXTERIOR_SPACE_ID),
-  );
-  for (const room of project.rooms.filter(
-    (candidate) => candidate.traits.frontage?.kind === "vehicle" &&
-      (candidate.inclusion === "required" || roomSpaces.has(candidate.id)),
-  )) {
-    const garagePortal = vehicleExternal.find(
-      (portal) =>
-        (portal.a === room.id || portal.b === room.id) &&
-        portal.wall === "south",
-    );
-    if (!garagePortal) issue(violations, "GARAGE_VEHICLE_PORTAL_MISSING", [room.id]);
-  }
-
-  // 6. Graph reachability and pass-through policy.
-  // A vehicle portal proves vehicle frontage only.  It must never make a
-  // garage (or any other occupiable room) appear human-reachable from the
-  // pedestrian entrance.
-  const graph = buildPedestrianPortalGraph({ ...layout, portals: validPortals });
-  const reachable = bfs(graph);
-  const transitReachable = transitReachability(graph, spaces, roomById);
-  for (const room of project.rooms) {
-    const roomSpace = roomSpaces.get(room.id);
-    if (!roomSpace) {
-      // Missing required rooms were recorded above. Optional rooms may be
-      // omitted, but once placed they are occupiable and need the same safe
-      // pedestrian access and pass-through checks as required rooms.
-      continue;
-    }
-    if (!isTransitNode(roomSpace, room)) {
-      // A private/service destination may have one pedestrian edge to the
-      // circulation graph, but two or more pedestrian edges would make it a
-      // possible through-route.  Vehicle frontage is deliberately excluded so
-      // a garage may have one vehicle edge plus one internal pedestrian edge.
-      const pedestrianIncidents = graph.edges.filter(
-        (edge) => edge.kind === "pedestrian" &&
-          (edge.a === room.id || edge.b === room.id),
-      );
-      if (pedestrianIncidents.length > 1) {
-        issue(violations, "FORBIDDEN_PASS_THROUGH", [room.id]);
-      }
-    }
-    if (!reachable.has(room.id)) {
-      issue(violations, "ROOM_UNREACHABLE", [room.id]);
-    } else if (!transitReachable.has(room.id)) {
-      issue(violations, "FORBIDDEN_PASS_THROUGH", [room.id]);
-    }
-  }
-  for (const space of spaces.filter((candidate) => spaceRole(candidate) === "circulation")) {
-    if (!reachable.has(space.instanceId)) issue(violations, "CIRCULATION_UNREACHABLE", [space.instanceId]);
-  }
-
-  // 7. Hard relationships.
-  for (const relationship of project.relationships) {
-    validateRelationship(relationship, project, roomSpaces, violations);
-  }
+  const context = prepareRuleContext(layout, project);
+  const evaluations = evaluatePlanlabCoreRules(context);
+  const violations = evaluations
+    .filter((evaluation) => evaluation.status === "fail")
+    .map(evaluationToViolation);
 
   return {
     valid: violations.length === 0,
     violations,
     counts: { errors: violations.length, warnings: 0 },
-    graph,
-    reachableSpaceIds: [...reachable],
+    graph: context.graph,
+    reachableSpaceIds: [...context.reachable],
   };
 }
 
