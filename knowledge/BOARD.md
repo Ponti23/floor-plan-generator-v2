@@ -14,7 +14,7 @@ Active design: [`planlab/README.md`](./planlab/README.md) · staged plan: [`../D
 | 0.6 | Architect usefulness review **(HARD GATE)** | astra-plan | user | done | `stage0-planlab-spike` (GO approved 2026-09-14) |
 | 1.1 | Versioned domain schema and brief normalization | luna-max | luna-max | done | `main` (`0e8589b`) |
 | 1.2 | Production geometry primitives and property oracles | luna-max | luna-max | done | `main` (`ff99f7c`) |
-| 1.3 | Canonical serialization, fingerprinting, and diagnostics | luna-max | — | todo | `main` |
+| 1.3 | Canonical serialization, fingerprinting, and diagnostics | luna-max | luna-max | done | `main` (`113d1d3`) |
 | 1.4 | Independent domain API review | terra-max | — | todo | `main` |
 
 ## Handoff rules
