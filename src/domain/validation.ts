@@ -8,7 +8,7 @@ import {
   sharedWallLength,
   type GridRect,
 } from "./geometry.ts";
-import { buildLayoutIndexes } from "./facts.ts";
+import { buildLayoutIndexes, placedSpaces } from "./facts.ts";
 import {
   GRID_MM,
   GRID_UNIT_METRES,
@@ -23,6 +23,7 @@ import {
   roomSelectorKey,
   type NormalizedProject,
   type RelationshipRequirement,
+  type RoomKind,
   type RoomInstance,
   type RoomSelector,
 } from "./model.ts";
@@ -149,9 +150,17 @@ export function buildPortalGraph(
   const adjacency: Record<string, string[]> = {};
   for (const node of nodes) adjacency[node] = [];
   const edges: PortalGraphEdge[] = [];
+  // Only geometrically real portals become edges.  A portal the validator
+  // rejects — off the shared wall, on a corner, too narrow, pointing at an
+  // unknown space — must not make a room look reachable.
+  const spaceById = new Map(
+    placedSpaces(layout).map((space) => [space.instanceId, space] as const),
+  );
+  const footprint = isGridRect(layout.footprint) ? layout.footprint : null;
   for (const portal of layout.portals) {
     if (permittedKinds !== undefined && !permittedKinds.has(portal.kind)) continue;
     if (!(portal.a in adjacency) || !(portal.b in adjacency)) continue;
+    if (!portalSpanValid(portal, spaceById, footprint)) continue;
     addAdjacency(adjacency, portal.a, portal.b);
     edges.push({
       a: portal.a,
@@ -191,9 +200,12 @@ export function reachableSpaceIds(
   graphOrLayout: PortalGraph | Layout,
   start = EXTERIOR_SPACE_ID,
 ): string[] {
+  // Reachability in this domain means human reachability.  A vehicle portal
+  // proves frontage, never a route, so a bare layout is resolved through the
+  // pedestrian graph; callers that pass a graph get exactly that graph.
   const graph = "adjacency" in graphOrLayout
     ? graphOrLayout
-    : buildPortalGraph(graphOrLayout);
+    : buildPedestrianPortalGraph(graphOrLayout);
   return [...bfs(graph, start)];
 }
 
@@ -236,6 +248,48 @@ function interiorPortalValid(
       return true;
     }
   }
+  return false;
+}
+
+/**
+ * Single source of truth for portal geometry.
+ *
+ * A portal only exists where the geometry allows one: its interval must lie
+ * inside a real shared-wall segment of the declared side (or the footprint
+ * boundary for an exterior portal), both endpoints must resolve, and it must be
+ * at least `MIN_PORTAL_WIDTH_UNITS` wide.  `validateLayout` and the access graph
+ * both call this, so reachability can never be established through a portal
+ * that validation simultaneously rejects — and mere adjacency, corner contact
+ * included, never becomes a route.
+ *
+ * `footprint` is `null` when the layout has no well-formed footprint; interior
+ * portals are still decidable in that case, exterior ones are not.
+ */
+export function portalSpanValid(
+  portal: AccessPortal,
+  spaceById: ReadonlyMap<string, PlacedSpace>,
+  footprint: GridRect | null,
+): boolean {
+  if (!portal || typeof portal !== "object") return false;
+  if (!["north", "east", "south", "west"].includes(portal.wall)) return false;
+  if (!Number.isSafeInteger(portal.start) || !Number.isSafeInteger(portal.length)) return false;
+  if (portal.length < MIN_PORTAL_WIDTH_UNITS) return false;
+
+  const a = portal.a === EXTERIOR_SPACE_ID ? undefined : spaceById.get(portal.a);
+  const b = portal.b === EXTERIOR_SPACE_ID ? undefined : spaceById.get(portal.b);
+  if (portal.a !== EXTERIOR_SPACE_ID && !a) return false;
+  if (portal.b !== EXTERIOR_SPACE_ID && !b) return false;
+
+  if (a === undefined && b !== undefined) {
+    return footprint !== null && exteriorPortalValid(portal, b, footprint);
+  }
+  if (b === undefined && a !== undefined) {
+    return footprint !== null && exteriorPortalValid(portal, a, footprint);
+  }
+  if (a !== undefined && b !== undefined) {
+    return interiorPortalValid(portal, a, b);
+  }
+  // Exterior on both sides is not a portal.
   return false;
 }
 
@@ -291,13 +345,46 @@ function validateRelationship(
   }
 }
 
+/**
+ * Rooms that may never be walked *through*, regardless of what their traits
+ * claim.  A bathroom is still a valid destination; it just cannot be someone
+ * else's corridor.  `RULE_ENGINE.md` names private, bathroom/WC, garage,
+ * laundry and storage explicitly.
+ */
+const NEVER_TRANSIT_KINDS: ReadonlySet<RoomKind> = new Set<RoomKind>([
+  "bedroom",
+  "bathroom",
+  "garage",
+  "laundry",
+  "storage",
+]);
+
+/**
+ * Rooms that may become transit nodes only when the project policy permits
+ * open-plan circulation.  The normalized form of that policy is the room's own
+ * `mayBePassThrough` trait, so an authored brief still has to ask for it.
+ */
+const OPEN_PLAN_TRANSIT_KINDS: ReadonlySet<RoomKind> = new Set<RoomKind>([
+  "living",
+  "dining",
+  "kitchen",
+]);
+
+/**
+ * Transit policy, in one place.
+ *
+ * Entry and circulation spaces are the designed through-route.  Private and
+ * service rooms are destinations only, even if a brief sets their
+ * `mayBePassThrough` trait.  Open-plan rooms (living/dining/kitchen) join the
+ * through-route only when the brief explicitly opts them in.
+ */
 function isTransitNode(space: PlacedSpace, room: RoomInstance | undefined): boolean {
   if (spaceRole(space) === "entry" || spaceRole(space) === "circulation") return true;
   if (!room) return false;
-  return (
-    room.traits.mayBePassThrough ||
-    room.kind === "hallway"
-  );
+  if (room.kind === "hallway") return true;
+  if (NEVER_TRANSIT_KINDS.has(room.kind)) return false;
+  if (room.traits.zone === "private" || room.traits.zone === "service") return false;
+  return OPEN_PLAN_TRANSIT_KINDS.has(room.kind) && room.traits.mayBePassThrough === true;
 }
 
 /**
@@ -538,15 +625,9 @@ export function validateLayout(
       issue(violations, "PORTAL_UNKNOWN_SPACE", [portal.id, portal.b]);
       continue;
     }
-    let valid = false;
-    if (a === undefined && b !== undefined && isGridRect(footprint)) {
-      valid = exteriorPortalValid(portal, b, footprint);
-    } else if (b === undefined && a !== undefined && isGridRect(footprint)) {
-      valid = exteriorPortalValid(portal, a, footprint);
-    } else if (a !== undefined && b !== undefined) {
-      valid = interiorPortalValid(portal, a, b);
-    }
-    if (!valid) {
+    // Same predicate the access graph uses, so "valid enough to validate" and
+    // "valid enough to walk through" can never drift apart.
+    if (!portalSpanValid(portal, spaceById, isGridRect(footprint) ? footprint : null)) {
       issue(violations, "PORTAL_NOT_ON_SHARED_EDGE", [portal.id]);
       continue;
     }
