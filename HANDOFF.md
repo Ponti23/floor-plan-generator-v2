@@ -2,21 +2,19 @@
 
 **Active plan:** [`DELEGATION-PLAN.md`](./DELEGATION-PLAN.md) · **Live queue:** [`knowledge/BOARD.md`](./knowledge/BOARD.md) · **Planning package:** [`knowledge/planlab/README.md`](./knowledge/planlab/README.md)
 
-**Status:** Plan approved; Stage 0 has not started because Git author identity is not configured.
+**Status:** Stage 0 is complete; buckets 0.1–0.6 passed, including the user-approved architect usefulness hard gate.
 
 ## Last checkpoint
 
-- Planning package approved by user on 2026-09-13; repository initially had no commits.
+- Bucket 0.6 received the user's explicit **GO** on 2026-09-14. Technical review commit `605eb88` has 39 passing tests; the clean-worktree 10-seed benchmark passes every gate (median 1,786.433 ms; p95 1,944.396 ms).
 
 ## Next step
 
-1. Configure repository-local Git `user.name` and `user.email` using values supplied by the user.
-2. Checkpoint the planning package, create `stage0-planlab-spike`, mark bucket 0.1 `in-progress`, and dispatch it to a fresh Luna@Max executor.
+1. Treat Milestone 0 as the accepted feasibility baseline.
+2. Activate and stage Milestone 1 from `knowledge/planlab/IMPLEMENTATION_PLAN.md` before starting product implementation.
 
 ## Constraints
 
-- Milestone 0 only: mathematical feasibility spike, no product application scaffolding or polished UI.
+- Milestone 0 remained a mathematical feasibility spike; no product application scaffolding or polished UI was added.
 - Approved assumptions are recorded in `DELEGATION-PLAN.md`.
-- Stop at bucket 0.6 for explicit architect go/no-go approval.
-
-<!-- Blocked on: user-supplied Git author name and email for repository-local configuration. -->
+- The architect usefulness gate is cleared; future money/payment and product/UX/copy decisions remain human hard gates.

@@ -7,11 +7,12 @@ tags: [progress, resume]
 
 ## Resume here
 
-- **Current focus:** PlanLab planning is complete and approved; prepare the repository for the approved Milestone 0 feasibility spike without starting product implementation.
-- **Open threads / waiting on user:** User must finish GitHub Credential Manager login as `Ponti23`, then provide or confirm the exact repository-local Git author name and GitHub commit email. Do not request or accept passwords, tokens, or one-time codes. Do not push as Codex.
-- **Next step:** Verify Credential Manager lists `Ponti23`; configure repository-local `user.name` and `user.email` from the user's supplied values; reconcile the staged planning checkpoint; then let the user perform or explicitly authorize the first push before starting Stage 0 bucket 0.1.
-- **In-flight branches:** `main` — unborn branch with no commits; PlanLab planning documents and workflow files are staged, while the latest `HANDOFF.md` and `knowledge/BOARD.md` blocker updates are unstaged. Planned branch `stage0-planlab-spike` has not been created.
-- **Deferred:** All PlanLab application scaffolding and implementation beyond the explicitly approved Milestone 0 feasibility spike; Stage 0 itself remains blocked until Git identity/account ownership is settled; architect usefulness review remains the hard gate at bucket 0.6.
+- **Checkpoint date:** 2026-09-14.
+- **Current focus:** Stage 0 is complete and the architect usefulness hard gate received the user's explicit GO on 2026-09-14.
+- **Open threads / waiting on user:** None for the accepted Milestone 0 feasibility baseline.
+- **Next step:** Activate and stage Milestone 1 from `knowledge/planlab/IMPLEMENTATION_PLAN.md` before starting product implementation.
+- **In-flight branches:** `stage0-planlab-spike` contains the accepted Stage 0 implementation, independent technical review `605eb88`, and completion bookkeeping; merge it to `main` as the Milestone 0 baseline.
+- **Deferred:** Milestone 1+ product implementation remains unstarted until its staged execution plan is activated; future product/UX/copy and money/payment decisions remain human hard gates.
 
 _(This block is rewritten by the `save-progress` skill. Everything below is the append-only timeline.)_
 

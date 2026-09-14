@@ -1,0 +1,37 @@
+PlanLab diagnostic layout-straight-footprint-40x72-28
+Validity: PASS (0 hard findings)
+Footprint: 10.00 × 18.00 (180.00 m²)
+Site: 600.00 m² | Buildable: 374.00 m²
+Programmed usable: 126.00 m² | Garage: 36.00 m² | Circulation: 18.00 m²
+GFA: 180.00 m² | target Δ 0.00 m² | max Δ -20.00 m²
+Unallocated interior: 0.00 m² (0.0%) | Planning efficiency: 87.5%
+Reachability: 8/8 required rooms | Dead ends: 0
+Portals: 11
+Spaces:
+- Garage [room] @ 20,64 6.00 × 6.00 (36.00 m²)
+- circulation-straight-1 [circulation] @ 44,16 1.00 × 17.00 (17.00 m²)
+- entry-straight [entry] @ 44,84 1.00 × 1.00 (1.00 m²)
+- Living Room [room] @ 32,16 3.00 × 6.75 (20.25 m²)
+- Bedroom 1 [room] @ 48,16 3.00 × 18.00 (54.00 m²)
+- Bedroom 2 [room] @ 32,43 3.00 × 3.50 (10.50 m²)
+- Bedroom 3 [room] @ 20,16 3.00 × 3.50 (10.50 m²)
+- Kitchen [room] @ 26,30 1.50 × 8.50 (12.75 m²)
+- Bathroom [room] @ 20,30 1.50 × 8.50 (12.75 m²)
+- Laundry [room] @ 32,57 3.00 × 1.75 (5.25 m²)
+Score model: planlab-scoring-0.4
+Scores:
+- Compact Efficiency: 83/100 | programSpace 89, flow 77, relationships 68, liveability 86, servicesSite 89
+  + validation.hard.pass [validation:hard]
+  + programSpace.targetFootprint.strong [footprint:targetGfa]
+  + programSpace.unallocatedInterior.strong [footprint:unallocated]
+  + flow.circulationRatio.strong [circulation:area]
+- Best Flow: 79/100 | programSpace 89, flow 77, relationships 68, liveability 86, servicesSite 89
+  + validation.hard.pass [validation:hard]
+  + programSpace.targetFootprint.strong [footprint:targetGfa]
+  + programSpace.unallocatedInterior.strong [footprint:unallocated]
+  + flow.circulationRatio.strong [circulation:area]
+- Balanced: 81/100 | programSpace 89, flow 77, relationships 68, liveability 86, servicesSite 89
+  + validation.hard.pass [validation:hard]
+  + programSpace.targetFootprint.strong [footprint:targetGfa]
+  + programSpace.unallocatedInterior.strong [footprint:unallocated]
+  + flow.circulationRatio.strong [circulation:area]
