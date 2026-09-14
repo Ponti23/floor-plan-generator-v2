@@ -27,10 +27,16 @@ Active design: [`planlab/README.md`](./planlab/README.md) · staged plan: [`../D
 | 3.4 | Determinism, pruning oracle, regression benchmark | luna-max | luna-max | done | `main` (`99e1904`) |
 | 3.5 | Independent Milestone 3 review | terra-max | orchestrator (`/root`) | done | `main` (`d7f82b9`) |
 | 3.6 | Stage 3 architect usefulness + scoring-language review **(HARD GATE)** | astra-plan | user | done | `main` (D1–D4 answered 2026-09-14) |
-| 3.7 | D1 room-shape policy and preferred-area allocation | terra-max | orchestrator (`/root`) | done | `main` (uncommitted at time of writing) |
-| 3.8 | D2/D3 settable calibration surface | terra-max | orchestrator (`/root`) | done | `main` (uncommitted) |
-| 3.9 | D4 generation-result payload projection | terra-max | orchestrator (`/root`) | done | `main` (uncommitted) |
+| 3.7 | D1 room-shape policy and preferred-area allocation | terra-max | orchestrator (`/root`) | done | `main` (`458b5ac`) |
+| 3.8 | D2/D3 settable calibration surface | terra-max | orchestrator (`/root`) | done | `main` (`458b5ac`) |
+| 3.9 | D4 generation-result payload projection | terra-max | orchestrator (`/root`) | done | `main` (`458b5ac`) |
 | 4.1 | Milestone 4 UI shell (worker + three-pane app) | terra-max | orchestrator (`/root`) | done | `main` (`89b9fc7`) |
+| 5.0 | Milestone 5 product copy + Vite/Next.js shell decision | astra-plan | user | needs-human | — |
+| 5.1 | Brief editor state and committed form | luna-max | unassigned | todo | `main` |
+| 5.2 | SVG projection, layers, pan/zoom/fit, evidence highlight | luna-max | unassigned | todo | `main` |
+| 5.3 | Result selector and analysis projection | luna-max | unassigned | todo | `main` |
+| 5.4 | Generation states, stale-result affordances, keyboard/a11y | terra-max | unassigned | todo | `main` |
+| 5.5 | Independent Milestone 5 review | terra-max | sol-max | todo | `main` |
 
 ## Handoff rules
 
@@ -75,3 +81,9 @@ Active design: [`planlab/README.md`](./planlab/README.md) · staged plan: [`../D
   diagnostics clean, Stage 0 `baselineMatch: true` after refreshing the
   input fingerprint, and browser smoke checks for generate/cancel/edit.
   Retry/worker-failure are unit-tested but not manually re-simulated.
+- Milestone 5 is staged but **not active** until 5.0 closes. The existing Vite/TS
+  shell is the recommended technical default for this client-only app; the
+  reference plan says Next.js, so that is still an architecture/product choice
+  for Sol/Astra. Strategy names, conceptual-use language, metric names, and
+  infeasibility copy are user product/UX/copy hard gates. No executor may claim
+  5.1–5.4 with final copy; use replaceable recommended text until approved.

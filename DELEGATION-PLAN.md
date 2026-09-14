@@ -123,5 +123,56 @@ contracts and proving the claims it currently asserts.
 **Hard gate at the end of Stage 3:** the architect/user explicitly approves mathematical usefulness
 and the scoring language before any polished UI work. Do not merge that decision solo.
 
-Future milestones remain defined in
+## Stage 4 — Worker vertical slice
+
+Goal (from `IMPLEMENTATION_PLAN.md` Milestone 4): isolate generation from the UI thread with a
+reliable, versioned protocol so editing/rendering stays responsive and cancellation is prompt.
+
+- [x] **4.1 Worker + three-pane UI shell.** Add the versioned worker protocol, `GenerationController`,
+  cooperative cancellation through a shared signal, monotonic progress clamping, stale-response
+  rejection, watchdog `budgetExceeded`, worker crash/retry recovery, a plain three-pane Vite/TS
+  shell, and a Node worker benchmark. Verify protocol parsing, cancellation, stale results, crash
+  recovery, integration, and the browser generate/cancel/edit path. — `terra-max` (`89b9fc7`)
+
+Stage 4 is complete. The remaining manual retry/worker-failure browser simulation is accepted as
+covered by `test/worker-controller.test.ts`; generate, cancel, and edit/regenerate were verified in
+the real browser on 2026-09-15.
+
+## Stage 5 — Minimal functional workspace
+
+Goal (from `IMPLEMENTATION_PLAN.md` Milestone 5): let an architect edit the canonical brief,
+generate, inspect, and compare actual results. **This stage is staged, not active.** Two
+preconditions block implementation: product/UX/copy approval and the Vite/Next.js shell decision.
+The existing Vite/TS shell is the recommended technical default because this is a client-only app
+with no backend, SSR, routing, or server actions.
+
+Spec: [`UI_ARCHITECTURE.md`](./knowledge/planlab/UI_ARCHITECTURE.md),
+[`PRODUCT_SPEC.md`](./knowledge/planlab/PRODUCT_SPEC.md),
+[`TESTING_STRATEGY.md`](./knowledge/planlab/TESTING_STRATEGY.md).
+
+- [ ] **5.0 Product copy + shell decision.** Confirm the final strategy names, conceptual-use
+  disclaimer, metric names, infeasibility/budget language, and whether the MVP continues on the
+  existing Vite/TS shell or migrates to Next.js. — `astra-plan`; **HARD GATE, owned by the user**
+- [ ] **5.1 Brief editor state and committed form.** Replace the vertical-slice form with typed
+  editor state: site, offsets, area policy, room program, relationships, and planning assumptions.
+  Keep local form state separate from committed normalized project state; a changed brief marks
+  previous results stale. Use replaceable recommended copy. — `luna-max`
+- [ ] **5.2 SVG projection, layers, pan/zoom/fit, and evidence highlight.** Render stable layers in
+  order (grid, site, envelope, footprint, spaces/portals, labels, evidence, north/scale) using a
+  grid-unit viewBox and a single viewport transform. Add zoom/fit and observation-to-geometry
+  highlighting without letting rendering own authoritative geometry. — `luna-max`
+- [ ] **5.3 Result selector and analysis projection.** Show up to three strategy options with honest
+  empty/partial states, selection updates the main plan, and the analysis panel projects raw metrics,
+  whole-number category scores, observations, and PASS/WARNING/FAIL rule checks from the canonical
+  result payload. — `luna-max`
+- [ ] **5.4 Generation states, stale-result affordances, keyboard/a11y.** Cover `idle`,
+  `invalidBrief`, `generating`, `complete`, `partial`, `infeasible`, `budgetExceeded`, and
+  `workerError`; make stale results obvious; provide labels, visible focus, keyboard order, and
+  non-colour status indicators. — `terra-max`
+- [ ] **5.5 Independent Milestone 5 review.** Review the editor/projection stack for state ownership
+  leaks, stale-result handling, copy hard-gate compliance, SVG accessibility, keyboard behaviour, and
+  false-precision presentation. Fix only Milestone 5 defects and record evidence under
+  `artifacts/planlab/milestone-5/`. — `terra-max` (independent review; Sol judges)
+
+Milestones 6–7 remain defined in
 [`knowledge/planlab/IMPLEMENTATION_PLAN.md`](./knowledge/planlab/IMPLEMENTATION_PLAN.md) and are not active.

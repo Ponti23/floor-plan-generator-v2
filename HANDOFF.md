@@ -8,12 +8,16 @@ default while requiring it to stay settable (D2/D3), and asked for the engineeri
 to be done rather than returned as questions (D4). All of it is implemented, verified and green
 (145 tests, full regression gate PASS at median 1,750 ms). Record:
 [`artifacts/planlab/milestone-3/gate-amendment-d1-d4.md`](artifacts/planlab/milestone-3/gate-amendment-d1-d4.md).
-**Next: finish the remaining Milestone 4 browser checks, then stage Milestone 5.**
+**Milestone 4 is closed for browser smoke; Milestone 5 is staged. Next: close 5.0 (product copy +
+Vite/Next.js decision), then execute 5.1–5.4.**
 
 ## D5 remote checkpoint — approved
 
 The user approved pushing `main` to `origin/main` on 2026-09-15 before Milestone 4 begins. This
 handoff update is part of that remote checkpoint.
+
+**Push completed.** `main` was pushed to `origin/main` on 2026-09-15
+(`60cfa73..baa9a54`). The pushed range includes the D1–D4 gate work and Milestone 4 bucket 4.1.
 
 Two things a resuming session should know before it re-measures anything:
 
@@ -32,18 +36,18 @@ signal, progress counters with monotonic clamping, stale-response rejection, wat
 `budgetExceeded`, worker crash/retry recovery, a plain three-pane shell, and a Node worker
 benchmark. Verification this session: `npm test` **145 passing**, `npm run typecheck` 0 errors,
 `npm run build` clean, `npm run diagnostics:canonical -- --check` clean, and
-`npm run benchmark:worker` median **532.6 ms** on this machine (recorded reference was 174.6 ms;
-re-measure on the reference device before treating this as a regression).
+`npm run benchmark:worker` median **174.1 ms** on this machine (recorded reference 174.6 ms;
+no regression).
 `npm run benchmark:stage0:check` is **PASS** with `baselineMatch: true` after the Stage 0
 regression baseline was refreshed to the Milestone 4 `package.json` input fingerprint; domain
 output hashes were unchanged.
 
 Browser smoke verification performed with the in-app browser: generate reaches `complete` with
-three options and the plan SVG; cancel returns to `idle` with no compatible result; editing site
-width/depth regenerates a different viewBox and layout set; an impossible envelope produces
-`infeasible`. The retry and worker-failure paths are covered by `worker-controller.test.ts` but
-were not manually re-simulated in the browser. `main` is currently **2 commits ahead of
-`origin/main`** (`2f15d96`, `89b9fc7`, `cd0723c`, `de2b20f`); those four commits are not pushed.
+three options and the plan SVG; cancel returns to `idle` and keeps the last compatible result;
+committing a site edit (`18000 × 26000 mm`) regenerates a changed viewBox (`86x126` → `78x110`)
+and layout set; an impossible envelope produces `infeasible`. The retry and worker-failure paths
+are covered by `worker-controller.test.ts` and are now formally accepted rather than manually
+re-simulated in the browser.
 
 ## Last checkpoint
 
@@ -207,24 +211,26 @@ for the Milestone 4 worker protocol. Raised for bucket 2.5 and for the user.
 
 ## Next step
 
-1. Decide whether to push the four local `main` commits (`2f15d96`, `89b9fc7`, `cd0723c`,
-   `de2b20f`) now that D5 was
-   approved for the pre-Milestone-4 checkpoint, or wait for Sol/Astra.
-2. Finish the remaining Milestone 4 browser manual checks (retry after a forced worker failure)
-   or explicitly accept the existing controller unit coverage.
-3. Stage Milestone 5 from `knowledge/planlab/IMPLEMENTATION_PLAN.md`. Raise the Next.js-vs-Vite
-   shell decision to Sol/Astra before scaffolding Milestone 5; the current bucket 4.1 shell is
-   plain Vite/TS.
+1. Close **5.0**: get user approval for Milestone 5 product copy (strategy names, conceptual-use
+   disclaimer, metric names, infeasibility language) and the Vite-vs-Next.js shell decision.
+   Recommended technical default: keep the existing Vite/TS shell; this client-only MVP has no
+   backend, SSR, routing, or server actions that justify Next.js.
+2. After 5.0, execute 5.1 → 5.2 → 5.3 → 5.4 with replaceable recommended copy until final copy is
+   approved. Do not freeze copy unilaterally.
+3. Run the Milestone 5 independent review (5.5) before closing the stage.
 4. Orchestrator note for future stages: dispatched executors in this project have repeatedly stalled
    by asking for authorization instead of implementing. Brief them to "do the work now, do not ask,
    do not spawn sub-agents" and do a stalled bucket directly rather than re-dispatching it.
 
 ## Open findings
 
-- Milestone 4 browser verification is partially complete: generate/cancel/edit are verified;
-  retry and worker-failure remain unit-tested but not manually re-simulated.
+- Milestone 4 browser verification is closed: generate/cancel/edit are verified in the real browser;
+  retry and worker-failure are accepted via `worker-controller.test.ts`.
 - Milestone 5's reference implementation says Next.js while the current shell is Vite/TS. That is
-  an architecture/product choice for Sol/Astra before implementation begins.
+  an architecture/product choice for Sol/Astra before implementation begins; the existing Vite/TS
+  shell is the recommended technical default.
+- Milestone 5 product copy is a hard gate: strategy names, the conceptual-use disclaimer, metric
+  names, and infeasibility language must be user-approved before they are frozen.
 - **Waiting on the user (decision, not a blocker):** the Stage 0 benchmark hashes no longer
   reproduce after bucket 2.1 (derived-facts evidence is serialized into `GenerationResult`;
   layouts and selections are byte-identical). Either accept the evidence evolution or stop

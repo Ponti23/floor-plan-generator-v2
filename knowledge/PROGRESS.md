@@ -8,10 +8,10 @@ tags: [progress, resume]
 ## Resume here
 
 - **Checkpoint date:** 2026-09-15.
-- **Current focus:** the Stage 3 hard gate is **answered**. The user did not approve the usefulness
-  claim; they directed a fix (D1), approved the scoring language as the default while requiring it to
-  stay settable (D2/D3), and asked for the engineering-shaped decisions to be done rather than
-  returned as questions (D4). All of that is implemented and green. Full record:
+- **Current focus:** Milestone 4 is closed and pushed; **Milestone 5 is staged, not active**. The
+  Stage 3 hard gate is answered and implemented (D1–D4), the worker/UI vertical slice is verified in
+  the real browser, and the next blocker is Milestone 5 preconditions: product/UX/copy approval and
+  the Vite-vs-Next.js shell decision. Full Stage 3 record:
   `artifacts/planlab/milestone-3/gate-amendment-d1-d4.md`.
 - **What changed (D1).** Minimum area alone admitted unusable rooms: the brief declared no minimum
   **short side** for the bathroom, kitchen, living room or laundry, so seed 01 passed hard validity
@@ -36,43 +36,43 @@ tags: [progress, resume]
   **904 ms → 1,750 ms**. Targets still met (median <2,000, p95 <4,000, 20,000 expansions) but the
   median margin fell from ~55% to ~13%, and expansions now sit close to the cap.
 - **Open threads:**
-  1. **D5 — push.** Approved by the user on 2026-09-15; this checkpoint is being pushed to
-     `origin/main` before Milestone 4 starts.
-  2. **Milestone 4 (UI).** Unblocked. Bucket 4.1 is committed as `89b9fc7` on local `main`:
-     versioned worker protocol, controller, cooperative cancellation, progress monotonicity,
-     stale-response rejection, watchdog/crash recovery, a three-pane shell, and a Node worker
-     benchmark. This session re-ran the full verification green (145 tests, typecheck, build,
-     diagnostics) and smoke-tested the browser path: generate, cancel, and edit/regenerate all
-     behave as expected; retry and worker-failure remain unit-tested but not manually
-     re-simulated. The worker benchmark measured median **532.6 ms** on this machine, not the
-     recorded 174.6 ms reference number. The Stage 0 regression baseline was refreshed for the
-     Milestone 4 `package.json` input fingerprint; `benchmark:stage0:check` is `baselineMatch:
-     true` with domain output hashes unchanged.
-  3. Product/UX/copy and money/payment decisions remain human hard gates. The calibration override
-     seam deliberately makes copy-adjacent values *settable* without freezing them.
+  1. **D5 — push.** Approved and completed. `main` was pushed to `origin/main` on 2026-09-15
+     (`60cfa73..baa9a54`).
+  2. **Milestone 4 (UI).** Complete enough to close the manual-verification gap. Bucket 4.1 is
+     committed as `89b9fc7` on `main`: versioned worker protocol, controller, cooperative
+     cancellation, progress monotonicity, stale-response rejection, watchdog/crash recovery, a
+     three-pane shell, and a Node worker benchmark. This session re-ran the full verification green
+     (145 tests, typecheck, build, diagnostics) and smoke-tested the real browser path: generate,
+     cancel, and edit/regenerate all behave as expected. Retry and worker-failure remain unit-tested
+     (`worker-controller.test.ts`) and are formally accepted rather than browser-simulated. The
+     worker benchmark measured median **174.1 ms** on this machine, matching the recorded reference.
+     `benchmark:stage0:check` is **PASS** with `baselineMatch: true` and domain output hashes
+     unchanged.
+  3. Product/UX/copy and money/payment decisions remain human hard gates. Milestone 5 is staged
+     only; no polished UI copy is implemented or frozen.
   4. **Evidence-resolution caveat** in D4 above — a future review needing value-level derived drift
      detection must use `serializeCanonical(result)` explicitly.
-- **Next step:** decide on pushing the four local `main` commits (`2f15d96`, `89b9fc7`,
-  `cd0723c`, `de2b20f`), finish or
-  formally accept the remaining retry/worker-failure browser check, then stage Milestone 5. Raise
-  the Next.js-vs-Vite shell decision to Sol/Astra before Milestone 5 implementation.
+- **Next step:** begin Milestone 5 execution only after its two preconditions are closed:
+  the Vite-vs-Next.js shell decision and the user product/UX/copy approval. Until then, continue
+  with non-hard-gated Milestone 5 preparation: brief-editor state, SVG projection/pan-zoom-fit,
+  result-analysis projection, and keyboard/accessibility scaffolding, using the existing Vite/TS
+  shell and recommended copy as replaceable defaults rather than frozen product copy.
 - **In-flight branches:** all work is on `main` (Milestone 0 baseline `8171058`, Stage 1
   `0e8589b`…`e1c6f38` plus typecheck infra `19916f1`, Stage 2 `9a24738`…`ded4d73`, Stage 3
   `6089c48`…`99e1904` plus the 3.5 review); `stage0-planlab-spike` is retained at the completed gate
   checkpoint `b8aba2a`.
-- **Deferred:** Milestone 5+ product implementation is unstarted until Milestone 4 is committed and
-  browser-verified. `INSTANCES_BY_PROJECT` in `rules.ts` caches instances per project object
-  identity — revisit when the project document becomes editable (Milestone 6).
+- **Deferred:** Milestone 5+ product implementation is blocked on the 5.0 hard gate; it is staged in
+  `DELEGATION-PLAN.md` and `knowledge/BOARD.md`. `INSTANCES_BY_PROJECT` in `rules.ts` caches
+  instances per project object identity — revisit when the project document becomes editable
+  (Milestone 6).
 
-**Evidence after the gate amendment:** `npm test` **145 passing** (122 → 129 → 136 → 145: +4
-room-shape policy, +7 calibration overrides, +3 result payload, +9 worker protocol/controller);
-`npm run typecheck` 0 errors; `npm run build` clean;
-`npm run diagnostics:canonical -- --check` clean at fingerprint `sha256:8efe5b5e…`;
+**Evidence this session:** `npm test` **145 passing**; `npm run typecheck` 0 errors; `npm run build`
+clean; `npm run diagnostics:canonical -- --check` clean at fingerprint `sha256:8efe5b5e…`;
 `npm run benchmark:stage0:check` **`baselineMatch: true`** with every gate line PASS at median
-**1,749.5 ms** / p95 **1,831.1 ms** (record run 1,786.9 ms; bounded 1,774.8 ms) on a quiet machine.
-The room-shape tests were mutation-checked (relaxing the bedroom aspect cap broke three of four).
-Earlier timings of ~2.2 s were measured while sub-agents were loading the machine and are not
-representative — re-measure before drawing any timing conclusion.
+**1,709.8 ms** / p95 **1,779.6 ms**; `npm run benchmark:worker` median **174.1 ms**. Browser smoke:
+generate reaches `complete` with three options and an SVG plan; cancel returns to `idle` and keeps
+the last compatible result; committing a site edit (`18000 × 26000 mm`) regenerates a changed
+viewBox (`86x126` → `78x110`) and layout set.
 
 **Process note:** the 3.5 review was performed by the orchestrator because no separate agent was
 available in the session, so it leans on differential evidence (frozen prior commit in a scratch
