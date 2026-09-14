@@ -16,6 +16,11 @@ Active design: [`planlab/README.md`](./planlab/README.md) · staged plan: [`../D
 | 1.2 | Production geometry primitives and property oracles | luna-max | luna-max | done | `main` (`ff99f7c`) |
 | 1.3 | Canonical serialization, fingerprinting, and diagnostics | luna-max | luna-max | done | `main` (`113d1d3`) |
 | 1.4 | Independent domain API review | terra-max | terra-max | done | `main` (`e1c6f38`) |
+| 2.1 | Layout facts pass and edge indexes | luna-max | — | todo | `main` |
+| 2.2 | Portal geometry and access graph hardening | luna-max | — | todo | `main` |
+| 2.3 | Rule definitions, instances, and ordered validator | terra-max | — | todo | `main` |
+| 2.4 | Relationship, garage, and circulation hard rules | luna-max | — | todo | `main` |
+| 2.5 | Independent Milestone 2 review | terra-max | — | todo | `main` |
 
 ## Handoff rules
 
@@ -24,3 +29,8 @@ Active design: [`planlab/README.md`](./planlab/README.md) · staged plan: [`../D
 - Stage 1 hardens the approved domain semantics and remains isolated from product UI/scaffolding.
 - Stage 1 public domain APIs passed independent review (1.4, `e1c6f38`). Stage
   Milestone 2 before beginning product implementation.
+- Stage 2 (access, rules, validation) is staged and active. Buckets run in order; 2.3 is
+  Terra-authored because it is an integration-heavy refactor, so the orchestrator judges it and
+  2.5 provides independent review of the whole stack.
+- Hard validity must stay authoritative: unsupported evaluators never pass, and Stage 2 must not
+  change Stage 1 canonical fingerprints or verdicts for existing fixtures.

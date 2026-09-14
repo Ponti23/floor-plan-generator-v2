@@ -2,7 +2,7 @@
 
 **Active plan:** [`DELEGATION-PLAN.md`](./DELEGATION-PLAN.md) · **Live queue:** [`knowledge/BOARD.md`](./knowledge/BOARD.md) · **Planning package:** [`knowledge/planlab/README.md`](./knowledge/planlab/README.md)
 
-**Status:** Stage 0 is complete and approved. Stage 1 is complete; the independent domain API review (bucket 1.4) passed on 2026-09-14. Staging Milestone 2 is the next orchestrator action.
+**Status:** Stage 0 is complete and approved. Stage 1 is complete; the independent domain API review (bucket 1.4) passed on 2026-09-14. **Stage 2 (access, rules, and validation) is staged and active** — buckets 2.1–2.5 are listed in `DELEGATION-PLAN.md` and `knowledge/BOARD.md`.
 
 ## Last checkpoint
 
@@ -17,8 +17,12 @@
 
 ## Next step
 
-1. Sol@Max stages Milestone 2 from `knowledge/planlab/IMPLEMENTATION_PLAN.md`. The Stage 1 review gate that blocked Milestone 2 is now cleared.
-2. Do not begin Milestone 2 product implementation before that staging.
+1. Execute Stage 2 in plan order. Bucket 2.1 (layout facts pass and edge indexes, `luna-max`) is the
+   next dispatch.
+2. Bucket 2.3 is Terra-authored (integration-heavy registry refactor), so the orchestrator judges
+   its result and 2.5 provides independent review of the whole validation stack.
+3. Stage 2 must not change Stage 1 canonical fingerprints or existing fixture verdicts; a change is
+   a defect, not a permitted side effect.
 
 ## Open findings
 
