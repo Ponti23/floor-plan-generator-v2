@@ -427,18 +427,53 @@ export function mm2ToGridAreaCeil(mm2: number): number {
   return Math.ceil(mm2 / GRID_MM2);
 }
 
+/**
+ * Parse a committed non-negative millimetre value.
+ *
+ * The project boundary stores dimensions as safe integer millimetres.  This
+ * helper deliberately does not coerce arbitrary strings (units, exponents,
+ * signs, whitespace, or decimal values) because doing so would make the
+ * authored document ambiguous.  A decimal string is accepted only by
+ * `parseMetresToMm`, the presentation-to-domain conversion below.
+ */
+export function parseIntegerMillimetres(value: unknown): number {
+  if (typeof value === "number") {
+    if (!Number.isSafeInteger(value) || value < 0) {
+      throw new TypeError("millimetres must be a non-negative safe integer");
+    }
+    return value;
+  }
+  if (typeof value !== "string" || !/^(?:0|[1-9]\d*)$/.test(value)) {
+    throw new TypeError("millimetres must be a non-negative integer with no units or decimals");
+  }
+  const millimetres = BigInt(value);
+  if (millimetres > BigInt(Number.MAX_SAFE_INTEGER)) {
+    throw new RangeError("millimetre value is outside the safe integer range");
+  }
+  return Number(millimetres);
+}
+
+export const parseMillimetres = parseIntegerMillimetres;
+export const parseMillimetresToMm = parseIntegerMillimetres;
+export const parseMm = parseIntegerMillimetres;
+export const parseIntegerMm = parseIntegerMillimetres;
+
 /** Parse a non-negative metre value exactly to integer millimetres. */
-export function parseMetresToMm(value: string | number): number {
-  const text = typeof value === "number" ? String(value) : value.trim();
+export function parseMetresToMm(value: unknown): number {
+  const text = typeof value === "number"
+    ? Number.isFinite(value) ? String(value) : ""
+    : typeof value === "string" ? value.trim() : "";
   if (!/^(?:0|[1-9]\d*)(?:\.\d{1,3})?$/.test(text)) {
     throw new TypeError(`metres must be a non-negative decimal with at most 3 places: ${text}`);
   }
-  const [whole, fraction = ""] = text.split(".");
-  const millimetres = Number(whole) * 1_000 + Number(fraction.padEnd(3, "0"));
-  if (!Number.isSafeInteger(millimetres)) {
+  const [whole = "0", fraction = ""] = text.split(".");
+  // BigInt keeps the conversion exact even near the safe-integer boundary;
+  // using Number arithmetic here could round an authored value by a millimetre.
+  const millimetres = BigInt(whole) * 1_000n + BigInt(fraction.padEnd(3, "0") || "0");
+  if (millimetres > BigInt(Number.MAX_SAFE_INTEGER)) {
     throw new RangeError("metre value is outside the safe integer range in millimetres");
   }
-  return millimetres;
+  return Number(millimetres);
 }
 
 export const metresToMm = parseMetresToMm;

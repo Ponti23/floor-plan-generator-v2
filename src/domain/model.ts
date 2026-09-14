@@ -1,5 +1,16 @@
 import type { CardinalSide, GridRect } from "./geometry.ts";
 
+/**
+ * Version of the editable project document understood by the V1 domain.
+ *
+ * Keep this value in the domain package (rather than in a UI/storage module)
+ * so every boundary agrees on which authored shape it is handling.  A future
+ * schema is a migration/API decision; it must not be silently interpreted as
+ * V1 by the solver.
+ */
+export const PROJECT_SCHEMA_VERSION = 1 as const;
+export type ProjectSchemaVersion = typeof PROJECT_SCHEMA_VERSION;
+
 export type OffsetSource = "architect" | "planning" | "system" | "custom";
 
 export interface Offset {
@@ -27,6 +38,21 @@ export type RoomKind =
   | "study"
   | "storage"
   | "other";
+
+/** Explicit selectors keep instance/group/kind intent distinguishable at the authored boundary. */
+export type RoomSelector =
+  | string
+  | { type: "instance"; id: string }
+  | { type: "requirement"; id: string }
+  | { type: "kind"; kind: RoomKind };
+
+export type RelationshipAggregation = "any" | "all" | "nearest" | "average";
+
+/** Stable textual key used by legacy validators after selector normalization. */
+export function roomSelectorKey(selector: RoomSelector): string {
+  if (typeof selector === "string") return selector;
+  return selector.type === "kind" ? selector.kind : selector.id;
+}
 
 export type RoomZone = "public" | "transition" | "private" | "service";
 
@@ -60,12 +86,13 @@ export interface RoomRequirement {
 
 export interface RelationshipRequirement {
   id: string;
-  from: string;
-  to: string;
+  from: RoomSelector;
+  to: RoomSelector;
   kind: "mustShareWall" | "preferShareWall" | "preferNear" | "avoidShareWall" | "keepSeparate";
   strength?: number;
   minSharedWallM?: number;
   targetDistanceM?: number;
+  aggregation?: RelationshipAggregation;
   source: "architect" | "planlab" | "planning" | "building_code" | "custom";
 }
 
@@ -77,7 +104,7 @@ export interface PlanningSettings {
 }
 
 export interface ProjectBrief {
-  schemaVersion: 1;
+  schemaVersion: ProjectSchemaVersion;
   projectId: string;
   name: string;
   site: SiteBrief;
@@ -86,6 +113,9 @@ export interface ProjectBrief {
   planning: PlanningSettings;
   generation: { seed: string };
 }
+
+/** The persisted project-document name used by the storage boundary. */
+export type ProjectDocument = ProjectBrief;
 
 export interface NormalizedDimensionConstraints {
   minAreaMm2: number;
@@ -123,7 +153,7 @@ export interface NormalizedSite {
 }
 
 export interface NormalizedProject {
-  schemaVersion: 1;
+  schemaVersion: ProjectSchemaVersion;
   projectId: string;
   name: string;
   site: NormalizedSite;

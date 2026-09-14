@@ -20,7 +20,13 @@ import {
   MIN_PORTAL_WIDTH_UNITS,
   MIN_MEANINGFUL_SHARED_WALL_UNITS,
 } from "./constants.ts";
-import type { NormalizedProject, RelationshipRequirement, RoomInstance } from "./model.ts";
+import {
+  roomSelectorKey,
+  type NormalizedProject,
+  type RelationshipRequirement,
+  type RoomInstance,
+  type RoomSelector,
+} from "./model.ts";
 import {
   EXTERIOR_SPACE_ID,
   type AccessPortal,
@@ -244,12 +250,13 @@ function interiorPortalValid(
   return false;
 }
 
-function roomSelectorMatches(room: RoomInstance, selector: string): boolean {
-  return room.id === selector || room.requirementId === selector || room.kind === selector;
+function roomSelectorMatches(room: RoomInstance, selector: RoomSelector): boolean {
+  const key = roomSelectorKey(selector);
+  return room.id === key || room.requirementId === key || room.kind === key;
 }
 
 function selectedSpaces(
-  selector: string,
+  selector: RoomSelector,
   project: NormalizedProject,
   roomSpaces: Map<string, PlacedSpace>,
 ): PlacedSpace[] {
@@ -270,8 +277,8 @@ function validateRelationship(
   const to = selectedSpaces(relationship.to, project, roomSpaces);
   if (from.length === 0 || to.length === 0) {
     issue(violations, "RELATIONSHIP_SELECTOR_UNRESOLVED", [relationship.id], {
-      from: relationship.from,
-      to: relationship.to,
+      from: roomSelectorKey(relationship.from),
+      to: roomSelectorKey(relationship.to),
     });
     return;
   }

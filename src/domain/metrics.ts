@@ -15,7 +15,12 @@ import {
   MAX_GFA_M2,
   MIN_MEANINGFUL_SHARED_WALL_UNITS,
 } from "./constants.ts";
-import type { NormalizedProject, RoomInstance } from "./model.ts";
+import {
+  roomSelectorKey,
+  type NormalizedProject,
+  type RoomInstance,
+  type RoomSelector,
+} from "./model.ts";
 import {
   EXTERIOR_SPACE_ID,
   type Layout,
@@ -534,11 +539,12 @@ function isGarage(room: RoomInstance): boolean {
 function roomSelection(
   project: NormalizedProject,
   facts: readonly RoomFact[],
-  selector: string,
+  selector: RoomSelector,
 ): RoomFact[] {
+  const key = roomSelectorKey(selector);
   const ids = new Set(
     project.rooms
-      .filter((room) => room.id === selector || room.requirementId === selector || room.kind === selector)
+      .filter((room) => room.id === key || room.requirementId === key || room.kind === key)
       .map((room) => room.id),
   );
   return facts.filter((fact) => ids.has(fact.instanceId));

@@ -8,6 +8,7 @@ import {
   IMPOSSIBLE_FIXTURES,
   MIN_MEANINGFUL_SHARED_WALL_UNITS,
   MIN_PORTAL_WIDTH_UNITS,
+  InvalidBriefError,
   area,
   boundaryDistance,
   containsRect,
@@ -20,6 +21,7 @@ import {
   normalizeRoomRequirements,
   overlaps,
   parseMetresToMm,
+  parseIntegerMillimetres,
   sharedWallLength,
   sharedWallSegments,
   tryNormalizeProject,
@@ -49,6 +51,14 @@ test("metre text converts to integer millimetres without floating-point geometry
   assert.equal(metresToMm(0.25), 250);
   assert.throws(() => parseMetresToMm("1.2345"), /at most 3 places/);
   assert.throws(() => parseMetresToMm("-1"), /non-negative/);
+});
+
+test("committed millimetre values are strict integers", () => {
+  assert.equal(parseIntegerMillimetres("250"), 250);
+  assert.equal(parseIntegerMillimetres(0), 0);
+  assert.throws(() => parseIntegerMillimetres("250.0"), /integer/);
+  assert.throws(() => parseIntegerMillimetres("250 mm"), /units/);
+  assert.throws(() => parseIntegerMillimetres(250.5), /safe integer/);
 });
 
 test("canonical fixture normalizes to the exact approved site and envelope", () => {
@@ -196,6 +206,62 @@ test("impossible fixtures return structured normalization diagnostics", () => {
   assert.equal(sizeResult.ok, false);
   if (!sizeResult.ok) {
     assert.equal(sizeResult.issues[0].code, "PROGRAM_TOO_LARGE");
+  }
+});
+
+test("malformed runtime briefs return structured errors instead of property access failures", () => {
+  const malformed = tryNormalizeProject({
+    schemaVersion: 1,
+    projectId: "malformed",
+    name: "Malformed",
+    site: null,
+    program: [],
+    relationships: [],
+    planning: null,
+    generation: null,
+  });
+  assert.equal(malformed.ok, false);
+  if (!malformed.ok) {
+    assert.ok(malformed.issues.some((issue) => issue.code === "INVALID_PLANNING_SETTINGS"));
+  }
+  assert.throws(() => normalizeProject({} as never), (error: unknown) => {
+    return error instanceof InvalidBriefError && error.issues.length > 0;
+  });
+});
+
+test("quantity expansion rejects oversized input before attempting an unbounded loop", () => {
+  const requirement = structuredClone(CANONICAL_PROJECT.program[0]!);
+  requirement.id = "many";
+  requirement.quantity = Number.MAX_SAFE_INTEGER;
+  const result = tryNormalizeProject({
+    ...CANONICAL_PROJECT,
+    program: [requirement],
+  });
+  assert.equal(result.ok, false);
+  if (!result.ok) assert.equal(result.issues[0]?.code, "PROGRAM_TOO_LARGE");
+});
+
+test("relationship selectors normalize explicit instance, requirement, and kind forms", () => {
+  const project = structuredClone(CANONICAL_PROJECT);
+  project.relationships = [{
+    id: "explicit-selectors",
+    from: { type: "requirement", id: "bedroom" },
+    to: { type: "kind", kind: "living" },
+    kind: "preferNear",
+    aggregation: "nearest",
+    source: "architect",
+  }];
+  const result = tryNormalizeProject(project);
+  assert.equal(result.ok, true);
+  if (result.ok) {
+    assert.deepEqual(result.value.relationships[0], {
+      id: "explicit-selectors",
+      from: "bedroom",
+      to: "living",
+      kind: "preferNear",
+      aggregation: "nearest",
+      source: "architect",
+    });
   }
 });
 
