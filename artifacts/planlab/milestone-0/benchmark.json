@@ -1,13 +1,13 @@
 {
   "reportVersion": "planlab-milestone-0-benchmark-0.5",
   "suiteVersion": "planlab-stage0-seed-suite-0.5",
-  "recordedAt": "2026-09-14T00:28:48.932Z",
+  "recordedAt": "2026-09-14T00:34:42.880Z",
   "engineVersion": "planlab-generator-0.4",
   "ruleVersion": "planlab-core-2",
   "environment": {
-    "gitHeadAtRun": "0dcbde29d3b5c5237e22579c59848e132b95e578",
-    "workingTreeStatusAtRun": "M artifacts/planlab/milestone-0/benchmark.json\n M artifacts/planlab/milestone-0/benchmark.md\n M artifacts/planlab/milestone-0/diagnostics/canonical-planlab-canonical-01-balanced.svg\n M artifacts/planlab/milestone-0/diagnostics/canonical-planlab-canonical-01-balanced.txt\n M artifacts/planlab/milestone-0/diagnostics/canonical-planlab-canonical-01-bestFlow.svg\n M artifacts/planlab/milestone-0/diagnostics/canonical-planlab-canonical-01-bestFlow.txt\n M artifacts/planlab/milestone-0/diagnostics/canonical-planlab-canonical-01-compactEfficiency.svg\n M artifacts/planlab/milestone-0/diagnostics/canonical-planlab-canonical-01-compactEfficiency.txt\n M scripts/benchmark-stage0.mjs\n M src/domain/diagnostics.ts\n M src/domain/diversity.ts\n M src/domain/generator.ts\n M src/domain/metrics.ts\n M src/domain/normalization.ts\n M src/domain/scoring.ts\n M src/domain/validation.ts\n M test/domain-harness.test.ts\n M test/generator.test.ts\n M test/planlab-scoring.test.ts",
-    "workingTreeCleanAtRun": false,
+    "gitHeadAtRun": "605eb8851a45510eea86dfbf0f7988d09a54b9fc",
+    "workingTreeStatusAtRun": "",
+    "workingTreeCleanAtRun": true,
     "benchmarkInputFingerprint": "5914900b9515d7825baf0e0f6b4f9a1c4187c91924121aeaefb0efc7eeaf55f4",
     "benchmarkInputFiles": [
       {
@@ -128,10 +128,10 @@
     }
   },
   "summary": {
-    "medianMs": 1810.531,
-    "p95Ms": 1939.007,
-    "minimumMs": 1679.031,
-    "maximumMs": 1976.939
+    "medianMs": 1786.433,
+    "p95Ms": 1944.396,
+    "minimumMs": 1657.822,
+    "maximumMs": 1977.697
   },
   "gate": {
     "threeValidLayoutsPerSeed": true,
@@ -146,18 +146,18 @@
   "canonical": [
     {
       "seed": "planlab-canonical-01",
-      "elapsedMs": 1905.153,
+      "elapsedMs": 1946.237,
       "timingSamplesMs": [
-        1976.939,
-        1905.153,
-        1876.66
+        1977.697,
+        1946.237,
+        1942.145
       ],
       "timingSamplesRawMs": [
-        1976.9385000000002,
-        1905.1534000000001,
-        1876.6603000000005
+        1977.6974999999998,
+        1946.2372999999998,
+        1942.1454000000003
       ],
-      "replayElapsedMs": 1967.239,
+      "replayElapsedMs": 1925.705,
       "deterministic": true,
       "outputHash": "2e25c2f1375142b5e634ece7ad83c14a3edc7690267f2eb7d283c3268a25ef5a",
       "replayHash": "2e25c2f1375142b5e634ece7ad83c14a3edc7690267f2eb7d283c3268a25ef5a",
@@ -241,18 +241,18 @@
     },
     {
       "seed": "planlab-canonical-02",
-      "elapsedMs": 1699.111,
+      "elapsedMs": 1674.111,
       "timingSamplesMs": [
-        1719.68,
-        1679.031,
-        1699.111
+        1676.4,
+        1662.191,
+        1674.111
       ],
       "timingSamplesRawMs": [
-        1719.6798999999992,
-        1679.0313999999998,
-        1699.1110000000008
+        1676.4001000000026,
+        1662.1913000000022,
+        1674.1110000000008
       ],
-      "replayElapsedMs": 1704.971,
+      "replayElapsedMs": 1674.437,
       "deterministic": true,
       "outputHash": "a958915b82414d49507b8e342c390071424b2d27fc36c5837a0a8d07e27d3bae",
       "replayHash": "a958915b82414d49507b8e342c390071424b2d27fc36c5837a0a8d07e27d3bae",
@@ -336,18 +336,18 @@
     },
     {
       "seed": "planlab-canonical-03",
-      "elapsedMs": 1834.609,
+      "elapsedMs": 1829.801,
       "timingSamplesMs": [
-        1966.706,
-        1834.609,
-        1827.746
+        1829.801,
+        1838.041,
+        1796.78
       ],
       "timingSamplesRawMs": [
-        1966.7059000000008,
-        1834.6085999999996,
-        1827.7459000000017
+        1829.8012000000017,
+        1838.0406999999977,
+        1796.780200000001
       ],
-      "replayElapsedMs": 1832.919,
+      "replayElapsedMs": 1934.982,
       "deterministic": true,
       "outputHash": "ec0c221b17a5d29ea8aa4913a3805fb7f717d762e4db198d7e6f79f06c807a56",
       "replayHash": "ec0c221b17a5d29ea8aa4913a3805fb7f717d762e4db198d7e6f79f06c807a56",
@@ -431,18 +431,18 @@
     },
     {
       "seed": "planlab-canonical-04",
-      "elapsedMs": 1814.751,
+      "elapsedMs": 1802.874,
       "timingSamplesMs": [
-        1820.751,
-        1814.751,
-        1790.992
+        1802.874,
+        1818.169,
+        1765.825
       ],
       "timingSamplesRawMs": [
-        1820.7513999999937,
-        1814.750600000014,
-        1790.992499999993
+        1802.8739999999962,
+        1818.1686999999947,
+        1765.825399999987
       ],
-      "replayElapsedMs": 1797.053,
+      "replayElapsedMs": 1768.114,
       "deterministic": true,
       "outputHash": "bb93aff6aed6e03356ffd71b0aa24c75c0301806f9943627e30a155ecb50c05e",
       "replayHash": "bb93aff6aed6e03356ffd71b0aa24c75c0301806f9943627e30a155ecb50c05e",
@@ -526,18 +526,18 @@
     },
     {
       "seed": "planlab-canonical-05",
-      "elapsedMs": 1813.412,
+      "elapsedMs": 1799.899,
       "timingSamplesMs": [
-        1830.425,
-        1807.491,
-        1813.412
+        1913.069,
+        1799.636,
+        1799.899
       ],
       "timingSamplesRawMs": [
-        1830.4245000000083,
-        1807.4907000000094,
-        1813.4119999999966
+        1913.0690999999933,
+        1799.635699999999,
+        1799.8989999999903
       ],
-      "replayElapsedMs": 1818.694,
+      "replayElapsedMs": 1822.117,
       "deterministic": true,
       "outputHash": "eefd52e3baedf222751b2caeebea752b309525afc4e32213576807377ca55e39",
       "replayHash": "eefd52e3baedf222751b2caeebea752b309525afc4e32213576807377ca55e39",
@@ -621,18 +621,18 @@
     },
     {
       "seed": "planlab-canonical-06",
-      "elapsedMs": 1697.561,
+      "elapsedMs": 1670.128,
       "timingSamplesMs": [
-        1712.247,
-        1689.94,
-        1697.561
+        1670.128,
+        1657.822,
+        1705.143
       ],
       "timingSamplesRawMs": [
-        1712.2465999999986,
-        1689.9402999999875,
-        1697.5610999999917
+        1670.127800000002,
+        1657.8224999999948,
+        1705.1429000000062
       ],
-      "replayElapsedMs": 1686.686,
+      "replayElapsedMs": 1662.198,
       "deterministic": true,
       "outputHash": "f899e35c28b80cc92507bd333b6ee1be04267650b0e4bbbb59937d8dd70e764e",
       "replayHash": "f899e35c28b80cc92507bd333b6ee1be04267650b0e4bbbb59937d8dd70e764e",
@@ -716,18 +716,18 @@
     },
     {
       "seed": "planlab-canonical-07",
-      "elapsedMs": 1792.854,
+      "elapsedMs": 1753.587,
       "timingSamplesMs": [
-        1807.649,
-        1765.978,
-        1792.854
+        1862.721,
+        1753.587,
+        1745.838
       ],
       "timingSamplesRawMs": [
-        1807.6494999999995,
-        1765.977600000013,
-        1792.8540999999968
+        1862.7213999999803,
+        1753.5870999999752,
+        1745.8380999999936
       ],
-      "replayElapsedMs": 1783.856,
+      "replayElapsedMs": 1746.771,
       "deterministic": true,
       "outputHash": "c91e362cbfd862010a17ee6daa356a6ca28261a77abf90c75e5e0ca0fb9478b3",
       "replayHash": "c91e362cbfd862010a17ee6daa356a6ca28261a77abf90c75e5e0ca0fb9478b3",
@@ -811,18 +811,18 @@
     },
     {
       "seed": "planlab-canonical-08",
-      "elapsedMs": 1701.75,
+      "elapsedMs": 1670.336,
       "timingSamplesMs": [
-        1707.299,
-        1701.75,
-        1688.09
+        1691.505,
+        1670.336,
+        1662.529
       ],
       "timingSamplesRawMs": [
-        1707.2986999999848,
-        1701.7504999999946,
-        1688.090200000006
+        1691.5047000000195,
+        1670.3362999999954,
+        1662.5292999999947
       ],
-      "replayElapsedMs": 1702.186,
+      "replayElapsedMs": 1676.747,
       "deterministic": true,
       "outputHash": "14e8fcfc20f53b9b00bf78dad5db67323cd26ee9c32a846e7342e12b2dfdd56e",
       "replayHash": "14e8fcfc20f53b9b00bf78dad5db67323cd26ee9c32a846e7342e12b2dfdd56e",
@@ -906,18 +906,18 @@
     },
     {
       "seed": "planlab-canonical-09",
-      "elapsedMs": 1825.402,
+      "elapsedMs": 1773.418,
       "timingSamplesMs": [
-        1847.149,
-        1798.666,
-        1825.402
+        1773.418,
+        1759.122,
+        1776.087
       ],
       "timingSamplesRawMs": [
-        1847.1492000000144,
-        1798.666099999973,
-        1825.4015000000072
+        1773.4178000000247,
+        1759.122000000003,
+        1776.086500000005
       ],
-      "replayElapsedMs": 1799.641,
+      "replayElapsedMs": 1771.301,
       "deterministic": true,
       "outputHash": "21e865f4345e7b7ed3e1942bd5469c8bb58c4a495466ed8779a196277515788d",
       "replayHash": "21e865f4345e7b7ed3e1942bd5469c8bb58c4a495466ed8779a196277515788d",
@@ -1001,18 +1001,18 @@
     },
     {
       "seed": "planlab-canonical-10",
-      "elapsedMs": 1890.009,
+      "elapsedMs": 1827.642,
       "timingSamplesMs": [
-        1890.009,
-        1882.203,
-        1903.415
+        1845.072,
+        1815.771,
+        1827.642
       ],
       "timingSamplesRawMs": [
-        1890.008600000001,
-        1882.2029000000039,
-        1903.4150000000081
+        1845.0718999999808,
+        1815.770599999989,
+        1827.641799999983
       ],
-      "replayElapsedMs": 1908.836,
+      "replayElapsedMs": 1816.836,
       "deterministic": true,
       "outputHash": "09b622a143038ec474b0146591694b7dcc78c7cc7dba907c777298c9b74e4184",
       "replayHash": "09b622a143038ec474b0146591694b7dcc78c7cc7dba907c777298c9b74e4184",
@@ -1099,7 +1099,7 @@
     {
       "fixture": "envelopeConsumesSite",
       "seed": "impossible-envelope",
-      "elapsedMs": 0.18,
+      "elapsedMs": 0.208,
       "ok": false,
       "candidateCount": 0,
       "selectedCount": 0,
@@ -1126,7 +1126,7 @@
     {
       "fixture": "roomCannotFitEnvelope",
       "seed": "impossible-room",
-      "elapsedMs": 0.047,
+      "elapsedMs": 0.046,
       "ok": false,
       "candidateCount": 0,
       "selectedCount": 0,
@@ -1153,7 +1153,7 @@
     {
       "fixture": "programExceedsInstanceLimit",
       "seed": "impossible-program-size",
-      "elapsedMs": 0.027,
+      "elapsedMs": 0.026,
       "ok": false,
       "candidateCount": 0,
       "selectedCount": 0,

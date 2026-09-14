@@ -26,11 +26,11 @@ benchmark provenance.
 ## Verification evidence
 
 - `npm test` — **39 passed, 0 failed**.
-- `npm run benchmark:stage0` — **PASS** on 2026-09-14T00:28:48.932Z.
+- `npm run benchmark:stage0` — **PASS** on 2026-09-14T00:34:42.880Z against committed review source `605eb88` with a clean worktree at benchmark start.
   - Fixed 10-seed suite; 30 measured generations plus deterministic replay.
   - Every seed: 300/300 independently valid candidates and 3/3 independently valid selected layouts.
   - Minimum selected-triplet distance: **0.3203629583969335**, above the 0.20 threshold.
-  - Median **1,810.531 ms**; p95 **1,939.007 ms**; approved limits are <2,000 ms and <4,000 ms.
+  - Median **1,786.433 ms**; p95 **1,944.396 ms**; approved limits are <2,000 ms and <4,000 ms.
   - All three impossible fixtures terminated with typed normalization diagnostics and zero candidates.
   - Input fingerprint: `5914900b9515d7825baf0e0f6b4f9a1c4187c91924121aeaefb0efc7eeaf55f4`.
 
@@ -43,9 +43,8 @@ human-readable summary is [benchmark.md](benchmark.md).
   weights, diversity threshold, and the usefulness of the constrained layout
   class still require architect judgement at bucket 0.6.
 - Timing is a Node reference-host measurement, not a browser/worker
-  measurement. The benchmark records the host and a source fingerprint; its
-  worktree was intentionally dirty during the review run because it measured
-  the reviewed sources.
+  measurement. The benchmark records the host, committed source revision, and
+  a source fingerprint; the final orchestrator rerun began from a clean worktree.
 - There is no package-defined typecheck/build script and no local TypeScript
   compiler dependency. Runtime test execution parses the TypeScript sources on
   the supported Node runtime; adding a production build/typecheck gate belongs
