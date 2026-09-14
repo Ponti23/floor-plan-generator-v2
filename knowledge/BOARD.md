@@ -60,9 +60,10 @@ Active design: [`planlab/README.md`](./planlab/README.md) · staged plan: [`../D
   may claim or close it.
 - Bucket 3.6 is **answered**: the user directed a D1 change rather than an approval, and asked for
   the engineering-shaped decisions to be done rather than returned as questions. Record:
-  `artifacts/planlab/milestone-3/gate-amendment-d1-d4.md`. D5 (push) is still unanswered.
+  `artifacts/planlab/milestone-3/gate-amendment-d1-d4.md`. D5 was approved by the user on
+  2026-09-15; the completed checkpoint is being pushed before Milestone 4 starts.
 - Buckets 3.7–3.9 carry that work. The room-shape values, the calibration overrides and the payload
   projection are all **data or seam changes with the approved defaults preserved**, so the approved
   scoring language is still the default rather than a replaced one.
-- Milestone 4 is unblocked once D5 is answered. 4.1 was dispatched to a sub-agent and that agent
+- Milestone 4 is unblocked. 4.1 was dispatched to a sub-agent and that agent
   stalled without writing a file; the bucket is back in the queue for the orchestrator.

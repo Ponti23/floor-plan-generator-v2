@@ -8,13 +8,12 @@ default while requiring it to stay settable (D2/D3), and asked for the engineeri
 to be done rather than returned as questions (D4). All of it is implemented, verified and green
 (136 tests, full regression gate PASS at median 1,750 ms). Record:
 [`artifacts/planlab/milestone-3/gate-amendment-d1-d4.md`](artifacts/planlab/milestone-3/gate-amendment-d1-d4.md).
-**Next: answer D5 (push), then build Milestone 4.**
+**Next: build Milestone 4.**
 
-## Waiting on — D5 only
+## D5 remote checkpoint — approved
 
-Everything else the gate asked for is settled. The one open decision is **D5: push `main` to
-`origin/main`** (56 commits ahead since Stage 1). Nothing has been pushed, so nothing was committed
-to a remote and no irreversible action has been taken.
+The user approved pushing `main` to `origin/main` on 2026-09-15 before Milestone 4 begins. This
+handoff update is part of that remote checkpoint.
 
 Two things a resuming session should know before it re-measures anything:
 
@@ -193,14 +192,10 @@ for the Milestone 4 worker protocol. Raised for bucket 2.5 and for the user.
 
 ## Next step
 
-1. Execute Stage 3 in plan order. Bucket 3.5 independent Milestone 3 review (`terra-max`) is next.
-   It must investigate the failed median-runtime gate and may not declare Stage 3 complete while the
-   approved technical acceptance criterion remains unmet.
-2. Stage 3's definition of done is the architect usefulness/scoring-language **hard gate** — it
-   stops for the user and is never merged solo.
-3. The Stage 0 benchmark evidence decision below is waiting on the user; it is not a blocker for
-   Stage 3, but it should be settled before the Milestone 4 worker protocol fixes message payloads
-   (bucket 3.4 records its mechanical consequence).
+1. Stage and execute Milestone 4 in plan order, beginning with bucket 4.1 (worker protocol and
+   three-pane UI shell) using `knowledge/planlab/UI_ARCHITECTURE.md`.
+2. Preserve the D4 payload boundary: worker transport uses the semantic result projection rather
+   than the full in-memory derived indexes.
 3. Orchestrator note for future stages: every dispatched executor in Stage 2 stalled at least once
    by reporting status and asking for authorization instead of implementing, and two spawned nested
    helpers. Four of the five buckets were finished by the orchestrator. Executor briefs must state

@@ -7,7 +7,7 @@ tags: [progress, resume]
 
 ## Resume here
 
-- **Checkpoint date:** 2026-09-14 (later the same day as the Stage 3 review).
+- **Checkpoint date:** 2026-09-15.
 - **Current focus:** the Stage 3 hard gate is **answered**. The user did not approve the usefulness
   claim; they directed a fix (D1), approved the scoring language as the default while requiring it to
   stay settable (D2/D3), and asked for the engineering-shaped decisions to be done rather than
@@ -35,15 +35,16 @@ tags: [progress, resume]
 - **Cost, stated honestly.** Expansions per seed rose **6,779 → 15,456** and the full-gate median
   **904 ms → 1,750 ms**. Targets still met (median <2,000, p95 <4,000, 20,000 expansions) but the
   median margin fell from ~55% to ~13%, and expansions now sit close to the cap.
-- **Open threads / waiting on user:**
-  1. **D5 — push.** `main` is 56 commits ahead of `origin/main`; still nothing pushed.
-  2. **Milestone 4 (UI).** Unblocked by D1/D2. Bucket 4.1 was dispatched to a sub-agent that stalled
+- **Open threads:**
+  1. **D5 — push.** Approved by the user on 2026-09-15; this checkpoint is being pushed to
+     `origin/main` before Milestone 4 starts.
+  2. **Milestone 4 (UI).** Unblocked. Bucket 4.1 was dispatched to a sub-agent that stalled
      for ~40 minutes without writing a single file and was interrupted; it is back in the queue.
   3. Product/UX/copy and money/payment decisions remain human hard gates. The calibration override
      seam deliberately makes copy-adjacent values *settable* without freezing them.
   4. **Evidence-resolution caveat** in D4 above — a future review needing value-level derived drift
      detection must use `serializeCanonical(result)` explicitly.
-- **Next step:** answer D5, then build Milestone 4 (worker/UI scaffolding) from
+- **Next step:** build Milestone 4 (worker/UI scaffolding) from
   `knowledge/planlab/IMPLEMENTATION_PLAN.md`, following `knowledge/planlab/UI_ARCHITECTURE.md`.
 - **In-flight branches:** all work is on `main` (Milestone 0 baseline `8171058`, Stage 1
   `0e8589b`…`e1c6f38` plus typecheck infra `19916f1`, Stage 2 `9a24738`…`ded4d73`, Stage 3
