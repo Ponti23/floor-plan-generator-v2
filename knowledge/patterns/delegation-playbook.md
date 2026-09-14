@@ -5,11 +5,13 @@ tags: [pattern, delegation, workflow]
 
 # Delegation Playbook
 
-Our default way of splitting work across Astra, Sol, Terra, and Luna. See [[README]] for the index.
+Our default way of splitting work across Astra, Sol, DeepSeek-Flash, Terra, and Luna. See
+[[README]] for the index.
 
 ## The idea
 
-**Luna@Max is the default executor.** Start every bounded bucket there and escalate only when the
+**Luna@Max is the default executor.** DeepSeek-Flash may take routine buckets with especially clear
+scope and acceptance criteria when a verified provider route is available. Escalate only when the
 work demonstrates that it needs broader judgment or deeper cross-cutting implementation. Sol@Max
 normally holds the plan and judges results. Astra@Max is the senior reasoning tier for architecture,
 ambiguity, consequential decisions, and failed escalations. Terra@Max is the stronger execution and
@@ -24,28 +26,39 @@ review tier for work that spans systems or requires sustained debugging.
   uncertain or a bucket fails twice.
 - **Luna@Max — default executor:** implement tightly scoped features and fixes, write tests and docs,
   perform repository research, run commands, and verify its own bucket. Maximize this lane.
+- **DeepSeek-Flash — optional routine executor:** handle explicitly scoped repository research,
+  non-product documentation, mechanical edits, and small tests or fixes with concrete verification.
+  Use only through a verified provider route; otherwise use Luna. The orchestrator judges its work
+  under the same acceptance rules as every other executor.
 - **Terra@Max — complex executor and independent reviewer:** handle cross-cutting refactors,
   integration work, difficult debugging, concurrency/state issues, migrations, and security-sensitive
-  implementation. Review risky Luna-authored work when independent review is warranted.
+  implementation. Review risky DeepSeek- or Luna-authored work when independent review is warranted.
+
+The native dispatch tool may expose only its advertised model overrides and no provider selector.
+Do not assume that a configured DeepSeek catalog entry makes `deepseek-flash` dispatchable. Use
+DeepSeek only through a route verified to select that provider and model and to provide the tools the
+bucket requires. If no such route is available, use Luna and record the executor actually used; do
+not shell-launch an agent as a workaround or put an API key in the repo or an agent prompt.
 
 ## Routing
 
 1. Planning and ordinary judgment → Sol@Max.
 2. Architecture, unresolved ambiguity, high-impact tradeoffs, or repeated failure → Astra@Max.
-3. Bounded implementation, tests, docs, research, and command work → Luna@Max first.
+3. Bounded implementation, tests, docs, research, and command work → Luna@Max by default;
+   DeepSeek-Flash may take routine, precisely specified buckets through a verified route.
 4. Cross-cutting implementation, integration-heavy changes, difficult debugging, migrations,
    concurrency/state, or security-sensitive work → Terra@Max.
 5. Verification → the executor runs relevant checks and reports raw results; the orchestrator judges.
-6. Independent review → use a model other than the author. Terra reviews risky Luna work; Sol or
-   Astra reviews Terra work. Never send work to Terra merely because it is important—send it when
-   its complexity or review independence justifies the escalation.
+6. Independent review → use a model other than the author. Terra reviews risky DeepSeek or Luna
+   work; Sol or Astra reviews Terra work. Never send work to Terra merely because it is
+   important—send it when its complexity or review independence justifies the escalation.
 
 ## The loop (once the human says "go")
 
-Sol briefs → Luna executes and verifies → Sol judges and merges → repeat. Route directly to Terra
-when the bucket meets Terra's criteria. Escalate planning or judgment to Astra when architecture,
-ambiguity, risk, or repeated failure warrants it. The human is pinged only for a hard gate or a
-genuine blocker.
+Sol briefs → Luna or an eligible DeepSeek-Flash executor verifies → Sol judges and merges → repeat.
+Route directly to Terra when the bucket meets Terra's criteria. Escalate planning or judgment to
+Astra when architecture, ambiguity, risk, or repeated failure warrants it. The human is pinged only
+for a hard gate or a genuine blocker.
 
 ## Hard human gates (always need the human's explicit yes)
 

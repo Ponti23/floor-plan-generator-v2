@@ -35,6 +35,8 @@ Active design: [`planlab/README.md`](./planlab/README.md) · staged plan: [`../D
 ## Handoff rules
 
 - Claim a bucket before editing and do not take work already owned.
+- DeepSeek-Flash may be selected for eligible future buckets per the delegation playbook. Record the
+  executor actually used in `Owner`; record a Luna fallback when the DeepSeek route is unavailable.
 - Each executor verifies and commits its bucket.
 - Stage 1 hardens the approved domain semantics and remains isolated from product UI/scaffolding.
 - Stage 1 public domain APIs passed independent review (1.4, `e1c6f38`). Stage

@@ -11,8 +11,8 @@ The **home note** for how we build this. Plain markdown in the repo (also openab
 ## How we work (patterns & playbooks)
 
 - [[BOARD]] — **the live work queue**: what to work on now, who owns it, and status.
-- [[orchestrator-and-subagents]] — Sol/Astra orchestrate; fresh Luna/Terra executors handle each step.
-- [[delegation-playbook]] — Luna-first routing across Astra, Sol, Terra, and Luna.
+- [[orchestrator-and-subagents]] — Sol/Astra orchestrate; fresh DeepSeek/Luna/Terra executors handle each step.
+- [[delegation-playbook]] — Luna-default routing with an optional DeepSeek-Flash routine lane.
 
 ## The project
 

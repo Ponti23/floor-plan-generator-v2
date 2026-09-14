@@ -8,7 +8,9 @@ The approved product and technical plan lives in
 ## Conventions
 
 - One bucket is executed and verified before the next begins.
-- Sol orchestrates; Luna executes bounded work by default; Terra handles cross-cutting work and independent review.
+- Sol orchestrates; Luna executes bounded work by default; DeepSeek-Flash may execute routine
+  buckets through a verified provider route; Terra handles cross-cutting work and independent
+  review. Executor selection and fallback follow the delegation playbook.
 - Milestone 0 is a mathematical feasibility spike, not product scaffolding.
 - The architect usefulness review is a hard gate. Do not begin Milestone 1 or UI work without explicit approval.
 
