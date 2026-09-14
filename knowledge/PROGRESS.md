@@ -8,11 +8,11 @@ tags: [progress, resume]
 ## Resume here
 
 - **Checkpoint date:** 2026-09-14.
-- **Current focus:** Stage 0 technical work is complete; buckets 0.1–0.5 passed and bucket 0.6 is waiting at the architect usefulness hard gate.
-- **Open threads / waiting on user:** Explicit architect usefulness **go** or **no-go** is required before the Stage 0 spike may be merged or Milestone 1 may begin.
-- **Next step:** Review the crude diagnostic outputs, feasibility benchmark, and independent technical review; record the user's bucket 0.6 decision.
-- **In-flight branches:** `main` contains the approved planning checkpoint `01507d8`; `stage0-planlab-spike` contains technical review commit `605eb88` and architect-gate bookkeeping `6b85992`.
-- **Deferred:** All PlanLab application scaffolding and implementation beyond the explicitly approved Milestone 0 feasibility spike; architect usefulness review remains the hard gate at bucket 0.6.
+- **Current focus:** Stage 0 is complete and the architect usefulness hard gate received the user's explicit GO on 2026-09-14.
+- **Open threads / waiting on user:** None for the accepted Milestone 0 feasibility baseline.
+- **Next step:** Activate and stage Milestone 1 from `knowledge/planlab/IMPLEMENTATION_PLAN.md` before starting product implementation.
+- **In-flight branches:** `stage0-planlab-spike` contains the accepted Stage 0 implementation, independent technical review `605eb88`, and completion bookkeeping; merge it to `main` as the Milestone 0 baseline.
+- **Deferred:** Milestone 1+ product implementation remains unstarted until its staged execution plan is activated; future product/UX/copy and money/payment decisions remain human hard gates.
 
 _(This block is rewritten by the `save-progress` skill. Everything below is the append-only timeline.)_
 

@@ -2,23 +2,19 @@
 
 **Active plan:** [`DELEGATION-PLAN.md`](./DELEGATION-PLAN.md) · **Live queue:** [`knowledge/BOARD.md`](./knowledge/BOARD.md) · **Planning package:** [`knowledge/planlab/README.md`](./knowledge/planlab/README.md)
 
-**Status:** Stage 0 technical work is complete on `stage0-planlab-spike`; buckets 0.1–0.5 are complete and bucket 0.6 is waiting at the architect usefulness hard gate.
+**Status:** Stage 0 is complete; buckets 0.1–0.6 passed, including the user-approved architect usefulness hard gate.
 
 ## Last checkpoint
 
-- Bucket 0.5 independent technical review completed as `605eb88`; all 39 tests pass and the clean-worktree 10-seed benchmark passes every technical gate (median 1,786.433 ms; p95 1,944.396 ms).
+- Bucket 0.6 received the user's explicit **GO** on 2026-09-14. Technical review commit `605eb88` has 39 passing tests; the clean-worktree 10-seed benchmark passes every gate (median 1,786.433 ms; p95 1,944.396 ms).
 
 ## Next step
 
-1. Present the crude diagnostic outputs, feasibility benchmark, and independent technical review for bucket 0.6.
-2. Obtain the user's explicit architect usefulness go/no-go decision before merging the spike or beginning Milestone 1.
+1. Treat Milestone 0 as the accepted feasibility baseline.
+2. Activate and stage Milestone 1 from `knowledge/planlab/IMPLEMENTATION_PLAN.md` before starting product implementation.
 
 ## Constraints
 
-- Milestone 0 only: mathematical feasibility spike, no product application scaffolding or polished UI.
+- Milestone 0 remained a mathematical feasibility spike; no product application scaffolding or polished UI was added.
 - Approved assumptions are recorded in `DELEGATION-PLAN.md`.
-- Stop at bucket 0.6 for explicit architect go/no-go approval.
-
-## Blocked on
-
-- **Bucket 0.6 human hard gate:** explicit architect usefulness **go** or **no-go** after reviewing the Stage 0 outputs and evidence.
+- The architect usefulness gate is cleared; future money/payment and product/UX/copy decisions remain human hard gates.
