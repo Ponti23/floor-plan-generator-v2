@@ -23,7 +23,7 @@ Active design: [`planlab/README.md`](./planlab/README.md) · staged plan: [`../D
 | 2.5 | Independent Milestone 2 review | terra-max | sol-max | done | `main` (`ded4d73`) |
 | 3.1 | Metric formulas and false-precision controls | luna-max | luna-max | done | `main` (`6089c48`) |
 | 3.2 | Strategy profiles and the calibration surface | luna-max | luna-max | done | `main` (`c5bff25`) |
-| 3.3 | Interchangeable matching, diversity, joint selection | luna-max | — | todo | `main` |
+| 3.3 | Interchangeable matching, diversity, joint selection | luna-max | luna-max | in-progress | `main` |
 | 3.4 | Determinism, pruning oracle, regression benchmark | luna-max | — | todo | `main` |
 | 3.5 | Independent Milestone 3 review | terra-max | — | todo | `main` |
 
