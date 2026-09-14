@@ -2,9 +2,20 @@
 
 **Active plan:** [`DELEGATION-PLAN.md`](./DELEGATION-PLAN.md) · **Live queue:** [`knowledge/BOARD.md`](./knowledge/BOARD.md) · **Planning package:** [`knowledge/planlab/README.md`](./knowledge/planlab/README.md)
 
-**Status:** Stage 0 is complete and approved. Stage 1 is complete (independent domain API review passed 2026-09-14). **Stage 2 (access, rules, and validation) is complete** — all five buckets landed on `main` and the independent review (2.5) passed on 2026-09-14 with three access-layer defects fixed. **Stage 3 (generator, metrics, scoring, and diversity) is active**; buckets 3.1–3.3 are complete and bucket 3.4 is the next dispatch.
+**Status:** Stage 0 is complete and approved. Stage 1 is complete (independent domain API review passed 2026-09-14). **Stage 2 (access, rules, and validation) is complete** — all five buckets landed on `main` and the independent review (2.5) passed on 2026-09-14 with three access-layer defects fixed. **Stage 3 (generator, metrics, scoring, and diversity) is active**; buckets 3.1–3.4 are complete and bucket 3.5 independent review is next. The full benchmark is deterministic and p95 passes, but its median-runtime gate currently fails (3,036 ms vs <2,000 ms); 3.5 must judge and resolve or escalate this finding.
 
 ## Last checkpoint
+
+- Bucket 3.4 landed as `99e1904` (`feat: pin PlanLab determinism and regression evidence`). Seeded
+  tie-breaking, budgets, and search-policy constants are versioned; an independent tiny-grid
+  exhaustive oracle verifies the minimum-area pruning condition and records certificates; and the
+  Stage 0 suite is now a repeatable current-baseline harness with explicit environment metadata and
+  separate historical/evidence-shape hashes. Verification: `npm test` **120 passing**;
+  `npm run typecheck` 0 errors; canonical diagnostics clean; bounded and full baseline checks pass.
+  The recorded ten-seed run produced three valid diverse layouts per seed, deterministic replays,
+  and in-budget expansions, but the overall technical gate is **FAIL** because median runtime is
+  **3,036.067 ms** against the approved **<2,000 ms** target (p95 **3,381.464 ms**, passing <4 s).
+  No product semantics were retuned; this remains an explicit 3.5 review finding.
 
 - Bucket 3.3 landed as `e301ed4` plus review correction `e8d4b45` (`feat: harden PlanLab diversity
   and triplet outcomes`; `fix: keep empty PlanLab pools non-infeasible`). Interchangeable room labels
@@ -136,8 +147,9 @@ for the Milestone 4 worker protocol. Raised for bucket 2.5 and for the user.
 
 ## Next step
 
-1. Execute Stage 3 in plan order. Bucket 3.4 (determinism, pruning oracle, and regression benchmark,
-   `luna-max`) is the next dispatch.
+1. Execute Stage 3 in plan order. Bucket 3.5 independent Milestone 3 review (`terra-max`) is next.
+   It must investigate the failed median-runtime gate and may not declare Stage 3 complete while the
+   approved technical acceptance criterion remains unmet.
 2. Stage 3's definition of done is the architect usefulness/scoring-language **hard gate** — it
    stops for the user and is never merged solo.
 3. The Stage 0 benchmark evidence decision below is waiting on the user; it is not a blocker for

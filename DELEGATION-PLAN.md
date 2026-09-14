@@ -98,13 +98,13 @@ contracts and proving the claims it currently asserts.
   "fewer than three" and "infeasible" as distinct outcomes rather than conflating them. Verify
   mirror/duplicate/topology diversity fixtures, distance symmetry and bounds, and the
   distinct-outcome matrix. — `luna-max` (`e301ed4`, `e8d4b45`)
-- [ ] **3.4 Determinism, pruning oracle, and regression benchmark.** Pin seeded tie-breaking and the
+- [x] **3.4 Determinism, pruning oracle, and regression benchmark.** Pin seeded tie-breaking and the
   fixed expansion budgets, add a pruning oracle proving a pruned branch could not have contained the
   selected optimum, and turn the Stage 0 benchmark into a repeatable regression harness with
   recorded baselines and explicit environment metadata. Verify replay byte-equivalence, budget
   determinism, and benchmark reproducibility. Whatever the outcome of the Stage 0 benchmark
   evidence decision (see `HANDOFF.md`), record its mechanical consequence here rather than changing
-  product semantics unilaterally. — `luna-max`
+  product semantics unilaterally. — `luna-max` (`99e1904`; benchmark deterministic, median-runtime gate open for 3.5 review)
 - [ ] **3.5 Independent Milestone 3 review.** Review the generator, metrics, scoring, and diversity
   stack for misleading metrics, false precision, determinism leaks, weak tests, pruning-oracle
   credibility, and benchmark honesty. Fix only Stage 3 defects, run the complete suite, and record

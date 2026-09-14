@@ -24,7 +24,7 @@ Active design: [`planlab/README.md`](./planlab/README.md) · staged plan: [`../D
 | 3.1 | Metric formulas and false-precision controls | luna-max | luna-max | done | `main` (`6089c48`) |
 | 3.2 | Strategy profiles and the calibration surface | luna-max | luna-max | done | `main` (`c5bff25`) |
 | 3.3 | Interchangeable matching, diversity, joint selection | luna-max | luna-max | done | `main` (`e8d4b45`) |
-| 3.4 | Determinism, pruning oracle, regression benchmark | luna-max | luna-max | in-progress | `main` |
+| 3.4 | Determinism, pruning oracle, regression benchmark | luna-max | luna-max | done | `main` (`99e1904`) |
 | 3.5 | Independent Milestone 3 review | terra-max | — | todo | `main` |
 
 ## Handoff rules
