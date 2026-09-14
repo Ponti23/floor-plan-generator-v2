@@ -8,10 +8,10 @@ tags: [progress, resume]
 ## Resume here
 
 - **Checkpoint date:** 2026-09-14.
-- **Current focus:** Execute the approved Milestone 0 mathematical feasibility spike; buckets 0.1–0.4 are complete and bucket 0.5 independent review is active.
-- **Open threads / waiting on user:** The Terra review executor hit the host usage limit after making uncommitted review fixes; no user decision is needed yet, but the review must be resumed or completed before the bucket 0.6 hard gate.
-- **Next step:** Inspect and complete the uncommitted bucket 0.5 review changes, run the full tests and benchmark checks, commit verified fixes and review evidence, then prepare the bucket 0.6 architect usefulness review.
-- **In-flight branches:** `main` contains the approved planning checkpoint `01507d8`; `stage0-planlab-spike` contains the last committed benchmark at `4d40d48` plus uncommitted bucket 0.5 review changes; bookkeeping is committed through `c849b6d`.
+- **Current focus:** Stage 0 technical work is complete; buckets 0.1–0.5 passed and bucket 0.6 is waiting at the architect usefulness hard gate.
+- **Open threads / waiting on user:** Explicit architect usefulness **go** or **no-go** is required before the Stage 0 spike may be merged or Milestone 1 may begin.
+- **Next step:** Review the crude diagnostic outputs, feasibility benchmark, and independent technical review; record the user's bucket 0.6 decision.
+- **In-flight branches:** `main` contains the approved planning checkpoint `01507d8`; `stage0-planlab-spike` contains technical review commit `605eb88` and architect-gate bookkeeping `6b85992`.
 - **Deferred:** All PlanLab application scaffolding and implementation beyond the explicitly approved Milestone 0 feasibility spike; architect usefulness review remains the hard gate at bucket 0.6.
 
 _(This block is rewritten by the `save-progress` skill. Everything below is the append-only timeline.)_
