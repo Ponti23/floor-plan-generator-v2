@@ -50,6 +50,16 @@ Weights are hypotheses to validate with architects:
 
 All three profiles share identical hard rules and underlying metrics. Search ordering may use profile bias, but candidate analysis calculates all three scorecards so trade-offs remain visible.
 
+The domain exports one frozen `CALIBRATION_SURFACE` (also available as
+`SCORING_CALIBRATION`) containing the metric breakpoints, three normalized
+profile weight maps, diversity coefficients/threshold, explanation limit, and
+semantic `tradeoffs` message descriptors. The descriptor keys and category
+values are inspectable domain data; a presentation adapter supplies any final
+wording. Hard-rule thresholds remain in the rule/geometry policy and are not
+part of a strategy profile, so changing calibration can change desirability or
+ordering but cannot make an invalid layout valid or make an infeasible brief
+feasible.
+
 ## Efficiency reporting
 
 Report, do not conflate:

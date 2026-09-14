@@ -8,7 +8,7 @@ import {
   unionArea,
   type GridRect,
 } from "./geometry.ts";
-import { MIN_MEANINGFUL_SHARED_WALL_UNITS, MIRRORED_LAYOUTS_COUNT_AS_DISTINCT } from "./constants.ts";
+import { MIRRORED_LAYOUTS_COUNT_AS_DISTINCT } from "./constants.ts";
 import type { NormalizedProject, RoomInstance } from "./model.ts";
 import type { Layout, PlacedSpace } from "./layout.ts";
 import {
@@ -18,9 +18,17 @@ import {
   type ScoredLayoutCandidate,
   type StrategyProfileId,
 } from "./scoring.ts";
+import {
+  CALIBRATION_SURFACE,
+  assertCalibrationSurface,
+  type ScoringCalibrationSurface,
+} from "./calibration.ts";
 
 export const DIVERSITY_VERSION = "planlab-diversity-0.4";
-export const DEFAULT_DIVERSITY_THRESHOLD = 0.20;
+/** Backwards-compatible alias for the calibrated minimum distance. */
+export const DEFAULT_DIVERSITY_THRESHOLD = CALIBRATION_SURFACE.diversity.threshold;
+/** All approved diversity distance coefficients are inspectable together. */
+export const DIVERSITY_CALIBRATION = CALIBRATION_SURFACE.diversity;
 
 export interface DiversityComponents {
   adjacency: number;
@@ -233,6 +241,7 @@ function adjacencyEdges(
   matches: readonly RoomMatch[],
   fromA: boolean,
   transform: RectTransform,
+  calibration: ScoringCalibrationSurface = CALIBRATION_SURFACE,
 ): Map<string, number> {
   const roomPlacements = placements(layout, project);
   const edges = new Map<string, number>();
@@ -241,7 +250,7 @@ function adjacencyEdges(
       const a = roomPlacements[first];
       const b = roomPlacements[second];
       const length = sharedWallLength(transform(a.space.rect), transform(b.space.rect));
-      if (length < MIN_MEANINGFUL_SHARED_WALL_UNITS) continue;
+      if (length < calibration.diversity.adjacencyThresholdUnits) continue;
       const firstId = mappedRoomId(a.room.id, matches, fromA);
       const secondId = mappedRoomId(b.room.id, matches, fromA);
       if (firstId === secondId) continue;
@@ -249,7 +258,7 @@ function adjacencyEdges(
       // Keep the actual meaningful wall length as the edge weight.  Scaling
       // only by the one-metre threshold and then clamping would make a 1 m
       // and a 5 m shared wall indistinguishable to weighted Jaccard.
-      edges.set(key, length / MIN_MEANINGFUL_SHARED_WALL_UNITS);
+      edges.set(key, length / calibration.diversity.adjacencyThresholdUnits);
     }
   }
   return edges;
@@ -332,10 +341,11 @@ function oneWayComparison(
   b: Layout,
   project: NormalizedProject,
   transformB: RectTransform,
+  calibration: ScoringCalibrationSurface = CALIBRATION_SURFACE,
 ): OneWayComparison {
   const matches = matchRooms(a, b, project, transformB);
-  const firstEdges = adjacencyEdges(a, project, matches, true, identityTransform);
-  const secondEdges = adjacencyEdges(b, project, matches, false, transformB);
+  const firstEdges = adjacencyEdges(a, project, matches, true, identityTransform, calibration);
+  const secondEdges = adjacencyEdges(b, project, matches, false, transformB, calibration);
   const adjacency = weightedJaccardDistance(firstEdges, secondEdges);
   const centroid = centroidDistance(a, b, project, matches, transformB);
   const footprint = 1 - iou(a.footprint, transformB(b.footprint));
@@ -351,10 +361,10 @@ function oneWayComparison(
   return {
     components,
     distance: clamp01(
-      0.45 * components.adjacency +
-      0.35 * components.centroid +
-      0.10 * components.footprint +
-      0.10 * components.circulation,
+      calibration.diversity.adjacencyWeight * components.adjacency +
+      calibration.diversity.centroidWeight * components.centroid +
+      calibration.diversity.footprintWeight * components.footprint +
+      calibration.diversity.circulationWeight * components.circulation,
     ),
     matches,
   };
@@ -365,16 +375,22 @@ export function compareLayoutDiversity(
   a: Layout,
   b: Layout,
   project: NormalizedProject,
-  threshold = DEFAULT_DIVERSITY_THRESHOLD,
+  threshold: number | undefined = undefined,
+  calibration: ScoringCalibrationSurface = CALIBRATION_SURFACE,
 ): DiversityComparison {
-  if (!Number.isFinite(threshold) || threshold < 0 || threshold > 1) {
+  assertCalibrationSurface(calibration);
+  const effectiveThreshold = threshold ?? calibration.diversity.threshold;
+  if (!Number.isFinite(effectiveThreshold) || effectiveThreshold < 0 || effectiveThreshold > 1) {
     throw new RangeError("diversity threshold must be between 0 and 1");
   }
-  const direct = oneWayComparison(a, b, project, identityTransform);
+  // A custom calibration is a scoring policy only. It is checked here before
+  // its coefficients can affect comparison; it never participates in hard
+  // validation or candidate feasibility.
+  const direct = oneWayComparison(a, b, project, identityTransform, calibration);
   let best = direct;
   let mirroredComparison = false;
   if (!MIRRORED_LAYOUTS_COUNT_AS_DISTINCT) {
-    const mirrored = oneWayComparison(a, b, project, mirrorTransform(b, project));
+    const mirrored = oneWayComparison(a, b, project, mirrorTransform(b, project), calibration);
     if (mirrored.distance < best.distance || mirrored.distance === best.distance && JSON.stringify(mirrored.components) < JSON.stringify(best.components)) {
       best = mirrored;
       mirroredComparison = true;
@@ -384,8 +400,8 @@ export function compareLayoutDiversity(
     version: DIVERSITY_VERSION,
     distance: best.distance,
     components: best.components,
-    threshold,
-    diverse: best.distance >= threshold,
+    threshold: effectiveThreshold,
+    diverse: best.distance >= effectiveThreshold,
     mirroredComparison,
     matchedRooms: best.matches,
   };
@@ -475,6 +491,7 @@ function isScoredCandidate(value: CandidateInput): value is ScoredLayoutCandidat
 function resolveScoredCandidates(
   candidates: readonly CandidateInput[],
   project: NormalizedProject,
+  calibration: ScoringCalibrationSurface = CALIBRATION_SURFACE,
 ): ScoredLayoutCandidate[] {
   // Accept raw layouts, scorecard sets, or a mixture.  The latter is useful to
   // callers that have cached analysis for some candidates but not others; a
@@ -484,7 +501,7 @@ function resolveScoredCandidates(
   for (const candidate of candidates) {
     const scored = isScoredCandidate(candidate)
       ? candidate
-      : scoreCandidates([candidate], project)[0];
+      : scoreCandidates([candidate], project, { calibration })[0];
     if (scored?.valid) resolved.push(scored);
   }
 
@@ -522,13 +539,14 @@ function assignmentObjective(
   selected: readonly { candidate: ScoredLayoutCandidate; strategy: StrategyProfileId }[],
   project: NormalizedProject,
   threshold: number,
+  calibration: ScoringCalibrationSurface = CALIBRATION_SURFACE,
 ): { valid: boolean; objective: number; distances: SelectionPairDistance[] } {
   const distances: SelectionPairDistance[] = [];
   for (let first = 0; first < selected.length; first += 1) {
     for (let second = first + 1; second < selected.length; second += 1) {
       const a = selected[first].candidate.layout;
       const b = selected[second].candidate.layout;
-      const comparison = compareLayoutDiversity(a, b, project, threshold);
+      const comparison = compareLayoutDiversity(a, b, project, threshold, calibration);
       distances.push({ a: a.id, b: b.id, distance: comparison.distance, diverse: comparison.diverse });
       if (!comparison.diverse) return { valid: false, objective: Number.NEGATIVE_INFINITY, distances };
     }
@@ -540,7 +558,11 @@ function assignmentObjective(
   const averageDistance = distances.length === 0
     ? 0
     : distances.reduce((total, item) => total + item.distance, 0) / distances.length;
-  return { valid: true, objective: score + 0.5 * averageDistance, distances };
+  return {
+    valid: true,
+    objective: score + calibration.diversity.selectionDiversityBonus * averageDistance,
+    distances,
+  };
 }
 
 function betterAssignment(
@@ -560,13 +582,19 @@ function betterAssignment(
 export function selectDiverseTriplet(
   candidates: readonly CandidateInput[],
   project: NormalizedProject,
-  options: { threshold?: number; shortlistSize?: number } = {},
+  options: {
+    threshold?: number;
+    shortlistSize?: number;
+    calibration?: ScoringCalibrationSurface;
+  } = {},
 ): TripletSelection {
-  const threshold = options.threshold ?? DEFAULT_DIVERSITY_THRESHOLD;
+  const calibration = options.calibration ?? CALIBRATION_SURFACE;
+  assertCalibrationSurface(calibration);
+  const threshold = options.threshold ?? calibration.diversity.threshold;
   if (!Number.isFinite(threshold) || threshold < 0 || threshold > 1) {
     throw new RangeError("diversity threshold must be between 0 and 1");
   }
-  const scored = resolveScoredCandidates(candidates, project);
+  const scored = resolveScoredCandidates(candidates, project, calibration);
   const diagnostics: SelectionDiagnostic[] = [];
   if (scored.length === 0) {
     diagnostics.push({ code: "NO_VALID_CANDIDATES", message: "no hard-valid candidates are available for strategy selection", candidateCount: 0, threshold });
@@ -587,7 +615,7 @@ export function selectDiverseTriplet(
     (!Number.isSafeInteger(options.shortlistSize) || options.shortlistSize <= 0)) {
     throw new RangeError("shortlist size must be a positive safe integer");
   }
-  const shortlistSize = Math.min(scored.length, options.shortlistSize ?? 24);
+  const shortlistSize = Math.min(scored.length, options.shortlistSize ?? calibration.diversity.shortlistSize);
   const pools = Object.fromEntries(STRATEGY_PROFILE_IDS.map((strategy) => [strategy, [...scored]
     .sort((a, b) => b.scorecards[strategy].overallUtility - a.scorecards[strategy].overallUtility || compareText(a.layout.id, b.layout.id))
     .slice(0, shortlistSize)])) as Record<StrategyProfileId, ScoredLayoutCandidate[]>;
@@ -602,7 +630,7 @@ export function selectDiverseTriplet(
           { candidate: second, strategy: "bestFlow" as const },
           { candidate: third, strategy: "balanced" as const },
         ];
-        const result = assignmentObjective(assignment, project, threshold);
+        const result = assignmentObjective(assignment, project, threshold, calibration);
         if (!result.valid) continue;
         const ids = assignment.map((item) => item.candidate.layout.id);
         if (betterAssignment(bestTriple, result.objective, ids)) {
@@ -647,7 +675,7 @@ export function selectDiverseTriplet(
           { candidate: first, strategy: firstStrategy },
           { candidate: second, strategy: secondStrategy },
         ];
-        const result = assignmentObjective(assignment, project, threshold);
+        const result = assignmentObjective(assignment, project, threshold, calibration);
         if (!result.valid) continue;
         const ids = assignment.map((item) => item.candidate.layout.id);
         if (betterAssignment(bestPair, result.objective, ids)) {

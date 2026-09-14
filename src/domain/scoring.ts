@@ -15,64 +15,38 @@ import {
   validateLayout,
   validationMatchesInput,
   type ValidationResult,
-  type ValidationViolation,
 } from "./validation.ts";
+import {
+  CALIBRATION_SURFACE,
+  CALIBRATED_STRATEGY_PROFILE_IDS,
+  assertCalibrationSurface,
+  strategyWeightTotals,
+  type StrategyProfileCalibration,
+  type CalibratedStrategyProfileId,
+  type StrategyTradeoffDescriptor,
+  type ScoringCalibrationSurface,
+} from "./calibration.ts";
 
-export const SCORING_VERSION = "planlab-scoring-0.5";
+export const SCORING_VERSION = "planlab-scoring-0.6";
 
-export type StrategyProfileId = "compactEfficiency" | "bestFlow" | "balanced";
+export type StrategyProfileId = CalibratedStrategyProfileId;
 
-export interface StrategyProfile {
-  id: StrategyProfileId;
-  label: "Compact Efficiency" | "Best Flow" | "Balanced";
-  weights: Readonly<Record<MetricCategory, number>>;
-}
+export type StrategyProfile = StrategyProfileCalibration;
 
-/** Initial hypotheses from SCORING_SYSTEM.md. Weights sum to one. */
-export const STRATEGY_PROFILES: Readonly<Record<StrategyProfileId, StrategyProfile>> = Object.freeze({
-  compactEfficiency: Object.freeze({
-    id: "compactEfficiency",
-    label: "Compact Efficiency",
-    weights: Object.freeze({
-      programSpace: 0.40,
-      flow: 0.20,
-      relationships: 0.15,
-      liveability: 0.10,
-      servicesSite: 0.15,
-    }),
-  }),
-  bestFlow: Object.freeze({
-    id: "bestFlow",
-    label: "Best Flow",
-    weights: Object.freeze({
-      programSpace: 0.15,
-      flow: 0.40,
-      relationships: 0.25,
-      liveability: 0.15,
-      servicesSite: 0.05,
-    }),
-  }),
-  balanced: Object.freeze({
-    id: "balanced",
-    label: "Balanced",
-    weights: Object.freeze({
-      programSpace: 0.25,
-      flow: 0.25,
-      relationships: 0.20,
-      liveability: 0.20,
-      servicesSite: 0.10,
-    }),
-  }),
-});
+/** Initial hypotheses from SCORING_SYSTEM.md, owned by the calibration surface. */
+export const STRATEGY_PROFILES: Readonly<Record<StrategyProfileId, StrategyProfile>> = CALIBRATION_SURFACE.profiles;
 
-export const STRATEGY_PROFILE_IDS: readonly StrategyProfileId[] = [
-  "compactEfficiency",
-  "bestFlow",
-  "balanced",
-] as const;
+export const STRATEGY_PROFILE_IDS: readonly StrategyProfileId[] = CALIBRATED_STRATEGY_PROFILE_IDS;
 
 export const SCORE_PROFILES = STRATEGY_PROFILES;
 export const strategyProfiles = STRATEGY_PROFILES;
+
+/** The calibrated semantic strategy language shown alongside score evidence. */
+export const STRATEGY_TRADEOFFS: Readonly<Record<StrategyProfileId, StrategyTradeoffDescriptor>> =
+  CALIBRATION_SURFACE.tradeoffs;
+
+/** Stable, inspectable totals for calibration review and diagnostics. */
+export const STRATEGY_WEIGHT_TOTALS = Object.freeze(strategyWeightTotals(CALIBRATION_SURFACE));
 
 export interface ScoreExplanation {
   category?: MetricCategory;
@@ -84,6 +58,7 @@ export interface ScoreExplanation {
 
 export interface LayoutScorecard {
   scoreModelVersion: string;
+  calibrationVersion: string;
   profileId: StrategyProfileId;
   profile: StrategyProfile;
   /** Display score is whole-number by design; utility keeps ranking precision. */
@@ -99,11 +74,14 @@ export interface LayoutScorecard {
   metrics: LayoutMetrics;
   categories: Record<MetricCategory, CategoryMetrics>;
   categoryScores: Record<MetricCategory, number>;
+  /** Semantic strategy trade-off descriptor; presentation supplies wording. */
+  tradeoffs: readonly StrategyTradeoffDescriptor[];
   explanations: ScoreExplanation[];
 }
 
 export interface LayoutScorecardSet {
   layout: Layout;
+  calibrationVersion: string;
   valid: boolean;
   validation: ValidationResult;
   ruleReport: ValidationResult;
@@ -117,6 +95,8 @@ export interface LayoutScorecardSet {
 export interface ScoreCandidatesOptions {
   includeInvalid?: boolean;
   factsByLayoutId?: Readonly<Record<string, LayoutFacts>>;
+  /** Optional reviewed calibration; hard validation is never sourced from it. */
+  calibration?: ScoringCalibrationSurface;
 }
 
 function clamp01(value: number): number {
@@ -129,7 +109,7 @@ function compareText(a: string, b: string): number {
 }
 
 function profileId(value: StrategyProfileId | string | undefined): StrategyProfileId {
-  switch ((value ?? "balanced").toLowerCase().replace(/[\s_]+/g, "")) {
+  switch ((value ?? "balanced").toLowerCase().replace(/[\s_-]+/g, "")) {
     case "compact":
     case "compactefficiency":
     case "compact-efficiency":
@@ -189,7 +169,7 @@ export function selectExplanations(
   validation: ValidationResult,
   metrics: LayoutMetrics,
   profile: StrategyProfile,
-  limit = 10,
+  limit = CALIBRATION_SURFACE.explanations.defaultLimit,
 ): ScoreExplanation[] {
   if (!Number.isSafeInteger(limit) || limit <= 0) {
     throw new RangeError("explanation limit must be a positive safe integer");
@@ -264,8 +244,10 @@ function createScorecard(
   facts: LayoutFacts,
   metrics: LayoutMetrics,
   id: StrategyProfileId,
+  calibration: ScoringCalibrationSurface = CALIBRATION_SURFACE,
 ): LayoutScorecard {
-  const profile = STRATEGY_PROFILES[id];
+  assertCalibrationSurface(calibration);
+  const profile = calibration.profiles[id];
   const valid = validation.valid;
   const categories = metrics.categories;
   const categoryScores = Object.fromEntries(
@@ -280,6 +262,7 @@ function createScorecard(
   const overallScore = Math.round(clamp01(overallUtility) * 100);
   return {
     scoreModelVersion: SCORING_VERSION,
+    calibrationVersion: calibration.version,
     profileId: id,
     profile,
     overallScore,
@@ -293,7 +276,8 @@ function createScorecard(
     metrics,
     categories,
     categoryScores,
-    explanations: selectExplanations(validation, metrics, profile),
+    tradeoffs: [calibration.tradeoffs[id]],
+    explanations: selectExplanations(validation, metrics, profile, calibration.explanations.defaultLimit),
   };
 }
 
@@ -308,14 +292,16 @@ export function scoreLayout(
   strategy: StrategyProfileId | string = "balanced",
   facts?: LayoutFacts,
   validation?: ValidationResult,
+  calibration: ScoringCalibrationSurface = CALIBRATION_SURFACE,
 ): LayoutScorecard {
+  assertCalibrationSurface(calibration);
   const id = profileId(strategy);
   const hard = validation && validationMatchesInput(validation, layout, project)
     ? validation
     : validateLayout(layout, project);
   const derivedFacts = facts ?? computeLayoutFacts(layout, project, hard);
-  const metrics = evaluateLayoutMetrics(layout, project, derivedFacts);
-  return createScorecard(layout, hard, derivedFacts, metrics, id);
+  const metrics = evaluateLayoutMetrics(layout, project, derivedFacts, calibration.metricConfig);
+  return createScorecard(layout, hard, derivedFacts, metrics, id, calibration);
 }
 
 export const calculateScore = scoreLayout;
@@ -327,17 +313,20 @@ export function scoreLayoutProfiles(
   project: NormalizedProject,
   facts?: LayoutFacts,
   validation?: ValidationResult,
+  calibration: ScoringCalibrationSurface = CALIBRATION_SURFACE,
 ): LayoutScorecardSet {
+  assertCalibrationSurface(calibration);
   const hard = validation && validationMatchesInput(validation, layout, project)
     ? validation
     : validateLayout(layout, project);
   const derivedFacts = facts ?? computeLayoutFacts(layout, project, hard);
-  const metrics = evaluateLayoutMetrics(layout, project, derivedFacts);
+  const metrics = evaluateLayoutMetrics(layout, project, derivedFacts, calibration.metricConfig);
   const scorecards = Object.fromEntries(
-    STRATEGY_PROFILE_IDS.map((id) => [id, createScorecard(layout, hard, derivedFacts, metrics, id)]),
+    STRATEGY_PROFILE_IDS.map((id) => [id, createScorecard(layout, hard, derivedFacts, metrics, id, calibration)]),
   ) as Record<StrategyProfileId, LayoutScorecard>;
   return {
     layout,
+    calibrationVersion: calibration.version,
     valid: hard.valid,
     validation: hard,
     ruleReport: hard,
@@ -362,12 +351,14 @@ export function scoreCandidates(
   project: NormalizedProject,
   options: ScoreCandidatesOptions = {},
 ): ScoredLayoutCandidate[] {
+  const calibration = options.calibration ?? CALIBRATION_SURFACE;
+  assertCalibrationSurface(calibration);
   const result: ScoredLayoutCandidate[] = [];
   for (const layout of layouts) {
     const validation = validateLayout(layout, project);
     if (!options.includeInvalid && !validation.valid) continue;
     const facts = options.factsByLayoutId?.[layout.id] ?? computeLayoutFacts(layout, project, validation);
-    const set = scoreLayoutProfiles(layout, project, facts, validation);
+    const set = scoreLayoutProfiles(layout, project, facts, validation, calibration);
     result.push({
       ...set,
       id: layout.id,

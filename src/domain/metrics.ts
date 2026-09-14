@@ -209,6 +209,11 @@ export interface MetricConfig {
   unacceptableCirculationRatio: number;
   privateDepthTargetUnits: number;
   deadEndBaselineComponents: number;
+  /** Semantic observation cutoffs; presentation decides how to word them. */
+  strongObservationUtilityThreshold: number;
+  weakObservationUtilityThreshold: number;
+  /** Soft avoidance uses the same meaningful-wall unit as adjacency evidence. */
+  avoidanceSharedWallThresholdUnits: number;
 }
 
 export const METRIC_CONFIG: Readonly<MetricConfig> = Object.freeze({
@@ -230,6 +235,9 @@ export const METRIC_CONFIG: Readonly<MetricConfig> = Object.freeze({
   unacceptableCirculationRatio: 0.35,
   privateDepthTargetUnits: 16,
   deadEndBaselineComponents: 1,
+  strongObservationUtilityThreshold: 0.75,
+  weakObservationUtilityThreshold: 0.45,
+  avoidanceSharedWallThresholdUnits: MIN_MEANINGFUL_SHARED_WALL_UNITS,
 });
 
 function clamp01(value: number): number {
@@ -677,10 +685,11 @@ function metricObservation(
   utility: number,
   values: Record<string, string | number>,
   evidenceRefs: string[],
+  config: MetricConfig = METRIC_CONFIG,
 ): MetricObservation[] {
   const bounded = clamp01(utility);
   const impact = bounded - 0.5;
-  if (bounded >= 0.75) {
+  if (bounded >= config.strongObservationUtilityThreshold) {
     return [{
       key: `${category}.${id}.strong`,
       values,
@@ -690,7 +699,7 @@ function metricObservation(
       message: { key: `${category}.${id}.strong`, values },
     }];
   }
-  if (bounded <= 0.45) {
+  if (bounded <= config.weakObservationUtilityThreshold) {
     return [{
       key: `${category}.${id}.weak`,
       values,
@@ -711,6 +720,7 @@ function makeMetric(
   values: Record<string, string | number>,
   evidenceRefs: string[],
   target?: number,
+  config: MetricConfig = METRIC_CONFIG,
 ): MetricValue {
   const bounded = clamp01(utility);
   const notApplicable = evidenceRefs.some((reference) => reference.includes(":notApplicable"));
@@ -722,7 +732,7 @@ function makeMetric(
     evidenceRefs,
     // A neutral score for an absent optional feature is useful for category
     // aggregation, but must not be presented as a positive design finding.
-    observations: notApplicable ? [] : metricObservation(category, id, bounded, values, evidenceRefs),
+    observations: notApplicable ? [] : metricObservation(category, id, bounded, values, evidenceRefs, config),
   };
 }
 
@@ -743,6 +753,7 @@ function category(
 function averageRelationshipUtility(
   project: NormalizedProject,
   facts: LayoutFacts,
+  config: MetricConfig = METRIC_CONFIG,
 ): { utility: number; observations: MetricObservation[]; rawCount: number } {
   const utilities: number[] = [];
   const observations: MetricObservation[] = [];
@@ -762,27 +773,27 @@ function averageRelationshipUtility(
         let measure = "distanceUnits";
         let raw = distance;
         let target = relationship.targetDistanceM === undefined
-          ? METRIC_CONFIG.defaultNearTargetUnits
+          ? config.defaultNearTargetUnits
           : relationship.targetDistanceM / GRID_UNIT_METRES;
         if (relationship.kind === "preferShareWall") {
           utility = adjacencyUtility(
             shared,
             relationship.minSharedWallM === undefined
-              ? METRIC_CONFIG.defaultAdjacencyTargetUnits
+              ? config.defaultAdjacencyTargetUnits
               : relationship.minSharedWallM / GRID_UNIT_METRES,
           );
           measure = "sharedWallUnits";
           raw = shared;
           target = relationship.minSharedWallM === undefined
-            ? METRIC_CONFIG.defaultAdjacencyTargetUnits
+            ? config.defaultAdjacencyTargetUnits
             : relationship.minSharedWallM / GRID_UNIT_METRES;
         } else if (relationship.kind === "preferNear") {
           utility = nearnessUtility(distance, target);
         } else if (relationship.kind === "avoidShareWall") {
-          utility = shared >= MIN_MEANINGFUL_SHARED_WALL_UNITS ? 0 : 1;
+          utility = shared >= config.avoidanceSharedWallThresholdUnits ? 0 : 1;
           measure = "sharedWallUnits";
           raw = shared;
-          target = MIN_MEANINGFUL_SHARED_WALL_UNITS;
+          target = config.avoidanceSharedWallThresholdUnits;
         } else if (relationship.kind === "keepSeparate") {
           utility = separationUtility(distance, target);
         }
@@ -793,6 +804,7 @@ function averageRelationshipUtility(
           utility,
           { from: first.displayName, to: second.displayName, [measure]: raw, targetUnits: target },
           [`relationship:${relationship.id}`, `room:${first.instanceId}`, `room:${second.instanceId}`],
+          config,
         ));
       }
     }
@@ -818,7 +830,7 @@ function bedroomGroupingUtility(facts: LayoutFacts, project: NormalizedProject):
   return clamp01(1 - dispersion);
 }
 
-function wetClusteringUtility(facts: LayoutFacts): number {
+function wetClusteringUtility(facts: LayoutFacts, config: MetricConfig = METRIC_CONFIG): number {
   const wet = facts.roomFacts.filter((fact) => fact.wet);
   if (wet.length < 2) return 1;
   const values: number[] = [];
@@ -829,21 +841,21 @@ function wetClusteringUtility(facts: LayoutFacts): number {
           candidate.b === (wet[first].instanceId < wet[second].instanceId ? wet[second].instanceId : wet[first].instanceId),
         )?.lengthUnits ?? 0;
       const distance = distanceFor(facts.roomDistances, wet[first].instanceId, wet[second].instanceId);
-      const distanceUtility = nearnessUtility(distance, METRIC_CONFIG.wetClusteringDistanceTargetUnits);
+      const distanceUtility = nearnessUtility(distance, config.wetClusteringDistanceTargetUnits);
       // A useful shared wall is a positive clustering bonus.  Keep both
       // signals bounded so a pair cannot contribute more than one unit of
       // utility when it is both adjacent and near.
-      values.push(clamp01(adjacencyUtility(shared) + distanceUtility));
+      values.push(clamp01(adjacencyUtility(shared, config.defaultAdjacencyTargetUnits) + distanceUtility));
     }
   }
   return average(values);
 }
 
-function roomTargetExterior(room: RoomInstance): number {
+function roomTargetExterior(room: RoomInstance, config: MetricConfig = METRIC_CONFIG): number {
   switch (room.traits.exteriorPreference) {
-    case "high": return METRIC_CONFIG.exteriorTargetHighUnits;
-    case "medium": return METRIC_CONFIG.exteriorTargetMediumUnits;
-    case "low": return METRIC_CONFIG.exteriorTargetLowUnits;
+    case "high": return config.exteriorTargetHighUnits;
+    case "medium": return config.exteriorTargetMediumUnits;
+    case "low": return config.exteriorTargetLowUnits;
     default: return 0;
   }
 }
@@ -1020,6 +1032,7 @@ export function evaluateLayoutMetrics(
   layout: Layout,
   project: NormalizedProject,
   facts = computeLayoutFacts(layout, project),
+  config: MetricConfig = METRIC_CONFIG,
 ): LayoutMetrics {
   const roomById = new Map(project.rooms.map((room) => [room.id, room]));
   const placedRooms = facts.roomFacts.filter((fact) => roomById.has(fact.instanceId));
@@ -1029,16 +1042,21 @@ export function evaluateLayoutMetrics(
   });
   const preferredUtilities = preferredRooms.map((fact) => {
     const room = roomById.get(fact.instanceId)!;
-    return preferredAreaUtility(fact.areaUnits2, room.dimensions.preferredAreaUnits2!);
+    return preferredAreaUtility(
+      fact.areaUnits2,
+      room.dimensions.preferredAreaUnits2!,
+      config.preferredAreaOversizeTolerance,
+      config.preferredAreaZeroUtilityRatio,
+    );
   });
   const aspectUtilities = placedRooms.map((fact) => {
     const room = roomById.get(fact.instanceId)!;
     return aspectUtility(
       fact.aspectRatio,
       room.dimensions.maxAspectRatio === undefined
-        ? METRIC_CONFIG.defaultPreferredAspectRatio
-        : Math.min(METRIC_CONFIG.defaultPreferredAspectRatio, room.dimensions.maxAspectRatio),
-      room.dimensions.maxAspectRatio ?? METRIC_CONFIG.defaultHardAspectRatio,
+        ? config.defaultPreferredAspectRatio
+        : Math.min(config.defaultPreferredAspectRatio, room.dimensions.maxAspectRatio),
+      room.dimensions.maxAspectRatio ?? config.defaultHardAspectRatio,
     );
   });
   const program = category("programSpace", [
@@ -1051,6 +1069,8 @@ export function evaluateLayoutMetrics(
       preferredRooms.length > 0
         ? preferredRooms.map((fact) => `room:${fact.instanceId}:area`)
         : ["program:preferredArea:notApplicable"],
+      undefined,
+      config,
     ),
     makeMetric(
       "programSpace",
@@ -1061,6 +1081,8 @@ export function evaluateLayoutMetrics(
       placedRooms.length > 0
         ? placedRooms.map((fact) => `room:${fact.instanceId}:aspect`)
         : ["program:proportion:notApplicable"],
+      undefined,
+      config,
     ),
     makeMetric(
       "programSpace",
@@ -1070,6 +1092,7 @@ export function evaluateLayoutMetrics(
       { unallocatedRatio: facts.unallocatedInteriorRatio, unallocatedAreaUnits2: facts.unallocatedInteriorAreaUnits2 },
       ["footprint:unallocated"],
       project.planning.maxUnallocatedInteriorRatio,
+      config,
     ),
     makeMetric(
       "programSpace",
@@ -1085,13 +1108,14 @@ export function evaluateLayoutMetrics(
       },
       ["footprint:targetGfa"],
       facts.targetGfaUnits2,
+      config,
     ),
   ]);
 
   const routeValues = project.rooms
     .map((room) => facts.routeDistancesUnits[room.id])
     .filter((distance): distance is number => distance !== null && Number.isFinite(distance));
-  const routeUtilities = routeValues.map((distance) => nearnessUtility(distance, METRIC_CONFIG.routeDistanceTargetUnits));
+  const routeUtilities = routeValues.map((distance) => nearnessUtility(distance, config.routeDistanceTargetUnits));
   const circulation = category("flow", [
     makeMetric(
       "flow",
@@ -1100,15 +1124,22 @@ export function evaluateLayoutMetrics(
       facts.reachabilityQuality,
       { reachableRequiredRooms: facts.reachableRequiredRoomCount, requiredRooms: facts.requiredRoomCount },
       ["access:reachability"],
+      undefined,
+      config,
     ),
     makeMetric(
       "flow",
       "circulationRatio",
-      circulationRatioUtility(facts.circulationRatio),
+      circulationRatioUtility(
+        facts.circulationRatio,
+        config.targetCirculationRatio,
+        config.unacceptableCirculationRatio,
+      ),
       facts.circulationRatio,
       { circulationAreaUnits2: facts.circulationAreaUnits2, footprintAreaUnits2: facts.footprintAreaUnits2, ratio: facts.circulationRatio },
       ["circulation:area"],
-      METRIC_CONFIG.targetCirculationRatio,
+      config.targetCirculationRatio,
+      config,
     ),
     makeMetric(
       "flow",
@@ -1119,21 +1150,25 @@ export function evaluateLayoutMetrics(
       project.rooms.length > 0
         ? project.rooms.map((room) => `route:${room.id}`)
         : ["route:notApplicable"],
+      undefined,
+      config,
     ),
     makeMetric(
       "flow",
       "deadEnds",
       1 - clamp01(facts.deadEndCount / Math.max(
-        METRIC_CONFIG.deadEndBaselineComponents,
-        facts.circulationComponentCount + METRIC_CONFIG.deadEndBaselineComponents,
+        config.deadEndBaselineComponents,
+        facts.circulationComponentCount + config.deadEndBaselineComponents,
       )),
       facts.deadEndCount,
       { deadEndCount: facts.deadEndCount, circulationComponents: facts.circulationComponentCount },
       ["circulation:deadEnds"],
+      undefined,
+      config,
     ),
   ]);
 
-  const relationship = averageRelationshipUtility(project, facts);
+  const relationship = averageRelationshipUtility(project, facts, config);
   const relationships = category("relationships", [
     makeMetric(
       "relationships",
@@ -1142,6 +1177,8 @@ export function evaluateLayoutMetrics(
       relationship.rawCount,
       { evaluatedPairs: relationship.rawCount },
       relationship.rawCount > 0 ? ["relationships:declared"] : ["relationships:declared:notApplicable"],
+      undefined,
+      config,
     ),
     makeMetric(
       "relationships",
@@ -1152,26 +1189,28 @@ export function evaluateLayoutMetrics(
       facts.roomFacts.filter((fact) => fact.kind === "bedroom").length > 1
         ? facts.roomFacts.filter((fact) => fact.kind === "bedroom").map((fact) => `room:${fact.instanceId}:centre`)
         : ["relationships:bedroomGrouping:notApplicable"],
+      undefined,
+      config,
     ),
   ]);
   relationships.observations.push(...relationship.observations);
 
   const exteriorUtilities = placedRooms.map((fact) => {
     const room = roomById.get(fact.instanceId)!;
-    const target = roomTargetExterior(room);
+    const target = roomTargetExterior(room, config);
     return target === 0 ? 1 : exteriorUtility(fact.exteriorContactUnits, target);
   });
   const orientationRooms = placedRooms.filter((fact) => fact.kind === "living" || fact.kind === "dining");
   const northUtilities = orientationRooms.map((fact) => exteriorUtility(
     fact.exteriorContactBySide.north,
-    Math.max(1, Math.min(fact.rect.width, METRIC_CONFIG.northOpportunityTargetUnits)),
+    Math.max(1, Math.min(fact.rect.width, config.northOpportunityTargetUnits)),
   ));
   const privateRooms = placedRooms.filter((fact) => fact.zone === "private");
   const privateDepthUtilities = privateRooms.map((fact) => {
     const distance = facts.routeDistancesUnits[fact.instanceId];
     return distance === null || distance === undefined
       ? 0
-      : clamp01(distance / METRIC_CONFIG.privateDepthTargetUnits);
+      : clamp01(distance / config.privateDepthTargetUnits);
   });
   const liveability = category("liveability", [
     makeMetric(
@@ -1183,6 +1222,8 @@ export function evaluateLayoutMetrics(
       placedRooms.length > 0
         ? placedRooms.map((fact) => `room:${fact.instanceId}:exterior`)
         : ["room:exterior:notApplicable"],
+      undefined,
+      config,
     ),
     makeMetric(
       "liveability",
@@ -1193,6 +1234,8 @@ export function evaluateLayoutMetrics(
       orientationRooms.length > 0
         ? orientationRooms.map((fact) => `room:${fact.instanceId}:north`)
         : ["room:north:notApplicable"],
+      undefined,
+      config,
     ),
     makeMetric(
       "liveability",
@@ -1203,6 +1246,8 @@ export function evaluateLayoutMetrics(
       privateRooms.length > 0
         ? privateRooms.map((fact) => `route:${fact.instanceId}`)
         : ["privacy:notApplicable"],
+      undefined,
+      config,
     ),
   ]);
 
@@ -1216,13 +1261,13 @@ export function evaluateLayoutMetrics(
     const related = placedRooms.filter((fact) => ["kitchen", "laundry"].includes(fact.kind));
     const near = related.map((fact) => nearnessUtility(
       distanceFor(facts.roomDistances, garage.instanceId, fact.instanceId),
-      METRIC_CONFIG.garageDistanceTargetUnits,
+      config.garageDistanceTargetUnits,
     ));
     const entryNear = entryFacts.length === 0
       ? 1
       : Math.max(...entryFacts.map((fact) => nearnessUtility(
         boundaryDistance(garage.rect, fact.rect),
-        METRIC_CONFIG.garageDistanceTargetUnits,
+        config.garageDistanceTargetUnits,
       )));
     return [average(near), entryNear];
   });
@@ -1234,12 +1279,14 @@ export function evaluateLayoutMetrics(
     makeMetric(
       "servicesSite",
       "wetClustering",
-      wetClusteringUtility(facts),
-      wetClusteringUtility(facts),
+      wetClusteringUtility(facts, config),
+      wetClusteringUtility(facts, config),
       { wetRoomCount: serviceRooms.filter((fact) => fact.wet).length },
       serviceRooms.filter((fact) => fact.wet).length > 0
         ? serviceRooms.filter((fact) => fact.wet).map((fact) => `room:${fact.instanceId}:wet`)
         : ["services:wetClustering:notApplicable"],
+      undefined,
+      config,
     ),
     makeMetric(
       "servicesSite",
@@ -1250,6 +1297,8 @@ export function evaluateLayoutMetrics(
       garages.length > 0
         ? garages.map((fact) => `room:${fact.instanceId}:garage`)
         : ["garage:notApplicable"],
+      undefined,
+      config,
     ),
     makeMetric(
       "servicesSite",
@@ -1258,6 +1307,8 @@ export function evaluateLayoutMetrics(
       compactness,
       { widthUnits: footprint?.width ?? 0, depthUnits: footprint?.depth ?? 0 },
       ["footprint:compactness"],
+      undefined,
+      config,
     ),
     makeMetric(
       "servicesSite",
@@ -1270,6 +1321,8 @@ export function evaluateLayoutMetrics(
       facts.planningEfficiency,
       { programmedUsableAreaUnits2: facts.programmedUsableAreaUnits2, footprintMinusGarageUnits2: facts.footprintAreaUnits2 - facts.garageAreaUnits2 },
       ["area:planningEfficiency"],
+      undefined,
+      config,
     ),
   ]);
 

@@ -348,7 +348,7 @@ test("joint selection returns a diverse triplet or an honest partial result", ()
 
 test("diagnostic rendering stays crude, deterministic, and inspectable", () => {
   const diagnostic = createCrudeDiagnostic(layout, project);
-  assert.equal(diagnostic.version, "planlab-diagnostic-0.4");
+  assert.equal(diagnostic.version, "planlab-diagnostic-0.5");
   assert.match(diagnostic.svg, /^<svg /);
   assert.match(diagnostic.svg, /data-space-id="/);
   assert.match(diagnostic.svg, /<title/);

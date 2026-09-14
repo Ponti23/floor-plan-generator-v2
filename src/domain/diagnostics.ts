@@ -11,11 +11,16 @@ import {
   type LayoutScorecardSet,
 } from "./scoring.ts";
 import {
+  CALIBRATION_SURFACE,
+  CALIBRATED_STRATEGY_PROFILE_IDS,
+  type ScoringCalibrationSurface,
+} from "./calibration.ts";
+import {
   validateLayout,
   type ValidationResult,
 } from "./validation.ts";
 
-export const DIAGNOSTIC_VERSION = "planlab-diagnostic-0.4";
+export const DIAGNOSTIC_VERSION = "planlab-diagnostic-0.5";
 
 export interface DiagnosticRenderOptions {
   includeGrid?: boolean;
@@ -29,6 +34,8 @@ export interface CrudeLayoutDiagnostic {
   validation: ValidationResult;
   facts: LayoutFacts;
   scorecards: LayoutScorecardSet;
+  /** Frozen domain calibration copied into diagnostics for architect review. */
+  calibration: ScoringCalibrationSurface;
   svg: string;
   text: string;
 }
@@ -154,6 +161,16 @@ export function renderDiagnosticText(
     `Circulation ratio: ${(facts.circulationRatio * 100).toFixed(1)}%`,
     `Reachability: ${facts.reachableRequiredRoomCount}/${facts.requiredRoomCount} required rooms | Dead ends: ${facts.deadEndCount}`,
     `Portals: ${Array.isArray(layout.portals) ? layout.portals.length : 0}`,
+    `Calibration: ${CALIBRATION_SURFACE.version} | diversity threshold ${CALIBRATION_SURFACE.diversity.threshold}`,
+    "Strategy calibration:",
+    ...CALIBRATED_STRATEGY_PROFILE_IDS.map((id) => {
+      const profile = CALIBRATION_SURFACE.profiles[id];
+      const weights = Object.entries(profile.weights)
+        .map(([category, weight]) => `${category} ${(weight * 100).toFixed(0)}%`)
+        .join(", ");
+      const tradeoff = CALIBRATION_SURFACE.tradeoffs[id];
+      return `- ${profile.label}: ${weights} | ${tradeoff.message.key}`;
+    }),
     "Spaces:",
   ];
   for (const space of validSpaces(layout)) {
@@ -195,6 +212,7 @@ export function createCrudeDiagnostic(
     validation,
     facts,
     scorecards,
+    calibration: CALIBRATION_SURFACE,
     svg: renderDiagnosticSvg(layout, project, { ...options, scorecards }),
     text: renderDiagnosticText(layout, project, facts, validation, scorecards),
   };

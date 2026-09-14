@@ -33,9 +33,11 @@ import { createSeededPrng, hashSeed, type SeededPrng } from "./prng.ts";
 import { isTransitNode } from "./portalGraph.ts";
 import { validateLayout, type ValidationResult } from "./validation.ts";
 import {
+  SCORING_VERSION,
   scoreCandidates,
   type ScoredLayoutCandidate,
 } from "./scoring.ts";
+import { CALIBRATION_SURFACE } from "./calibration.ts";
 import {
   DEFAULT_DIVERSITY_THRESHOLD,
   DIVERSITY_VERSION,
@@ -101,6 +103,8 @@ export interface GenerationResult {
   metadata: {
     engineVersion: string;
     ruleVersion: string;
+    scoringVersion: string;
+    calibrationVersion: string;
     seed: string;
     budget: GenerationBudget;
     expandedStates: number;
@@ -1172,6 +1176,8 @@ export function generateLayouts(
   const emptyMetadata = {
     engineVersion: GENERATOR_ENGINE_VERSION,
     ruleVersion: GENERATOR_RULE_VERSION,
+    scoringVersion: SCORING_VERSION,
+    calibrationVersion: CALIBRATION_SURFACE.version,
     seed,
     budget,
     expandedStates: 0,

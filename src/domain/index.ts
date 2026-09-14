@@ -10,6 +10,7 @@ export * from "./portalGraph.ts";
 export * from "./rules.ts";
 export * from "./validation.ts";
 export * from "./metrics.ts";
+export * from "./calibration.ts";
 export * from "./scoring.ts";
 export * from "./diversity.ts";
 export * from "./diagnostics.ts";
