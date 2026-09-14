@@ -71,6 +71,7 @@ export interface GenerationOptions {
 export interface GenerationDiagnostic {
   code:
     | "NORMALIZATION_FAILED"
+    | "INFEASIBLE"
     | "NO_FOOTPRINT_VARIANT"
     | "NO_VALID_CANDIDATES"
     | "SEARCH_BUDGET_EXCEEDED"
@@ -1131,9 +1132,9 @@ function emptyTripletSelection(
 ): TripletSelection {
   return {
     version: DIVERSITY_VERSION,
-    status: "partial",
+    status: code === "NO_VALID_CANDIDATES" ? "infeasible" : "partial",
     complete: false,
-    partial: true,
+    partial: code !== "NO_VALID_CANDIDATES",
     threshold: DEFAULT_DIVERSITY_THRESHOLD,
     selected: [],
     layouts: [],
@@ -1190,7 +1191,10 @@ export function generateLayouts(
       ok: false,
       layouts: [],
       candidates: [],
-      diagnostics: normalized.normalizationDiagnostics,
+      diagnostics: [
+        ...normalized.normalizationDiagnostics,
+        { code: "INFEASIBLE", message: "the brief is infeasible before candidate search" },
+      ],
       analyses: [],
       scorecards: [],
       selection,
@@ -1208,7 +1212,10 @@ export function generateLayouts(
       ok: false,
       layouts: [],
       candidates: [],
-      diagnostics: [{ code: "NO_FOOTPRINT_VARIANT", message: "no footprint satisfies the envelope, room minimums, and GFA cap" }],
+      diagnostics: [
+        { code: "NO_FOOTPRINT_VARIANT", message: "no footprint satisfies the envelope, room minimums, and GFA cap" },
+        { code: "INFEASIBLE", message: "the brief is infeasible before candidate search" },
+      ],
       analyses: [],
       scorecards: [],
       selection,

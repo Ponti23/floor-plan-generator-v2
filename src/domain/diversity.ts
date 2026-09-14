@@ -24,7 +24,7 @@ import {
   type ScoringCalibrationSurface,
 } from "./calibration.ts";
 
-export const DIVERSITY_VERSION = "planlab-diversity-0.4";
+export const DIVERSITY_VERSION = "planlab-diversity-0.5";
 /** Backwards-compatible alias for the calibrated minimum distance. */
 export const DEFAULT_DIVERSITY_THRESHOLD = CALIBRATION_SURFACE.diversity.threshold;
 /** All approved diversity distance coefficients are inspectable together. */
@@ -82,9 +82,20 @@ function validSpaces(layout: Layout): (PlacedSpace & { rect: GridRect })[] {
 
 function placements(layout: Layout, project: NormalizedProject): RoomPlacement[] {
   const roomById = new Map(project.rooms.map((room) => [room.id, room]));
-  return validSpaces(layout)
+  const result = validSpaces(layout)
     .filter((space) => space.role === "room" && roomById.has(space.instanceId))
     .map((space) => ({ room: roomById.get(space.instanceId)!, space }));
+  // Layout arrays are domain data and may have been assembled in a different
+  // declaration order.  Sort the measurable room placements so all distance
+  // accumulations are independent of that incidental ordering.
+  return result.sort((first, second) =>
+    compareText(groupKey(first.room), groupKey(second.room)) ||
+    compareText(first.room.id, second.room.id) ||
+    first.space.rect.x - second.space.rect.x ||
+    first.space.rect.y - second.space.rect.y ||
+    first.space.rect.width - second.space.rect.width ||
+    first.space.rect.depth - second.space.rect.depth,
+  );
 }
 
 function mirrorTransform(layout: Layout, project: NormalizedProject): RectTransform {
@@ -258,7 +269,10 @@ function adjacencyEdges(
       // Keep the actual meaningful wall length as the edge weight.  Scaling
       // only by the one-metre threshold and then clamping would make a 1 m
       // and a 5 m shared wall indistinguishable to weighted Jaccard.
-      edges.set(key, length / calibration.diversity.adjacencyThresholdUnits);
+      // Retain the raw wall-length signal (longer walls remain more similar),
+      // while capping pathological custom-calibration ratios before they can
+      // overflow the weighted-Jaccard accumulation.
+      edges.set(key, Math.min(Number.MAX_SAFE_INTEGER, length / calibration.diversity.adjacencyThresholdUnits));
     }
   }
   return edges;
@@ -266,11 +280,21 @@ function adjacencyEdges(
 
 function weightedJaccardDistance(first: Map<string, number>, second: Map<string, number>): number {
   const keys = new Set([...first.keys(), ...second.keys()]);
+  if (keys.size === 0) return 0;
+
+  // Scale before accumulating.  A project supplied through the normalized
+  // API is bounded, but a custom calibration may make a shared-wall weight
+  // very large.  Dividing by the largest weight preserves the Jaccard ratio
+  // while keeping both sums finite and the result reproducibly bounded.
+  const weights = [...keys].flatMap((key) => [first.get(key) ?? 0, second.get(key) ?? 0]);
+  const scale = Math.max(1, ...weights.map((value) => Number.isFinite(value) ? Math.max(0, value) : Number.MAX_SAFE_INTEGER));
   let minimum = 0;
   let maximum = 0;
   for (const key of keys) {
-    const a = first.get(key) ?? 0;
-    const b = second.get(key) ?? 0;
+    const rawA = first.get(key) ?? 0;
+    const rawB = second.get(key) ?? 0;
+    const a = (Number.isFinite(rawA) ? Math.min(Number.MAX_SAFE_INTEGER, Math.max(0, rawA)) : Number.MAX_SAFE_INTEGER) / scale;
+    const b = (Number.isFinite(rawB) ? Math.min(Number.MAX_SAFE_INTEGER, Math.max(0, rawB)) : Number.MAX_SAFE_INTEGER) / scale;
     minimum += Math.min(a, b);
     maximum += Math.max(a, b);
   }
@@ -314,7 +338,10 @@ function iou(first: GridRect, second: GridRect): number {
 function circulationRects(layout: Layout): GridRect[] {
   return validSpaces(layout)
     .filter((space) => space.role === "circulation" || space.role === "entry")
-    .map((space) => space.rect);
+    .map((space) => space.rect)
+    .sort((first, second) =>
+      first.x - second.x || first.y - second.y || first.width - second.width || first.depth - second.depth,
+    );
 }
 
 function unionIntersectionArea(first: readonly GridRect[], second: readonly GridRect[]): number {
@@ -334,6 +361,36 @@ interface OneWayComparison {
   distance: number;
   components: DiversityComponents;
   matches: RoomMatch[];
+}
+
+function invertMatches(matches: readonly RoomMatch[]): RoomMatch[] {
+  return matches
+    .map((match) => ({ ...match, a: match.b, b: match.a }))
+    .sort((first, second) => compareText(first.a, second.a) || compareText(first.b, second.b));
+}
+
+/**
+ * Choose one stable orientation for a pair before evaluating its distance.
+ * Room assignment and weighted sums are then performed in exactly the same
+ * order for compare(a, b) and compare(b, a), eliminating direction-dependent
+ * floating-point accumulation while preserving caller-facing match labels.
+ */
+function compareLayoutOrder(a: Layout, b: Layout, project: NormalizedProject): number {
+  // Generated layouts have unique stable ids, so use them as the cheap common
+  // case.  Geometry keys remain the deterministic fallback for callers that
+  // compare hand-built layouts reusing an id.
+  const idOrder = compareText(a.id, b.id);
+  if (idOrder !== 0) return idOrder;
+  const first = canonicalLayoutKey(a, project);
+  const second = canonicalLayoutKey(b, project);
+  if (first !== second) return compareText(first, second);
+
+  // Canonical keys intentionally collapse mirrors.  A direct geometry key
+  // gives mirror pairs a deterministic tie-break before falling back to the
+  // persisted layout id; equal geometry remains equivalent in either order.
+  const directFirst = layoutGeometryKey(a, project, identityTransform);
+  const directSecond = layoutGeometryKey(b, project, identityTransform);
+  return compareText(directFirst, directSecond);
 }
 
 function oneWayComparison(
@@ -386,11 +443,14 @@ export function compareLayoutDiversity(
   // A custom calibration is a scoring policy only. It is checked here before
   // its coefficients can affect comparison; it never participates in hard
   // validation or candidate feasibility.
-  const direct = oneWayComparison(a, b, project, identityTransform, calibration);
+  const swapped = compareLayoutOrder(a, b, project) > 0;
+  const first = swapped ? b : a;
+  const second = swapped ? a : b;
+  const direct = oneWayComparison(first, second, project, identityTransform, calibration);
   let best = direct;
   let mirroredComparison = false;
   if (!MIRRORED_LAYOUTS_COUNT_AS_DISTINCT) {
-    const mirrored = oneWayComparison(a, b, project, mirrorTransform(b, project), calibration);
+    const mirrored = oneWayComparison(first, second, project, mirrorTransform(second, project), calibration);
     if (mirrored.distance < best.distance || mirrored.distance === best.distance && JSON.stringify(mirrored.components) < JSON.stringify(best.components)) {
       best = mirrored;
       mirroredComparison = true;
@@ -403,7 +463,7 @@ export function compareLayoutDiversity(
     threshold: effectiveThreshold,
     diverse: best.distance >= effectiveThreshold,
     mirroredComparison,
-    matchedRooms: best.matches,
+    matchedRooms: swapped ? invertMatches(best.matches) : best.matches,
   };
 }
 
@@ -421,28 +481,29 @@ export const compareLayouts = compareLayoutDiversity;
  * geometry, and the east/west mirror is canonicalised when the approved
  * prototype policy treats mirrors as the same design.
  */
-export function canonicalLayoutKey(layout: Layout, project: NormalizedProject): string {
-  const encode = (transform: RectTransform): string => {
-    const roomRecords = placements(layout, project).map((placement) => ({
+function layoutGeometryKey(layout: Layout, project: NormalizedProject, transform: RectTransform): string {
+  const roomRecords = placements(layout, project).map((placement) => ({
       group: groupKey(placement.room),
       rect: transform(placement.space.rect),
     })).sort((a, b) =>
       compareText(a.group, b.group) ||
       a.rect.x - b.rect.x || a.rect.y - b.rect.y || a.rect.width - b.rect.width || a.rect.depth - b.rect.depth,
     );
-    const transit = circulationRects(layout).map(transform).sort((a, b) =>
+  const transit = circulationRects(layout).map(transform).sort((a, b) =>
       a.x - b.x || a.y - b.y || a.width - b.width || a.depth - b.depth,
     );
-    const footprint = transform(layout.footprint);
-    return JSON.stringify({
+  const footprint = transform(layout.footprint);
+  return JSON.stringify({
       footprint: [footprint.x, footprint.y, footprint.width, footprint.depth],
       rooms: roomRecords.map((record) => [record.group, record.rect.x, record.rect.y, record.rect.width, record.rect.depth]),
       transit: transit.map((rect) => [rect.x, rect.y, rect.width, rect.depth]),
-    });
-  };
-  const direct = encode(identityTransform);
+  });
+}
+
+export function canonicalLayoutKey(layout: Layout, project: NormalizedProject): string {
+  const direct = layoutGeometryKey(layout, project, identityTransform);
   if (MIRRORED_LAYOUTS_COUNT_AS_DISTINCT) return direct;
-  const mirrored = encode(mirrorTransform(layout, project));
+  const mirrored = layoutGeometryKey(layout, project, mirrorTransform(layout, project));
   return direct < mirrored ? direct : mirrored;
 }
 
@@ -469,9 +530,12 @@ export interface SelectionDiagnostic {
   threshold: number;
 }
 
+export type TripletSelectionStatus = "complete" | "partial" | "infeasible";
+
 export interface TripletSelection {
   version: string;
-  status: "complete" | "partial";
+  /** `infeasible` is reserved for an empty hard-valid candidate pool. */
+  status: TripletSelectionStatus;
   complete: boolean;
   partial: boolean;
   threshold: number;
@@ -484,6 +548,13 @@ export interface TripletSelection {
 
 type CandidateInput = Layout | ScoredLayoutCandidate;
 
+interface ResolvedCandidates {
+  /** Canonical, interchangeable/mirror-deduplicated candidates used for search. */
+  candidates: ScoredLayoutCandidate[];
+  /** Number of hard-valid inputs before canonical design deduplication. */
+  validCandidateCount: number;
+}
+
 function isScoredCandidate(value: CandidateInput): value is ScoredLayoutCandidate {
   return value !== null && typeof value === "object" && "layout" in value && "scorecards" in value;
 }
@@ -492,7 +563,7 @@ function resolveScoredCandidates(
   candidates: readonly CandidateInput[],
   project: NormalizedProject,
   calibration: ScoringCalibrationSurface = CALIBRATION_SURFACE,
-): ScoredLayoutCandidate[] {
+): ResolvedCandidates {
   // Accept raw layouts, scorecard sets, or a mixture.  The latter is useful to
   // callers that have cached analysis for some candidates but not others; a
   // cast of the mixed array to Layout[] would otherwise feed scorecard objects
@@ -532,7 +603,10 @@ function resolveScoredCandidates(
     unique.set(key, candidate);
     keysById.set(candidate.layout.id, key);
   }
-  return [...unique.values()];
+  return {
+    candidates: [...unique.values()],
+    validCandidateCount: resolved.length,
+  };
 }
 
 function assignmentObjective(
@@ -594,15 +668,17 @@ export function selectDiverseTriplet(
   if (!Number.isFinite(threshold) || threshold < 0 || threshold > 1) {
     throw new RangeError("diversity threshold must be between 0 and 1");
   }
-  const scored = resolveScoredCandidates(candidates, project, calibration);
+  const resolved = resolveScoredCandidates(candidates, project, calibration);
+  const scored = resolved.candidates;
+  const validCandidateCount = resolved.validCandidateCount;
   const diagnostics: SelectionDiagnostic[] = [];
   if (scored.length === 0) {
     diagnostics.push({ code: "NO_VALID_CANDIDATES", message: "no hard-valid candidates are available for strategy selection", candidateCount: 0, threshold });
     return {
       version: DIVERSITY_VERSION,
-      status: "partial",
+      status: "infeasible",
       complete: false,
-      partial: true,
+      partial: false,
       threshold,
       selected: [],
       layouts: [],
@@ -691,13 +767,16 @@ export function selectDiverseTriplet(
       layout: item.candidate.layout,
       scorecard: item.candidate.scorecards[item.strategy],
     }));
-    const code = scored.length < 3 ? "INSUFFICIENT_CANDIDATES" : "INSUFFICIENT_DIVERSITY";
+    // Count hard-valid inputs, not canonical representatives.  Three valid
+    // copies of one design are a feasible pool that cannot furnish a diverse
+    // triplet; they are not evidence that fewer than three candidates exist.
+    const code = validCandidateCount < 3 ? "INSUFFICIENT_CANDIDATES" : "INSUFFICIENT_DIVERSITY";
     diagnostics.push({
       code,
       message: code === "INSUFFICIENT_CANDIDATES"
         ? "fewer than three hard-valid candidates are available"
         : "fewer than three candidates meet the pairwise diversity threshold",
-      candidateCount: scored.length,
+      candidateCount: validCandidateCount,
       threshold,
     });
     return {
@@ -725,13 +804,13 @@ export function selectDiverseTriplet(
     layout: bestSingle.layout,
     scorecard: bestSingle.scorecards[bestStrategy],
   }];
-  const code = scored.length < 3 ? "INSUFFICIENT_CANDIDATES" : "INSUFFICIENT_DIVERSITY";
+  const code = validCandidateCount < 3 ? "INSUFFICIENT_CANDIDATES" : "INSUFFICIENT_DIVERSITY";
   diagnostics.push({
     code,
     message: code === "INSUFFICIENT_CANDIDATES"
       ? "fewer than three hard-valid candidates are available"
       : "no pair of hard-valid candidates meets the pairwise diversity threshold",
-    candidateCount: scored.length,
+    candidateCount: validCandidateCount,
     threshold,
   });
   return {
