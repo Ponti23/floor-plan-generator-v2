@@ -6,9 +6,9 @@
 did not approve the usefulness claim for D1 but directed a fix, approved the scoring language as the
 default while requiring it to stay settable (D2/D3), and asked for the engineering-shaped decisions
 to be done rather than returned as questions (D4). All of it is implemented, verified and green
-(136 tests, full regression gate PASS at median 1,750 ms). Record:
+(145 tests, full regression gate PASS at median 1,750 ms). Record:
 [`artifacts/planlab/milestone-3/gate-amendment-d1-d4.md`](artifacts/planlab/milestone-3/gate-amendment-d1-d4.md).
-**Next: verify the Milestone 4 worker shell in a browser, then stage Milestone 5.**
+**Next: finish the remaining Milestone 4 browser checks, then stage Milestone 5.**
 
 ## D5 remote checkpoint — approved
 
@@ -26,13 +26,21 @@ Two things a resuming session should know before it re-measures anything:
    value-level derived drift must call `serializeCanonical(result)` explicitly.
 
 **Milestone 4 status:** bucket 4.1 (worker + three-pane UI shell per
-`knowledge/planlab/UI_ARCHITECTURE.md`) is complete on the working tree. It adds the versioned
-worker protocol, `GenerationController`, cooperative cancellation through a shared signal,
-progress counters with monotonic clamping, stale-response rejection, watchdog `budgetExceeded`,
-worker crash/retry recovery, a plain three-pane shell, and a Node worker benchmark. Verification:
-`npm test` **145 passing**, `npm run typecheck` 0 errors, `npm run build` clean, and
-`npm run benchmark:worker` median **174.6 ms**. The bucket is uncommitted at the time of writing;
-manual browser verification remains before Milestone 4 is declared complete.
+`knowledge/planlab/UI_ARCHITECTURE.md`) is committed as `89b9fc7` on local `main`. It adds the
+versioned worker protocol, `GenerationController`, cooperative cancellation through a shared
+signal, progress counters with monotonic clamping, stale-response rejection, watchdog
+`budgetExceeded`, worker crash/retry recovery, a plain three-pane shell, and a Node worker
+benchmark. Verification this session: `npm test` **145 passing**, `npm run typecheck` 0 errors,
+`npm run build` clean, `npm run diagnostics:canonical -- --check` clean, and
+`npm run benchmark:worker` median **532.6 ms** on this machine (recorded reference was 174.6 ms;
+re-measure on the reference device before treating this as a regression).
+
+Browser smoke verification performed with the in-app browser: generate reaches `complete` with
+three options and the plan SVG; cancel returns to `idle` with no compatible result; editing site
+width/depth regenerates a different viewBox and layout set; an impossible envelope produces
+`infeasible`. The retry and worker-failure paths are covered by `worker-controller.test.ts` but
+were not manually re-simulated in the browser. `main` is currently **2 commits ahead of
+`origin/main`** (`2f15d96`, `89b9fc7`); those two commits are not pushed.
 
 ## Last checkpoint
 
@@ -196,18 +204,23 @@ for the Milestone 4 worker protocol. Raised for bucket 2.5 and for the user.
 
 ## Next step
 
-1. Commit bucket 4.1 once its final checks are green, then verify the browser path manually:
-   generate, cancel, edit mid-run, retry, and simulate a worker failure.
-2. Stage Milestone 5 (minimal functional workspace) from
-   `knowledge/planlab/IMPLEMENTATION_PLAN.md`, keeping the D4 payload boundary in place for the
-   worker transport.
-3. Orchestrator note for future stages: dispatched executors in this project have repeatedly stalled
+1. Decide whether to push the two local `main` commits (`2f15d96`, `89b9fc7`) now that D5 was
+   approved for the pre-Milestone-4 checkpoint, or wait for Sol/Astra.
+2. Finish the remaining Milestone 4 browser manual checks (retry after a forced worker failure)
+   or explicitly accept the existing controller unit coverage.
+3. Stage Milestone 5 from `knowledge/planlab/IMPLEMENTATION_PLAN.md`. Raise the Next.js-vs-Vite
+   shell decision to Sol/Astra before scaffolding Milestone 5; the current bucket 4.1 shell is
+   plain Vite/TS.
+4. Orchestrator note for future stages: dispatched executors in this project have repeatedly stalled
    by asking for authorization instead of implementing. Brief them to "do the work now, do not ask,
    do not spawn sub-agents" and do a stalled bucket directly rather than re-dispatching it.
 
 ## Open findings
 
-- None outstanding. The former 1.4 findings (typecheck errors, selector coercion) are closed in this checkpoint.
+- Milestone 4 browser verification is partially complete: generate/cancel/edit are verified;
+  retry and worker-failure remain unit-tested but not manually re-simulated.
+- Milestone 5's reference implementation says Next.js while the current shell is Vite/TS. That is
+  an architecture/product choice for Sol/Astra before implementation begins.
 - **Waiting on the user (decision, not a blocker):** the Stage 0 benchmark hashes no longer
   reproduce after bucket 2.1 (derived-facts evidence is serialized into `GenerationResult`;
   layouts and selections are byte-identical). Either accept the evidence evolution or stop

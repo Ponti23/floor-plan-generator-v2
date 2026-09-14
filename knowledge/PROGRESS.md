@@ -38,17 +38,21 @@ tags: [progress, resume]
 - **Open threads:**
   1. **D5 — push.** Approved by the user on 2026-09-15; this checkpoint is being pushed to
      `origin/main` before Milestone 4 starts.
-  2. **Milestone 4 (UI).** Unblocked. Bucket 4.1 is complete on the working tree: versioned worker
-     protocol, controller, cooperative cancellation, progress monotonicity, stale-response
-     rejection, watchdog/crash recovery, a three-pane shell, and a Node worker benchmark
-     (median 174.6 ms). Manual browser verification remains before Milestone 4 is declared complete.
+  2. **Milestone 4 (UI).** Unblocked. Bucket 4.1 is committed as `89b9fc7` on local `main`:
+     versioned worker protocol, controller, cooperative cancellation, progress monotonicity,
+     stale-response rejection, watchdog/crash recovery, a three-pane shell, and a Node worker
+     benchmark. This session re-ran the full verification green (145 tests, typecheck, build,
+     diagnostics) and smoke-tested the browser path: generate, cancel, and edit/regenerate all
+     behave as expected; retry and worker-failure remain unit-tested but not manually
+     re-simulated. The worker benchmark measured median **532.6 ms** on this machine, not the
+     recorded 174.6 ms reference number.
   3. Product/UX/copy and money/payment decisions remain human hard gates. The calibration override
      seam deliberately makes copy-adjacent values *settable* without freezing them.
   4. **Evidence-resolution caveat** in D4 above — a future review needing value-level derived drift
      detection must use `serializeCanonical(result)` explicitly.
-- **Next step:** commit bucket 4.1 after its final checks, verify the browser path manually
-  (generate/cancel/edit/retry/worker failure), then stage Milestone 5 from
-  `knowledge/planlab/IMPLEMENTATION_PLAN.md`.
+- **Next step:** decide on pushing the two local `main` commits (`2f15d96`, `89b9fc7`), finish or
+  formally accept the remaining retry/worker-failure browser check, then stage Milestone 5. Raise
+  the Next.js-vs-Vite shell decision to Sol/Astra before Milestone 5 implementation.
 - **In-flight branches:** all work is on `main` (Milestone 0 baseline `8171058`, Stage 1
   `0e8589b`…`e1c6f38` plus typecheck infra `19916f1`, Stage 2 `9a24738`…`ded4d73`, Stage 3
   `6089c48`…`99e1904` plus the 3.5 review); `stage0-planlab-spike` is retained at the completed gate

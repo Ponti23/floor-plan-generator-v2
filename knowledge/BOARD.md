@@ -30,7 +30,7 @@ Active design: [`planlab/README.md`](./planlab/README.md) · staged plan: [`../D
 | 3.7 | D1 room-shape policy and preferred-area allocation | terra-max | orchestrator (`/root`) | done | `main` (uncommitted at time of writing) |
 | 3.8 | D2/D3 settable calibration surface | terra-max | orchestrator (`/root`) | done | `main` (uncommitted) |
 | 3.9 | D4 generation-result payload projection | terra-max | orchestrator (`/root`) | done | `main` (uncommitted) |
-| 4.1 | Milestone 4 UI shell (worker + three-pane app) | terra-max | orchestrator (`/root`) | done | `main` (uncommitted at time of writing) |
+| 4.1 | Milestone 4 UI shell (worker + three-pane app) | terra-max | orchestrator (`/root`) | done | `main` (`89b9fc7`) |
 
 ## Handoff rules
 
@@ -72,4 +72,5 @@ Active design: [`planlab/README.md`](./planlab/README.md) · staged plan: [`../D
   signal, progress monotonicity, stale-response rejection, watchdog outcomes,
   worker error recovery, a plain three-pane UI shell, and a Node worker
   benchmark. Verification: 145 tests, typecheck clean, Vite build clean,
-  `benchmark:worker` median 174.6 ms on the reference machine.
+  diagnostics clean, and browser smoke checks for generate/cancel/edit.
+  Retry/worker-failure are unit-tested but not manually re-simulated.
