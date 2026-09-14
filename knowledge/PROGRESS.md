@@ -45,12 +45,15 @@ tags: [progress, resume]
      diagnostics) and smoke-tested the browser path: generate, cancel, and edit/regenerate all
      behave as expected; retry and worker-failure remain unit-tested but not manually
      re-simulated. The worker benchmark measured median **532.6 ms** on this machine, not the
-     recorded 174.6 ms reference number.
+     recorded 174.6 ms reference number. The Stage 0 regression baseline was refreshed for the
+     Milestone 4 `package.json` input fingerprint; `benchmark:stage0:check` is `baselineMatch:
+     true` with domain output hashes unchanged.
   3. Product/UX/copy and money/payment decisions remain human hard gates. The calibration override
      seam deliberately makes copy-adjacent values *settable* without freezing them.
   4. **Evidence-resolution caveat** in D4 above — a future review needing value-level derived drift
      detection must use `serializeCanonical(result)` explicitly.
-- **Next step:** decide on pushing the two local `main` commits (`2f15d96`, `89b9fc7`), finish or
+- **Next step:** decide on pushing the four local `main` commits (`2f15d96`, `89b9fc7`,
+  `cd0723c`, `de2b20f`), finish or
   formally accept the remaining retry/worker-failure browser check, then stage Milestone 5. Raise
   the Next.js-vs-Vite shell decision to Sol/Astra before Milestone 5 implementation.
 - **In-flight branches:** all work is on `main` (Milestone 0 baseline `8171058`, Stage 1

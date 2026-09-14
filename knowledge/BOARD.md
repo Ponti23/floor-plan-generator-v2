@@ -72,5 +72,6 @@ Active design: [`planlab/README.md`](./planlab/README.md) · staged plan: [`../D
   signal, progress monotonicity, stale-response rejection, watchdog outcomes,
   worker error recovery, a plain three-pane UI shell, and a Node worker
   benchmark. Verification: 145 tests, typecheck clean, Vite build clean,
-  diagnostics clean, and browser smoke checks for generate/cancel/edit.
+  diagnostics clean, Stage 0 `baselineMatch: true` after refreshing the
+  input fingerprint, and browser smoke checks for generate/cancel/edit.
   Retry/worker-failure are unit-tested but not manually re-simulated.
