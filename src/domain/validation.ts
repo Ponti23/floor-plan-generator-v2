@@ -2,13 +2,12 @@ import {
   area,
   containsRect,
   edgeSegment,
-  intersection,
   intersectionArea,
+  intervalContainsSpan,
   isGridRect,
   sharedWallSegments,
   sharedWallLength,
-  unionArea,
-  type GridInterval,
+  unallocatedInteriorArea,
   type GridRect,
 } from "./geometry.ts";
 import {
@@ -200,16 +199,6 @@ export function reachableSpaceIds(
 
 export const computeReachability = reachableSpaceIds;
 
-function intervalContains(container: GridInterval, start: number, length: number): boolean {
-  return (
-    Number.isSafeInteger(start) &&
-    Number.isSafeInteger(length) &&
-    length > 0 &&
-    start >= container.start &&
-    start + length <= container.end
-  );
-}
-
 function exteriorPortalValid(
   portal: AccessPortal,
   space: PlacedSpace,
@@ -227,8 +216,8 @@ function exteriorPortalValid(
   const footprintEdge = edgeSegment(footprint, portal.wall);
   return (
     edge.fixed === footprintEdge.fixed &&
-    intervalContains(edge.interval, portal.start, portal.length) &&
-    intervalContains(footprintEdge.interval, portal.start, portal.length)
+    intervalContainsSpan(edge.interval, portal.start, portal.length) &&
+    intervalContainsSpan(footprintEdge.interval, portal.start, portal.length)
   );
 }
 
@@ -242,7 +231,7 @@ function interiorPortalValid(
     const aSide = portal.a === a.instanceId ? segment.aSide : segment.bSide;
     if (
       aSide === portal.wall &&
-      intervalContains(segment.interval, portal.start, portal.length)
+      intervalContainsSpan(segment.interval, portal.start, portal.length)
     ) {
       return true;
     }
@@ -495,22 +484,17 @@ export function validateLayout(
 
   // 4. Coverage/unallocated interior.  Overlap remains a separate failure and
   // is never allowed to inflate coverage.
-  let footprintArea = 0;
   if (isGridRect(footprint)) {
-    footprintArea = area(footprint);
-    // Use the analytical union for the coverage identity.  Pairwise overlap
-    // checks above remain the authoritative failure; subtracting pairwise
-    // overlaps here would over-subtract triple intersections.
-    const coveredArea = unionArea(
-      spaces.filter((space): space is PlacedSpace & { rect: GridRect } =>
-        isGridRect(space.rect),
-      ).flatMap((space) => {
-        const covered = intersection(space.rect, footprint);
-        return covered ? [covered] : [];
-      }),
-    );
-    const unallocated = Math.max(0, footprintArea - coveredArea);
-    const ratio = footprintArea === 0 ? 1 : unallocated / footprintArea;
+    // Coverage is the analytical union of every well-formed space clipped to
+    // the footprint; malformed rectangles are skipped so they cannot shrink
+    // or inflate the interior void.  Pairwise overlap checks above remain the
+    // authoritative failure; subtracting pairwise overlaps here would
+    // over-subtract triple intersections.
+    const coverage = spaces.filter((space): space is PlacedSpace & { rect: GridRect } =>
+      isGridRect(space.rect),
+    ).map((space) => space.rect);
+    const unallocated = unallocatedInteriorArea(footprint, coverage);
+    const ratio = unallocated / area(footprint);
     const maximum = Math.min(
       project.planning.maxUnallocatedInteriorRatio ?? DEFAULT_MAX_UNALLOCATED_RATIO,
       MAX_UNALLOCATED_INTERIOR_RATIO,

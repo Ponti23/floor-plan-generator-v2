@@ -3,9 +3,10 @@ import {
   boundaryDistance,
   centre,
   exteriorContactBySide,
-  intersection,
   isGridRect,
+  overlapArea,
   sharedWallLength,
+  unallocatedInteriorArea,
   unionArea,
   type CardinalSide,
   type GridRect,
@@ -491,12 +492,6 @@ function countDeadEnds(spaces: readonly PlacedSpace[], graph: PortalGraph): numb
   ).length;
 }
 
-function multiplyAllocatedArea(rectangles: readonly GridRect[]): number {
-  // Sum-minus-union measures every extra allocation exactly once. Pairwise
-  // intersection totals overstate a region covered by three or more spaces.
-  return Math.max(0, rectangles.reduce((sum, rect) => sum + area(rect), 0) - unionArea(rectangles));
-}
-
 function sharedWallsForRooms(roomFacts: readonly RoomFact[]): SharedWallFact[] {
   const facts: SharedWallFact[] = [];
   for (let first = 0; first < roomFacts.length; first += 1) {
@@ -817,18 +812,16 @@ export function computeLayoutFacts(
     return room ? isGarage(room) : false;
   });
   const programmedFacts = roomFacts.filter((fact) => !garageFacts.includes(fact));
-  // Coverage is an interior measure. A malformed space that spills outside
-  // the footprint must not make an interior void disappear from facts.
-  const coveredArea = unionArea(spaces.flatMap((space) => {
-    const covered = intersection(space.rect, footprint);
-    return covered ? [covered] : [];
-  }));
+  // Coverage is an interior measure: spaces are clipped to the footprint
+  // before the union, so a malformed space that spills outside cannot make an
+  // interior void disappear from facts.
+  const spaceRects = spaces.map((space) => space.rect);
   const footprintArea = area(footprint);
   const garageAreaUnits2 = unionArea(garageFacts.map((fact) => fact.rect));
   const circulationAreaUnits2 = unionArea(transitSpaces.map((space) => space.rect));
   const entryAreaUnits2 = unionArea(entrySpaces.map((space) => space.rect));
   const programmedUsableAreaUnits2 = unionArea(programmedFacts.map((fact) => fact.rect));
-  const unallocatedInteriorAreaUnits2 = Math.max(0, footprintArea - coveredArea);
+  const unallocatedInteriorAreaUnits2 = unallocatedInteriorArea(footprint, spaceRects);
   const denominator = footprintArea - garageAreaUnits2;
   // Keep the category totals additive for the allocation diagnostic.  Unlike
   // unallocated area (which is based on geometric union), this intentionally
@@ -863,7 +856,7 @@ export function computeLayoutFacts(
     unallocatedInteriorAreaUnits2,
     unallocatedInteriorAreaM2: unallocatedInteriorAreaUnits2 * GRID_M2,
     unallocatedInteriorRatio: footprintArea === 0 ? 1 : unallocatedInteriorAreaUnits2 / footprintArea,
-    overlapAreaUnits2: multiplyAllocatedArea(spaces.map((space) => space.rect)),
+    overlapAreaUnits2: overlapArea(spaceRects),
     allocationRatio: footprintArea === 0 ? 0 : allocatedAreaUnits2 / footprintArea,
     planningEfficiency: denominator <= 0 ? 0 : programmedUsableAreaUnits2 / denominator,
     targetGfaUnits2,

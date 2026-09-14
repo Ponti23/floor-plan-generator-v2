@@ -1,3 +1,29 @@
+/**
+ * PlanLab production geometry primitives.
+ *
+ * Coordinate and unit invariants (see knowledge/planlab/COORDINATE_SYSTEM.md):
+ * - Solver space is an integer planning grid with one unit of `GRID_MM` =
+ *   250 mm.  Authored millimetres cross the boundary through the unit helpers
+ *   below and are normalized conservatively (`mmToGridFloor` for maximum edges,
+ *   `mmToGridCeil` for minimum edges); no floating-point metre value is ever
+ *   used for containment, collision, coverage, or adjacency decisions.
+ * - The origin is the north-west corner: `x` increases east and `y` increases
+ *   south, matching SVG viewBox axes so diagnostics never flip Y.
+ * - Rectangles are axis-aligned and half-open: `[x, x + width) x [y, y + depth)`.
+ *   Edge or corner contact therefore has zero area, is not overlap, and is not
+ *   a shared wall; only a positive-length coincident edge counts.
+ * - Exactly measurable geometry is a two-tier contract.  `isGridRect` (and
+ *   `assertExactGridRect`) is the strong boundary predicate: safe-integer
+ *   coordinates, positive integer width/depth, safe-integer edges, and a
+ *   safe-integer area.  The bulk operations (`unionArea`, `coveredAreaWithin`,
+ *   `overlapArea`, `unallocatedInteriorArea`) apply it once per input, while
+ *   the per-edge and per-pair helpers (`right`, `bottom`, `area`,
+ *   `intersection`, `containsRect`, `sharedWallLength`, `boundaryDistance`)
+ *   only run the cheap structural guard so generation stays fast.  Validate
+ *   with the predicate first when a rectangle does not come from this domain.
+ * - The canonical fixture (20 m x 30 m site, 1.5/2/1.5/6 m offsets) is always
+ *   site `(0, 0, 80, 120)` and envelope `(6, 8, 68, 88)`; tests pin that pair.
+ */
 import {
   GRID_MM,
   GRID_MM2,
@@ -62,7 +88,8 @@ function assertPositiveInteger(value: number, label: string): void {
   }
 }
 
-export function isGridRect(value: unknown): value is GridRect {
+/** Shared structural check behind the exact predicate and the fast guard. */
+function isWellFormedGridRect(value: unknown): value is GridRect {
   if (value === null || typeof value !== "object") return false;
   const candidate = value as Partial<GridRect>;
   const { x, y, width, depth } = candidate;
@@ -71,17 +98,55 @@ export function isGridRect(value: unknown): value is GridRect {
     isSafeInteger(y ?? NaN) &&
     isSafeInteger(width ?? NaN) &&
     isSafeInteger(depth ?? NaN) &&
-    width !== undefined &&
-    depth !== undefined &&
+    typeof width === "number" &&
+    typeof depth === "number" &&
     width > 0 &&
     depth > 0
   );
 }
 
+/**
+ * True for an exactly measurable integer rectangle.
+ *
+ * Boundary callers use this predicate to reject coordinates whose edges or
+ * area would leave the safe integer range: a rectangle that cannot be measured
+ * exactly is not a usable planning-grid rectangle.
+ */
+export function isGridRect(value: unknown): value is GridRect {
+  if (!isWellFormedGridRect(value)) return false;
+  return (
+    isSafeInteger(value.x + value.width) &&
+    isSafeInteger(value.y + value.depth) &&
+    isSafeInteger(value.width * value.depth)
+  );
+}
+
+/**
+ * Fast structural guard used by the primitive arithmetic below.
+ *
+ * This is deliberately cheaper than `isGridRect`: it skips the derived-edge and
+ * area checks so the generation hot path carries no redundant validation.
+ * Composite operations that must reject inexact geometry call
+ * `assertExactGridRect` once per input instead.
+ */
 export function assertGridRect(rect: GridRect, label = "rectangle"): void {
-  if (!isGridRect(rect)) {
+  if (!isWellFormedGridRect(rect)) {
     throw new TypeError(
       `${label} must contain integer x/y and positive integer width/depth`,
+    );
+  }
+}
+
+/**
+ * Reject a rectangle that cannot be measured exactly.
+ *
+ * Bulk operations call this once per input so their totals stay exact, while
+ * per-edge and per-pair helpers stay cheap.
+ */
+export function assertExactGridRect(rect: unknown, label = "rectangle"): void {
+  if (!isGridRect(rect)) {
+    throw new TypeError(
+      `${label} must contain safe integer x/y with positive integer width/depth and a safe area`,
     );
   }
 }
@@ -156,19 +221,48 @@ export const overlaps = (a: GridRect, b: GridRect): boolean =>
 
 export const positiveAreaOverlap = overlaps;
 
+/**
+ * Length of a half-open interval.  Empty and reversed intervals are both 0:
+ * callers such as `exteriorWallContact` rely on that to drop clipped fragments.
+ */
 export function intervalLength(interval: GridInterval): number {
   assertSafeInteger(interval.start, "interval.start");
   assertSafeInteger(interval.end, "interval.end");
   return Math.max(0, interval.end - interval.start);
 }
 
+/** The positive-length intersection of two half-open intervals, else null. */
 export function intervalIntersection(
   a: GridInterval,
   b: GridInterval,
 ): GridInterval | null {
+  assertSafeInteger(a.start, "a.start");
+  assertSafeInteger(a.end, "a.end");
+  assertSafeInteger(b.start, "b.start");
+  assertSafeInteger(b.end, "b.end");
   const start = Math.max(a.start, b.start);
   const end = Math.min(a.end, b.end);
   return end > start ? { start, end } : null;
+}
+
+/**
+ * True when `[start, start + length)` lies inside the container interval.
+ * Portal spans use this instead of re-deriving half-open bounds per caller.
+ */
+export function intervalContainsSpan(
+  container: GridInterval,
+  start: number,
+  length: number,
+): boolean {
+  assertSafeInteger(container.start, "container.start");
+  assertSafeInteger(container.end, "container.end");
+  assertSafeInteger(start, "start");
+  assertPositiveInteger(length, "length");
+  return (
+    start >= container.start &&
+    isSafeInteger(start + length) &&
+    start + length <= container.end
+  );
 }
 
 export function edgeSegment(rect: GridRect, side: CardinalSide): EdgeSegment {
@@ -268,7 +362,28 @@ export function boundaryDistance(a: GridRect, b: GridRect): number {
   assertGridRect(b, "b");
   const horizontal = Math.max(a.x - right(b), b.x - right(a), 0);
   const vertical = Math.max(a.y - bottom(b), b.y - bottom(a), 0);
-  return horizontal + vertical;
+  const distance = horizontal + vertical;
+  if (!isSafeInteger(distance)) {
+    throw new RangeError("boundary distance exceeds the exact integer range");
+  }
+  return distance;
+}
+
+/**
+ * Squared Euclidean distance between the two rectangles as point sets, the
+ * exact-integer counterpart to `boundaryDistance`.  Overlapping, touching, and
+ * identical rectangles are 0; diagonal gaps keep both axis components.
+ */
+export function boundaryGapDistanceSquared(a: GridRect, b: GridRect): number {
+  assertGridRect(a, "a");
+  assertGridRect(b, "b");
+  const horizontal = Math.max(a.x - right(b), b.x - right(a), 0);
+  const vertical = Math.max(a.y - bottom(b), b.y - bottom(a), 0);
+  const squared = horizontal * horizontal + vertical * vertical;
+  if (!isSafeInteger(squared)) {
+    throw new RangeError("squared boundary distance exceeds the exact integer range");
+  }
+  return squared;
 }
 
 export function centre(rect: GridRect): { x: number; y: number } {
@@ -287,6 +402,20 @@ export function centreAsRational(rect: GridRect): {
     yNumerator: 2 * rect.y + rect.depth,
     denominator: 2,
   };
+}
+
+/**
+ * Centre-to-centre Euclidean distance, in grid units.  Secondary diagnostic
+ * only: scoring uses boundary distance because it is stable and interpretable
+ * on orthogonal plans, so this deliberately returns a float.
+ */
+export function centreDistance(a: GridRect, b: GridRect): number {
+  const first = centreAsRational(a);
+  const second = centreAsRational(b);
+  return Math.hypot(
+    first.xNumerator - second.xNumerator,
+    first.yNumerator - second.yNumerator,
+  ) / 2;
 }
 
 function unionLength(intervals: GridInterval[]): number {
@@ -313,7 +442,7 @@ function unionLength(intervals: GridInterval[]): number {
 /** Exact union area for a bounded list of axis-aligned integer rectangles. */
 export function unionArea(rectangles: readonly GridRect[]): number {
   if (rectangles.length === 0) return 0;
-  rectangles.forEach((rect, index) => assertGridRect(rect, `rectangles[${index}]`));
+  rectangles.forEach((rect, index) => assertExactGridRect(rect, `rectangles[${index}]`));
   const xEdges = [
     ...new Set(rectangles.flatMap((rect) => [rect.x, right(rect)])),
   ].sort((a, b) => a - b);
@@ -331,6 +460,65 @@ export function unionArea(rectangles: readonly GridRect[]): number {
 }
 
 export const coverageArea = unionArea;
+
+/**
+ * Exact area of `rectangles` that lies inside `bounds`.
+ *
+ * Each rectangle is clipped to the bounds before the union, so a rectangle
+ * spilling outside contributes only its interior part and overlapping
+ * rectangles are never double counted.  This is the reviewed replacement for
+ * callers that used to clip-and-union by hand.
+ */
+export function coveredAreaWithin(
+  bounds: GridRect,
+  rectangles: readonly GridRect[],
+): number {
+  assertExactGridRect(bounds, "bounds");
+  const clipped: GridRect[] = [];
+  rectangles.forEach((rect, index) => {
+    assertExactGridRect(rect, `rectangles[${index}]`);
+    const inside = intersection(rect, bounds);
+    if (inside !== null) clipped.push(inside);
+  });
+  return unionArea(clipped);
+}
+
+/** Uncovered interior area of a footprint; never negative. */
+export function unallocatedInteriorArea(
+  footprint: GridRect,
+  rectangles: readonly GridRect[],
+): number {
+  assertExactGridRect(footprint, "footprint");
+  return Math.max(0, area(footprint) - coveredAreaWithin(footprint, rectangles));
+}
+
+/** Uncovered fraction of a footprint, 0 through 1. */
+export function unallocatedInteriorRatio(
+  footprint: GridRect,
+  rectangles: readonly GridRect[],
+): number {
+  return unallocatedInteriorArea(footprint, rectangles) / area(footprint);
+}
+
+/**
+ * Total multiply-allocated area across `rectangles` (sum of areas minus the
+ * union area).
+ *
+ * A region covered by three rectangles counts once, not once per intersecting
+ * pair, so this stays the identity behind layout allocation facts.
+ */
+export function overlapArea(rectangles: readonly GridRect[]): number {
+  if (rectangles.length === 0) return 0;
+  rectangles.forEach((rect, index) => assertExactGridRect(rect, `rectangles[${index}]`));
+  const allocated = rectangles.reduce((sum, rect) => {
+    const total = sum + area(rect);
+    if (!isSafeInteger(total)) {
+      throw new RangeError("total rectangle area exceeds the exact integer range");
+    }
+    return total;
+  }, 0);
+  return Math.max(0, allocated - unionArea(rectangles));
+}
 
 function subtractInterval(
   base: GridInterval,
@@ -412,18 +600,30 @@ export function totalExteriorWallContact(
   );
 }
 
+/**
+ * Grid-boundary conversions.  Authored dimensions are committed as
+ * non-negative safe integer millimetres, so negatives are rejected here rather
+ * than silently mirrored into the grid.
+ */
+function assertNonNegativeInteger(value: number, label: string): void {
+  assertSafeInteger(value, label);
+  if (value < 0) {
+    throw new RangeError(`${label} must be non-negative`);
+  }
+}
+
 export function mmToGridFloor(mm: number): number {
-  assertSafeInteger(mm, "millimetres");
+  assertNonNegativeInteger(mm, "millimetres");
   return Math.floor(mm / GRID_MM);
 }
 
 export function mmToGridCeil(mm: number): number {
-  assertSafeInteger(mm, "millimetres");
+  assertNonNegativeInteger(mm, "millimetres");
   return Math.ceil(mm / GRID_MM);
 }
 
 export function mm2ToGridAreaCeil(mm2: number): number {
-  assertSafeInteger(mm2, "square millimetres");
+  assertNonNegativeInteger(mm2, "square millimetres");
   return Math.ceil(mm2 / GRID_MM2);
 }
 
