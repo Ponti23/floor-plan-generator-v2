@@ -6,6 +6,19 @@
 
 ## Last checkpoint
 
+- Bucket 2.2 landed as `7f87add` (`fix: harden PlanLab portal geometry and access graph`).
+  Two real defects closed: (a) `buildPortalGraph` added an edge for *any* portal whose
+  endpoints resolved, so reachability could be established through a portal `validateLayout`
+  simultaneously rejected — the graph now filters through the new exported `portalSpanValid`,
+  which is the single predicate the validator's own portal step calls, and `reachableSpaceIds(layout)`
+  resolves a bare layout through the pedestrian graph (vehicle frontage proves frontage, never a
+  route); (b) `isTransitNode` granted transit rights to any room whose traits said so, so a private
+  bedroom tagged `mayBePassThrough` could act as a corridor — private/service rooms and the
+  bedroom/bathroom/garage/laundry/storage kinds are now never transit nodes, while living/dining/
+  kitchen join the through-route only when the brief explicitly opts in. Verification: `npm test`
+  **84 passing** (77 + 7 new in `test/portal-access.test.ts`); `npm run typecheck` 0 errors;
+  canonical fingerprint unchanged. Both new test groups were checked for teeth by temporarily
+  restoring the old behaviour (each failed as expected), and the mutation was reverted.
 - Bucket 2.1 landed as `9a24738` (`refactor: add PlanLab layout facts pass and edge indexes`).
   `src/domain/facts.ts` now computes one immutable geometry index per candidate — per-space
   coverage, pairwise overlaps with clipped rects, shared-wall intervals plus a `a|b` pair index,
@@ -27,8 +40,8 @@
 
 ## Next step
 
-1. Execute Stage 2 in plan order. Bucket 2.2 (portal geometry and access graph hardening,
-   `luna-max`) is the next dispatch.
+1. Execute Stage 2 in plan order. Bucket 2.3 (rule definitions, instances, and the ordered
+   validator, Terra-authored) is the next dispatch.
 2. Bucket 2.3 is Terra-authored (integration-heavy registry refactor), so the orchestrator judges
    its result and 2.5 provides independent review of the whole validation stack.
 3. Stage 2 must not change Stage 1 canonical fingerprints or existing fixture verdicts; a change is
@@ -41,6 +54,10 @@
 ## Open findings
 
 - None outstanding. The former 1.4 findings (typecheck errors, selector coercion) are closed in this checkpoint.
+- New, not yet actioned: `src/domain/generator.ts` still has its own `mayBePassThrough || hallway`
+  transit helper. Generated layouts remain hard-valid under the stricter policy today, so this is a
+  latent consistency risk rather than a defect; align it when the generator is next opened
+  (Milestone 3), or fold it into the 2.3 registry work if that turns out to be cheap.
 
 ## Constraints
 
