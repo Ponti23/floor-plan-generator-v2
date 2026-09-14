@@ -4,6 +4,25 @@
 
 **Status:** Stage 0 is complete and approved. Stage 1 is complete (independent domain API review passed 2026-09-14). **Stage 2 (access, rules, and validation) is complete** — all five buckets landed on `main` and the independent review (2.5) passed on 2026-09-14 with three access-layer defects fixed. **Stage 3 (generator, metrics, scoring, and diversity) is complete** — buckets 3.1–3.4 landed and the 3.5 review resolved the recorded median-runtime failure (3,036 ms → 904 ms, byte-identical results) and found the selection memo untested. **Next: the Stage 3 hard gate — the architect/user approves mathematical usefulness and the scoring language before any polished UI work.** Do not stage Milestone 4 before that decision.
 
+## Blocked on — Stage 3 hard gate (needs human, nothing dispatched)
+
+The next action is a decision, not a bucket. The decision package is
+[`artifacts/planlab/milestone-3/gate-brief.md`](artifacts/planlab/milestone-3/gate-brief.md):
+state `main` @ `cf31d93`, 122 tests passing, regression gate PASS, the calibration being approved
+(`planlab-calibration-0.1`), what seed 01 actually produced, and the observations that bear on the
+judgement. The exact asks:
+
+- **D1 Mathematical usefulness** — approve, or redirect and name what is missing.
+- **D2 Scoring language** — approve the five categories, breakpoints, profile weights, diversity
+  threshold, and false-precision policy, or point at the values to change.
+- **D3** Tune metric breakpoints / `shortlistSize` now, or accept as-is (every change moves selected
+  triplets).
+- **D4 Stage 0 evidence shape** (carried from 2.5) — accept the new `outputHash` baselines or stop
+  serializing derived indexes; ~256 → ~342 MB canonical payload matters for Milestone 4.
+- **D5** Push `main` to `origin/main` (55 commits ahead since Stage 1).
+
+Do not start Milestone 4 worker/UI scaffolding before D1 and D2 are answered.
+
 ## Last checkpoint
 
 - Bucket 3.5 landed as `d7f82b9` (`perf: memoise PlanLab selection pair distances`, plus its
