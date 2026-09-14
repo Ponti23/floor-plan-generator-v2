@@ -69,6 +69,7 @@ export interface GenerationDiagnostic {
   code:
     | "NORMALIZATION_FAILED"
     | "NO_FOOTPRINT_VARIANT"
+    | "NO_VALID_CANDIDATES"
     | "SEARCH_BUDGET_EXCEEDED"
     | "NO_VALID_LAYOUT"
     | "VALIDATION_REJECTED"

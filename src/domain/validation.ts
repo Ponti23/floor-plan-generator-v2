@@ -12,6 +12,7 @@ import {
 } from "./geometry.ts";
 import {
   GRID_MM,
+  GRID_UNIT_METRES,
   GARAGE_MIN_DEPTH_UNITS,
   GARAGE_MIN_WIDTH_UNITS,
   MAX_UNALLOCATED_INTERIOR_RATIO,
@@ -275,7 +276,7 @@ function validateRelationship(
     MIN_MEANINGFUL_SHARED_WALL_UNITS,
     relationship.minSharedWallM === undefined
       ? 0
-      : Math.ceil(relationship.minSharedWallM / (GRID_MM / 1_000)),
+      : Math.ceil(relationship.minSharedWallM / GRID_UNIT_METRES),
   );
   let satisfied = false;
   for (const a of from) {

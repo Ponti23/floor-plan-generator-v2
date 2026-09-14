@@ -454,7 +454,11 @@ export function unionArea(rectangles: readonly GridRect[]): number {
     const yIntervals = rectangles
       .filter((rect) => rect.x < xEnd && right(rect) > xStart)
       .map((rect) => ({ start: rect.y, end: bottom(rect) }));
-    total += (xEnd - xStart) * unionLength(yIntervals);
+    const slice = (xEnd - xStart) * unionLength(yIntervals);
+    if (!isSafeInteger(total + slice)) {
+      throw new RangeError("union area exceeds the exact integer range");
+    }
+    total += slice;
   }
   return total;
 }

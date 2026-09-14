@@ -12,6 +12,7 @@ import {
   type GridRect,
 } from "./geometry.ts";
 import {
+  GRID_UNIT_METRES,
   GRID_M2,
   MAX_GFA_M2,
   MIN_MEANINGFUL_SHARED_WALL_UNITS,
@@ -174,7 +175,20 @@ export interface LayoutMetrics {
 export const METRICS_VERSION = "planlab-metrics-0.4";
 
 /** Named breakpoints for the intentionally small prototype utility model. */
-export const METRIC_CONFIG = Object.freeze({
+export interface MetricConfig {
+  preferredAreaOversizeTolerance: number;
+  preferredAreaZeroUtilityRatio: number;
+  defaultPreferredAspectRatio: number;
+  defaultHardAspectRatio: number;
+  defaultAdjacencyTargetUnits: number;
+  defaultNearTargetUnits: number;
+  defaultExteriorTargetUnits: number;
+  targetCirculationRatio: number;
+  unacceptableCirculationRatio: number;
+  privateDepthTargetUnits: number;
+}
+
+export const METRIC_CONFIG: Readonly<MetricConfig> = Object.freeze({
   preferredAreaOversizeTolerance: 1.15,
   preferredAreaZeroUtilityRatio: 2,
   defaultPreferredAspectRatio: 1.5,
@@ -648,19 +662,19 @@ function averageRelationshipUtility(
         let raw = distance;
         let target = relationship.targetDistanceM === undefined
           ? METRIC_CONFIG.defaultNearTargetUnits
-          : relationship.targetDistanceM / 0.25;
+          : relationship.targetDistanceM / GRID_UNIT_METRES;
         if (relationship.kind === "preferShareWall") {
           utility = adjacencyUtility(
             shared,
             relationship.minSharedWallM === undefined
               ? METRIC_CONFIG.defaultAdjacencyTargetUnits
-              : relationship.minSharedWallM / 0.25,
+              : relationship.minSharedWallM / GRID_UNIT_METRES,
           );
           measure = "sharedWallUnits";
           raw = shared;
           target = relationship.minSharedWallM === undefined
             ? METRIC_CONFIG.defaultAdjacencyTargetUnits
-            : relationship.minSharedWallM / 0.25;
+            : relationship.minSharedWallM / GRID_UNIT_METRES;
         } else if (relationship.kind === "preferNear") {
           utility = nearnessUtility(distance, target);
         } else if (relationship.kind === "avoidShareWall") {

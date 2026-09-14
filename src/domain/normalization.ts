@@ -821,16 +821,18 @@ function normalizeSelector(
   value: unknown,
   path: string,
   issues: NormalizationIssue[],
-): string | null {
+): RoomSelector | null {
   if (typeof value === "string") {
     const selector = value.trim();
     if (selector.length > 0) return selector;
   } else if (isRecord(value)) {
-    if ((value.type === "instance" || value.type === "requirement" || value.type === "group") &&
+    if ((value.type === "instance" || value.type === "requirement") &&
         isNonEmptyString(value.id)) {
-      return value.id.trim();
+      return { type: value.type, id: value.id.trim() };
     }
-    if (value.type === "kind" && enumValue(ROOM_KINDS, value.kind)) return value.kind;
+    if (value.type === "kind" && enumValue(ROOM_KINDS, value.kind)) {
+      return { type: "kind", kind: value.kind };
+    }
   }
   addIssue(
     issues,
@@ -955,8 +957,20 @@ function normalizeRelationships(
     }
     seen.add(relationship.id);
     const selectorKnown = (selector: RoomSelector): boolean => {
-      const key = roomSelectorKey(selector);
-      return rooms.some((room) => room.id === key || room.requirementId === key || room.kind === key);
+      if (typeof selector === "string") {
+        // Legacy authored strings keep the spike behaviour: they may name an
+        // instance, a requirement, or a kind without declaring which.
+        return rooms.some(
+          (room) => room.id === selector || room.requirementId === selector || room.kind === selector,
+        );
+      }
+      if (selector.type === "instance") {
+        return rooms.some((room) => room.id === selector.id);
+      }
+      if (selector.type === "requirement") {
+        return rooms.some((room) => room.requirementId === selector.id);
+      }
+      return rooms.some((room) => room.kind === selector.kind);
     };
     const fromKey = roomSelectorKey(relationship.from);
     const toKey = roomSelectorKey(relationship.to);

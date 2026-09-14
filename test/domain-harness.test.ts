@@ -256,12 +256,60 @@ test("relationship selectors normalize explicit instance, requirement, and kind 
   if (result.ok) {
     assert.deepEqual(result.value.relationships[0], {
       id: "explicit-selectors",
-      from: "bedroom",
-      to: "living",
+      from: { type: "requirement", id: "bedroom" },
+      to: { type: "kind", kind: "living" },
       kind: "preferNear",
       aggregation: "nearest",
       source: "architect",
     });
+  }
+});
+
+test("selector normalization preserves instance, requirement, and kind intent", () => {
+  const project = structuredClone(CANONICAL_PROJECT);
+  project.relationships = [
+    {
+      id: "instance-to-requirement",
+      from: { type: "instance", id: "bedroom-1" },
+      to: { type: "requirement", id: "bedroom" },
+      kind: "preferNear",
+      source: "architect",
+    },
+  ];
+  const result = tryNormalizeProject(project);
+  assert.equal(result.ok, true);
+  if (result.ok) {
+    assert.deepEqual(result.value.relationships[0]!.from, {
+      type: "instance",
+      id: "bedroom-1",
+    });
+    assert.deepEqual(result.value.relationships[0]!.to, {
+      type: "requirement",
+      id: "bedroom",
+    });
+  }
+});
+
+test("an instance selector that collides with a requirement id does not silently retarget", () => {
+  const project = structuredClone(CANONICAL_PROJECT);
+  project.relationships = [
+    {
+      id: "missing-instance",
+      from: { type: "instance", id: "bedroom" },
+      to: "living",
+      kind: "preferNear",
+      source: "architect",
+    },
+  ];
+  const result = tryNormalizeProject(project);
+  assert.equal(result.ok, false);
+  if (!result.ok) {
+    assert.ok(
+      result.issues.some(
+        (issue) => issue.code === "UNRESOLVED_RELATIONSHIP_SELECTOR" &&
+          issue.path === "relationships[0].from",
+      ),
+    );
   }
 });
 
