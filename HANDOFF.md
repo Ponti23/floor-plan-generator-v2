@@ -2,9 +2,25 @@
 
 **Active plan:** [`DELEGATION-PLAN.md`](./DELEGATION-PLAN.md) · **Live queue:** [`knowledge/BOARD.md`](./knowledge/BOARD.md) · **Planning package:** [`knowledge/planlab/README.md`](./knowledge/planlab/README.md)
 
-**Status:** Stage 0 is complete and approved. Stage 1 is complete; the independent domain API review (bucket 1.4) passed on 2026-09-14. **Stage 2 (access, rules, and validation) is staged and active** — buckets 2.1–2.5 are listed in `DELEGATION-PLAN.md` and `knowledge/BOARD.md`.
+**Status:** Stage 0 is complete and approved. Stage 1 is complete (independent domain API review passed 2026-09-14). **Stage 2 (access, rules, and validation) is complete** — all five buckets landed on `main` and the independent review (2.5) passed on 2026-09-14 with three access-layer defects fixed. Milestone 3 is the next orchestrator action and is not active until staged.
 
 ## Last checkpoint
+
+- Bucket 2.5 landed as `ded4d73` (`test: add Milestone 2 independent validation review`), closing
+  Stage 2. The review (evidence: `artifacts/planlab/milestone-2/validation-review.md`) used
+  differential validation against the frozen Stage 1 implementation rather than reading alone:
+  15 deliberately broken layouts keep their verdict and violation set, `serializeCanonical(GenerationResult)`
+  is byte-identical from `9a24738` through this commit, and the domain stays framework-free and
+  deterministic. It fixed three access-layer defects of the same class — the graph and the validator
+  disagreeing about one portal — all of which pre-dated Stage 2 (verified at `e1c6f38`):
+  1. an unsupported portal `kind` created a traversable edge while validation reported
+     `PORTAL_KIND_INVALID`;  2. a repeated portal id added a second route while validation reported
+     `DUPLICATE_PORTAL_ID`;  3. a malformed candidate (missing `portals`/`spaces`) threw a
+     `TypeError` out of the access helpers instead of being reported invalid — a crash could take
+     down a generation run or, later, a worker. It also aligned `src/domain/generator.ts` onto the
+     shared `isTransitNode` policy so the constructor can no longer explore corridors validation
+     forbids (output byte-identical). Verification: `npm test` **102 passing**; `npm run typecheck`
+     0 errors; canonical fingerprint unchanged.
 
 - Bucket 2.4 landed as `f93ddd3` (`feat: implement PlanLab relationship aggregation and hard rules`).
   `mustShareWall` is now aggregation-aware instead of implicitly `any`: `any` needs one qualifying
@@ -95,26 +111,30 @@ for the Milestone 4 worker protocol. Raised for bucket 2.5 and for the user.
 
 ## Next step
 
-1. Execute Stage 2 in plan order. Bucket 2.5 (independent Milestone 2 review) is the last bucket:
-   review the whole validation stack, fix only Stage 2 defects, and record evidence under
-   `artifacts/planlab/milestone-2/`. 2.3 is Terra-authored, so the orchestrator judged it directly;
-   2.5 should provide the independent pass over 2.1/2.2/2.4 and re-check the deltas 2.3 recorded.
-2. Bucket 2.3 is Terra-authored (integration-heavy registry refactor), so the orchestrator judges
-   its result and 2.5 provides independent review of the whole validation stack.
-3. Stage 2 must not change Stage 1 canonical fingerprints or existing fixture verdicts; a change is
-   a defect, not a permitted side effect. (2.1 held this: the fingerprint is unchanged.)
-4. Orchestrator note: the first two 2.1 executors stalled by reporting status and asking for
-   authorization instead of implementing, and one spawned nested helpers. The bucket was finished
-   and judged by the orchestrator, which also added the missing occupancy-grid oracle test. Future
-   executor briefs must state "do the work now, do not ask, do not spawn sub-agents".
+1. Sol@Max stages Milestone 3 (generator, metrics, scoring, and diversity) from
+   `knowledge/planlab/IMPLEMENTATION_PLAN.md`. Do not begin Milestone 3 product implementation
+   before that staging.
+2. The Stage 0 benchmark evidence decision below is waiting on the user; it is not a blocker for
+   staging Milestone 3, but it should be settled before the Milestone 4 worker protocol fixes
+   message payloads.
+3. Orchestrator note for future stages: every dispatched executor in Stage 2 stalled at least once
+   by reporting status and asking for authorization instead of implementing, and two spawned nested
+   helpers. Four of the five buckets were finished by the orchestrator. Executor briefs must state
+   "do the work now, do not ask, do not spawn sub-agents" — and a stalled executor should be
+   interrupted and the bucket done directly rather than re-dispatched a third time.
 
 ## Open findings
 
 - None outstanding. The former 1.4 findings (typecheck errors, selector coercion) are closed in this checkpoint.
-- New, not yet actioned: `src/domain/generator.ts` still has its own `mayBePassThrough || hallway`
-  transit helper. Generated layouts remain hard-valid under the stricter policy today, so this is a
-  latent consistency risk rather than a defect; align it when the generator is next opened
-  (Milestone 3), or fold it into the 2.3 registry work if that turns out to be cheap.
+- **Waiting on the user (decision, not a blocker):** the Stage 0 benchmark hashes no longer
+  reproduce after bucket 2.1 (derived-facts evidence is serialized into `GenerationResult`;
+  layouts and selections are byte-identical). Either accept the evidence evolution or stop
+  serializing the derived indexes so the canonical result stays byte-stable. The 342 MB canonical
+  result also bears on the Milestone 4 worker protocol. Full detail in the checkpoint note above
+  and in `artifacts/planlab/milestone-2/validation-review.md`.
+- `INSTANCES_BY_PROJECT` in `rules.ts` caches rule instances per project object identity; a caller
+  that mutates a normalized project in place would keep stale parameters. No caller does this
+  today; revisit when the project document becomes editable (Milestone 6).
 
 ## Constraints
 

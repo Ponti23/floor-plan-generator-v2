@@ -20,7 +20,7 @@ Active design: [`planlab/README.md`](./planlab/README.md) · staged plan: [`../D
 | 2.2 | Portal geometry and access graph hardening | luna-max | luna-max | done | `main` (`7f87add`) |
 | 2.3 | Rule definitions, instances, and ordered validator | terra-max | terra-max | done | `main` (`2a4f216`) |
 | 2.4 | Relationship, garage, and circulation hard rules | luna-max | luna-max | done | `main` (`f93ddd3`) |
-| 2.5 | Independent Milestone 2 review | terra-max | — | todo | `main` |
+| 2.5 | Independent Milestone 2 review | terra-max | sol-max | done | `main` (`ded4d73`) |
 
 ## Handoff rules
 
@@ -34,3 +34,6 @@ Active design: [`planlab/README.md`](./planlab/README.md) · staged plan: [`../D
   2.5 provides independent review of the whole stack.
 - Hard validity must stay authoritative: unsupported evaluators never pass, and Stage 2 must not
   change Stage 1 canonical fingerprints or verdicts for existing fixtures.
+- Stage 2 is **complete** (`9a24738`, `7f87add`, `2a4f216`, `f93ddd3`, `ded4d73`). The independent
+  review passed with open findings; see `artifacts/planlab/milestone-2/validation-review.md`.
+  Milestone 3 is not active until the orchestrator stages it.
