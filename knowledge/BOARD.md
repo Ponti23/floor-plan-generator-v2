@@ -19,7 +19,7 @@ Active design: [`planlab/README.md`](./planlab/README.md) · staged plan: [`../D
 | 2.1 | Layout facts pass and edge indexes | luna-max | luna-max | done | `main` (`9a24738`) |
 | 2.2 | Portal geometry and access graph hardening | luna-max | luna-max | done | `main` (`7f87add`) |
 | 2.3 | Rule definitions, instances, and ordered validator | terra-max | terra-max | done | `main` (`2a4f216`) |
-| 2.4 | Relationship, garage, and circulation hard rules | luna-max | — | todo | `main` |
+| 2.4 | Relationship, garage, and circulation hard rules | luna-max | luna-max | done | `main` (`f93ddd3`) |
 | 2.5 | Independent Milestone 2 review | terra-max | — | todo | `main` |
 
 ## Handoff rules

@@ -6,6 +6,21 @@
 
 ## Last checkpoint
 
+- Bucket 2.4 landed as `f93ddd3` (`feat: implement PlanLab relationship aggregation and hard rules`).
+  `mustShareWall` is now aggregation-aware instead of implicitly `any`: `any` needs one qualifying
+  expanded pair, `all` needs every pair (and an empty expansion is **not** vacuously satisfied),
+  and the distance aggregations `nearest`/`average` are reported through a new
+  `RELATIONSHIP_AGGREGATION_UNSUPPORTED` definition rather than silently read as `any` — one defect,
+  one finding. Wall contact is exact shared-edge length from the facts index (corner contact and
+  sub-threshold contact never satisfy it), garage south frontage / 6 m preset / vehicle portal and
+  the project circulation-width setting are pinned by tests, and a multi-defect layout is asserted
+  to report every finding deterministically in pipeline order. `test/relationship-rules.test.ts`
+  adds 8 tests; the pipeline-order test in `test/rule-registry.test.ts` moves 32 → 33 definitions.
+  Verification: `npm test` **99 passing**; `npm run typecheck` 0 errors; canonical fingerprint
+  unchanged; and `serializeCanonical(GenerationResult)` for the canonical seed is byte-identical to
+  `2a4f216`, so 2.4 moved no output. Both new behaviours were checked for teeth by temporarily
+  restoring implicit-`any` (the tests failed as expected) and the mutation was reverted.
+
 - Bucket 2.3 landed as `2a4f216` (`feat: add PlanLab rule registry and ordered validator`).
   `src/domain/rules.ts` now holds the typed evaluator registry: one immutable `planlab-core`
   definition per violation code, hard rule instances carrying `enforcement`, `source`, validated
@@ -80,8 +95,10 @@ for the Milestone 4 worker protocol. Raised for bucket 2.5 and for the user.
 
 ## Next step
 
-1. Execute Stage 2 in plan order. Bucket 2.3 (rule definitions, instances, and the ordered
-   validator, Terra-authored) is the next dispatch.
+1. Execute Stage 2 in plan order. Bucket 2.5 (independent Milestone 2 review) is the last bucket:
+   review the whole validation stack, fix only Stage 2 defects, and record evidence under
+   `artifacts/planlab/milestone-2/`. 2.3 is Terra-authored, so the orchestrator judged it directly;
+   2.5 should provide the independent pass over 2.1/2.2/2.4 and re-check the deltas 2.3 recorded.
 2. Bucket 2.3 is Terra-authored (integration-heavy registry refactor), so the orchestrator judges
    its result and 2.5 provides independent review of the whole validation stack.
 3. Stage 2 must not change Stage 1 canonical fingerprints or existing fixture verdicts; a change is
