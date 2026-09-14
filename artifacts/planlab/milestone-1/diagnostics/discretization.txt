@@ -1,0 +1,10 @@
+Discretization (grid 250 mm)
+Project: canonical-planlab-project
+Authored site: 20000 × 30000 mm
+Snapped site: 80 × 120 units = 20000 × 30000 mm (truncated width 0 mm, depth 0 mm)
+Authored envelope: 17000 × 22000 mm at x 1500 mm, y 2000 mm
+Snapped envelope: 68 × 88 units at x 6, y 8 = 17000 × 22000 mm at x 1500 mm, y 2000 mm
+Inset loss: north 0 mm, east 0 mm, south 0 mm, west 0 mm
+Discretization loss: 0 mm² (0.00 m²)
+Findings: EXACT_GRID_FIT
+- EXACT_GRID_FIT (info): authored site and envelope land exactly on the 250 mm grid; no authored millimetres are lost

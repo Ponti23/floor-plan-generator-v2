@@ -1,0 +1,31 @@
+PlanLab project inspection planlab-project-inspection-1
+Project: canonical-planlab-project (PlanLab canonical prototype)
+Schema: v1 | Seed: canonical-0
+Fingerprint: sha256:95d89f35db8b7eea5bc52196cb70f49a8885cf37bbdde5a82a5caff50cbc061d
+
+Discretization (grid 250 mm)
+Project: canonical-planlab-project
+Authored site: 20000 × 30000 mm
+Snapped site: 80 × 120 units = 20000 × 30000 mm (truncated width 0 mm, depth 0 mm)
+Authored envelope: 17000 × 22000 mm at x 1500 mm, y 2000 mm
+Snapped envelope: 68 × 88 units at x 6, y 8 = 17000 × 22000 mm at x 1500 mm, y 2000 mm
+Inset loss: north 0 mm, east 0 mm, south 0 mm, west 0 mm
+Discretization loss: 0 mm² (0.00 m²)
+Findings: EXACT_GRID_FIT
+- EXACT_GRID_FIT (info): authored site and envelope land exactly on the 250 mm grid; no authored millimetres are lost
+
+Program: 8 room instances
+- bedroom-1: bedroom "Bedroom 1" [required] | min area 10.00 m² (160 units²) | min short side 3.00 m | zone private, wet no, exterior high, pass-through not allowed
+- bedroom-2: bedroom "Bedroom 2" [required] | min area 10.00 m² (160 units²) | min short side 3.00 m | zone private, wet no, exterior high, pass-through not allowed
+- bedroom-3: bedroom "Bedroom 3" [required] | min area 10.00 m² (160 units²) | min short side 3.00 m | zone private, wet no, exterior high, pass-through not allowed
+- bathroom-1: bathroom "Bathroom" [required] | min area 5.00 m² (80 units²) | zone service, wet yes, exterior low, pass-through not allowed
+- kitchen-1: kitchen "Kitchen" [required] | min area 12.00 m² (192 units²) | zone public, wet yes, exterior medium, pass-through allowed
+- living-1: living "Living Room" [required] | min area 20.00 m² (320 units²) | zone public, wet no, exterior high, pass-through allowed
+- laundry-1: laundry "Laundry" [required] | min area 5.00 m² (80 units²) | zone service, wet yes, exterior low, pass-through not allowed
+- garage-1: garage "Garage" [required] | min area 36.00 m² (576 units²) | min width 6.00 m | min depth 6.00 m | zone service, wet no, exterior none, pass-through not allowed, frontage south vehicle, 2 vehicle spaces
+
+Relationships: 2
+- kitchen-living-near: kitchen → living (preferShareWall, architect, aggregation any)
+- bathroom-bedrooms-near: bathroom → bedroom (preferNear, architect, aggregation any)
+
+Planning: min circulation 1000 mm (4 units) | target GFA 180.00 m² | max GFA 200.00 m² | max unallocated interior 5.0%

@@ -28,6 +28,7 @@ import {
   createCrudeDiagnostic,
   generateLayouts,
   normalizeProject,
+  serializeCanonical,
   validateLayout,
 } from "../src/domain/index.ts";
 
@@ -69,19 +70,6 @@ function percentile(values, fraction) {
   if (lower === upper) return ordered[lower];
   const weight = position - lower;
   return ordered[lower] + (ordered[upper] - ordered[lower]) * weight;
-}
-
-/** Stable JSON used for replay hashes and byte-equivalence checks. */
-function stableJson(value) {
-  if (Array.isArray(value)) return `[${value.map(stableJson).join(",")}]`;
-  if (value !== null && typeof value === "object") {
-    const entries = Object.entries(value)
-      .filter(([, entry]) => entry !== undefined)
-      .sort(([a], [b]) => a < b ? -1 : a > b ? 1 : 0)
-      .map(([key, entry]) => `${JSON.stringify(key)}:${stableJson(entry)}`);
-    return `{${entries.join(",")}}`;
-  }
-  return JSON.stringify(value);
 }
 
 function sha256(value) {
@@ -174,9 +162,12 @@ function makeCanonicalRecord(seed, budget) {
   const replayStart = performance.now();
   const replay = generateLayouts(createCanonicalProject(seed), { seed, budget });
   const replayElapsedMs = performance.now() - replayStart;
-  const firstBytes = stableJson(result);
-  const repeatedBytes = timedRuns.map((run) => stableJson(run.result));
-  const replayBytes = stableJson(replay);
+  // Replay hashes and byte-equivalence checks use the domain canonical form, so
+  // benchmark evidence and Stage 1 fingerprints cannot disagree about what a
+  // result "is".
+  const firstBytes = serializeCanonical(result);
+  const repeatedBytes = timedRuns.map((run) => serializeCanonical(run.result));
+  const replayBytes = serializeCanonical(replay);
 
   // The result contains normalized geometry but intentionally does not carry a
   // project reference. Recreate the normalized brief once, outside timing.

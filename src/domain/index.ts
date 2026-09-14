@@ -10,4 +10,6 @@ export * from "./metrics.ts";
 export * from "./scoring.ts";
 export * from "./diversity.ts";
 export * from "./diagnostics.ts";
+export * from "./serialization.ts";
+export * from "./inspection.ts";
 export * from "./generator.ts";

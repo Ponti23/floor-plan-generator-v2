@@ -4,6 +4,7 @@
   "type": "module",
   "scripts": {
     "test": "node --test",
-    "benchmark:stage0": "node scripts/benchmark-stage0.mjs"
+    "benchmark:stage0": "node scripts/benchmark-stage0.mjs",
+    "diagnostics:canonical": "node scripts/inspect-canonical.mjs"
   }
 }
