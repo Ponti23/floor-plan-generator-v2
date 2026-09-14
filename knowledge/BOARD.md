@@ -21,7 +21,7 @@ Active design: [`planlab/README.md`](./planlab/README.md) · staged plan: [`../D
 | 2.3 | Rule definitions, instances, and ordered validator | terra-max | terra-max | done | `main` (`2a4f216`) |
 | 2.4 | Relationship, garage, and circulation hard rules | luna-max | luna-max | done | `main` (`f93ddd3`) |
 | 2.5 | Independent Milestone 2 review | terra-max | sol-max | done | `main` (`ded4d73`) |
-| 3.1 | Metric formulas and false-precision controls | luna-max | luna-max | in-progress | `main` |
+| 3.1 | Metric formulas and false-precision controls | luna-max | luna-max | done | `main` (`6089c48`) |
 | 3.2 | Strategy profiles and the calibration surface | luna-max | — | todo | `main` |
 | 3.3 | Interchangeable matching, diversity, joint selection | luna-max | — | todo | `main` |
 | 3.4 | Determinism, pruning oracle, regression benchmark | luna-max | — | todo | `main` |

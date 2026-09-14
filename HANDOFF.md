@@ -2,9 +2,19 @@
 
 **Active plan:** [`DELEGATION-PLAN.md`](./DELEGATION-PLAN.md) · **Live queue:** [`knowledge/BOARD.md`](./knowledge/BOARD.md) · **Planning package:** [`knowledge/planlab/README.md`](./knowledge/planlab/README.md)
 
-**Status:** Stage 0 is complete and approved. Stage 1 is complete (independent domain API review passed 2026-09-14). **Stage 2 (access, rules, and validation) is complete** — all five buckets landed on `main` and the independent review (2.5) passed on 2026-09-14 with three access-layer defects fixed. **Stage 3 (generator, metrics, scoring, and diversity) is staged and active**; bucket 3.1 is the next dispatch.
+**Status:** Stage 0 is complete and approved. Stage 1 is complete (independent domain API review passed 2026-09-14). **Stage 2 (access, rules, and validation) is complete** — all five buckets landed on `main` and the independent review (2.5) passed on 2026-09-14 with three access-layer defects fixed. **Stage 3 (generator, metrics, scoring, and diversity) is active**; bucket 3.1 is complete and bucket 3.2 is the next dispatch.
 
 ## Last checkpoint
+
+- Bucket 3.1 landed as `6089c48` (`feat: pin PlanLab metric formulas and validity gates`). The five
+  metric categories now use named, versioned breakpoints; utility helpers pin their bounds and
+  documented monotonic behavior; planning efficiency and allocation ratio are distinct formulas
+  with garage excluded from the habitable comparison; and stale validation results cannot preserve
+  a PASS after geometry changes. Diagnostics expose the separate ratios without compliance
+  language. Verification: `npm test` **105 passing**; `npm run typecheck` 0 errors;
+  `npm run diagnostics:canonical -- --check` clean. The intentional metrics-version update changed
+  the canonical project fingerprint to
+  `sha256:b8f11f6232fbc26b15a49b610c391b62dffb4b002a2e57935bc74d70d44dbf03`.
 
 - Bucket 2.5 landed as `ded4d73` (`test: add Milestone 2 independent validation review`), closing
   Stage 2. The review (evidence: `artifacts/planlab/milestone-2/validation-review.md`) used
@@ -111,7 +121,7 @@ for the Milestone 4 worker protocol. Raised for bucket 2.5 and for the user.
 
 ## Next step
 
-1. Execute Stage 3 in plan order. Bucket 3.1 (metric formulas and false-precision controls,
+1. Execute Stage 3 in plan order. Bucket 3.2 (strategy profiles and the calibration surface,
    `luna-max`) is the next dispatch.
 2. Stage 3's definition of done is the architect usefulness/scoring-language **hard gate** — it
    stops for the user and is never merged solo.

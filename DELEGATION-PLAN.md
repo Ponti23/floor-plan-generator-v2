@@ -80,13 +80,13 @@ Existing seams: `src/domain/generator.ts`, `metrics.ts`, `scoring.ts`, `diversit
 Much of this already exists as a Stage 0 prototype; the work here is hardening it to production
 contracts and proving the claims it currently asserts.
 
-- [ ] **3.1 Metric formulas and false-precision controls.** Pin the five category metrics and their
+- [x] **3.1 Metric formulas and false-precision controls.** Pin the five category metrics and their
   documented formulas against `SCORING_SYSTEM.md`: breakpoints, boundedness, monotonicity where the
   spec claims it, and the efficiency-reporting rules (planning efficiency vs allocation ratio,
   garage never inflating habitable comparison). Keep false-precision controls honest — no
   compliance percentage, no metric rescued by a score, invalid geometry always invalid regardless
   of score. Verify formula breakpoints, monotonic responses, bound saturation, and the
-  invalid-geometry-never-rescued rule. — `luna-max`
+  invalid-geometry-never-rescued rule. — `luna-max` (`6089c48`)
 - [ ] **3.2 Strategy profiles and the calibration surface.** Consolidate every profile weight and
   threshold into one auditable calibration surface, prove a profile can never change hard validity
   or feasibility, and make the strategy trade-off language inspectable so the architect can
