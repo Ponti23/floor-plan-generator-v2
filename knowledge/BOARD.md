@@ -21,6 +21,11 @@ Active design: [`planlab/README.md`](./planlab/README.md) · staged plan: [`../D
 | 2.3 | Rule definitions, instances, and ordered validator | terra-max | terra-max | done | `main` (`2a4f216`) |
 | 2.4 | Relationship, garage, and circulation hard rules | luna-max | luna-max | done | `main` (`f93ddd3`) |
 | 2.5 | Independent Milestone 2 review | terra-max | sol-max | done | `main` (`ded4d73`) |
+| 3.1 | Metric formulas and false-precision controls | luna-max | — | todo | `main` |
+| 3.2 | Strategy profiles and the calibration surface | luna-max | — | todo | `main` |
+| 3.3 | Interchangeable matching, diversity, joint selection | luna-max | — | todo | `main` |
+| 3.4 | Determinism, pruning oracle, regression benchmark | luna-max | — | todo | `main` |
+| 3.5 | Independent Milestone 3 review | terra-max | — | todo | `main` |
 
 ## Handoff rules
 
@@ -37,3 +42,6 @@ Active design: [`planlab/README.md`](./planlab/README.md) · staged plan: [`../D
 - Stage 2 is **complete** (`9a24738`, `7f87add`, `2a4f216`, `f93ddd3`, `ded4d73`). The independent
   review passed with open findings; see `artifacts/planlab/milestone-2/validation-review.md`.
   Milestone 3 is not active until the orchestrator stages it.
+- Stage 3 (generator, metrics, scoring, diversity) is staged and active. Buckets run in order.
+  Its definition of done is a **user hard gate**: the architect approves mathematical usefulness
+  and the scoring language before polished UI work; never merge that solo.

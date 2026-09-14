@@ -2,7 +2,7 @@
 
 **Active plan:** [`DELEGATION-PLAN.md`](./DELEGATION-PLAN.md) · **Live queue:** [`knowledge/BOARD.md`](./knowledge/BOARD.md) · **Planning package:** [`knowledge/planlab/README.md`](./knowledge/planlab/README.md)
 
-**Status:** Stage 0 is complete and approved. Stage 1 is complete (independent domain API review passed 2026-09-14). **Stage 2 (access, rules, and validation) is complete** — all five buckets landed on `main` and the independent review (2.5) passed on 2026-09-14 with three access-layer defects fixed. Milestone 3 is the next orchestrator action and is not active until staged.
+**Status:** Stage 0 is complete and approved. Stage 1 is complete (independent domain API review passed 2026-09-14). **Stage 2 (access, rules, and validation) is complete** — all five buckets landed on `main` and the independent review (2.5) passed on 2026-09-14 with three access-layer defects fixed. **Stage 3 (generator, metrics, scoring, and diversity) is staged and active**; bucket 3.1 is the next dispatch.
 
 ## Last checkpoint
 
@@ -111,12 +111,13 @@ for the Milestone 4 worker protocol. Raised for bucket 2.5 and for the user.
 
 ## Next step
 
-1. Sol@Max stages Milestone 3 (generator, metrics, scoring, and diversity) from
-   `knowledge/planlab/IMPLEMENTATION_PLAN.md`. Do not begin Milestone 3 product implementation
-   before that staging.
-2. The Stage 0 benchmark evidence decision below is waiting on the user; it is not a blocker for
-   staging Milestone 3, but it should be settled before the Milestone 4 worker protocol fixes
-   message payloads.
+1. Execute Stage 3 in plan order. Bucket 3.1 (metric formulas and false-precision controls,
+   `luna-max`) is the next dispatch.
+2. Stage 3's definition of done is the architect usefulness/scoring-language **hard gate** — it
+   stops for the user and is never merged solo.
+3. The Stage 0 benchmark evidence decision below is waiting on the user; it is not a blocker for
+   Stage 3, but it should be settled before the Milestone 4 worker protocol fixes message payloads
+   (bucket 3.4 records its mechanical consequence).
 3. Orchestrator note for future stages: every dispatched executor in Stage 2 stalled at least once
    by reporting status and asking for authorization instead of implementing, and two spawned nested
    helpers. Four of the five buckets were finished by the orchestrator. Executor briefs must state

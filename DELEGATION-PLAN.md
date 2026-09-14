@@ -65,5 +65,54 @@ decision about Stage 0 benchmark evidence; see `HANDOFF.md`). Stage 3 and beyond
 [`knowledge/planlab/IMPLEMENTATION_PLAN.md`](./knowledge/planlab/IMPLEMENTATION_PLAN.md) and are not
 active until staged.
 
+## Stage 3 — Generator, metrics, scoring, and diversity
+
+Goal (from `IMPLEMENTATION_PLAN.md` Milestone 3): deliver the production deterministic layout
+pipeline and three strategy results. Acceptance: the canonical seed suite meets the approved
+validity/diversity/expansion gates; all output is reproducible; "fewer than three" and
+"infeasible" are distinct outcomes; profiles never alter hard validity. **Definition of done is a
+user hard gate** — the architect approves mathematical usefulness and the scoring language.
+
+Spec: [`SCORING_SYSTEM.md`](./knowledge/planlab/SCORING_SYSTEM.md), [`GENERATION_ENGINE.md`](./knowledge/planlab/GENERATION_ENGINE.md),
+[`DATA_MODEL.md`](./knowledge/planlab/DATA_MODEL.md), [`TESTING_STRATEGY.md`](./knowledge/planlab/TESTING_STRATEGY.md).
+Existing seams: `src/domain/generator.ts`, `metrics.ts`, `scoring.ts`, `diversity.ts`,
+`scripts/benchmark-stage0.mjs`, `test/planlab-scoring.test.ts`, `test/generator.test.ts`.
+Much of this already exists as a Stage 0 prototype; the work here is hardening it to production
+contracts and proving the claims it currently asserts.
+
+- [ ] **3.1 Metric formulas and false-precision controls.** Pin the five category metrics and their
+  documented formulas against `SCORING_SYSTEM.md`: breakpoints, boundedness, monotonicity where the
+  spec claims it, and the efficiency-reporting rules (planning efficiency vs allocation ratio,
+  garage never inflating habitable comparison). Keep false-precision controls honest — no
+  compliance percentage, no metric rescued by a score, invalid geometry always invalid regardless
+  of score. Verify formula breakpoints, monotonic responses, bound saturation, and the
+  invalid-geometry-never-rescued rule. — `luna-max`
+- [ ] **3.2 Strategy profiles and the calibration surface.** Consolidate every profile weight and
+  threshold into one auditable calibration surface, prove a profile can never change hard validity
+  or feasibility, and make the strategy trade-off language inspectable so the architect can
+  calibrate thresholds. Verify weights normalize as documented, profiles differ only through
+  weights, and a profile change cannot flip a hard verdict. — `luna-max`
+- [ ] **3.3 Interchangeable matching, diversity, and joint triplet selection.** Harden
+  interchangeable-instance matching so a bedroom-number swap or a mirror is not a new design, keep
+  the diversity distance metric symmetric and bounded, and ensure joint triplet selection reports
+  "fewer than three" and "infeasible" as distinct outcomes rather than conflating them. Verify
+  mirror/duplicate/topology diversity fixtures, distance symmetry and bounds, and the
+  distinct-outcome matrix. — `luna-max`
+- [ ] **3.4 Determinism, pruning oracle, and regression benchmark.** Pin seeded tie-breaking and the
+  fixed expansion budgets, add a pruning oracle proving a pruned branch could not have contained the
+  selected optimum, and turn the Stage 0 benchmark into a repeatable regression harness with
+  recorded baselines and explicit environment metadata. Verify replay byte-equivalence, budget
+  determinism, and benchmark reproducibility. Whatever the outcome of the Stage 0 benchmark
+  evidence decision (see `HANDOFF.md`), record its mechanical consequence here rather than changing
+  product semantics unilaterally. — `luna-max`
+- [ ] **3.5 Independent Milestone 3 review.** Review the generator, metrics, scoring, and diversity
+  stack for misleading metrics, false precision, determinism leaks, weak tests, pruning-oracle
+  credibility, and benchmark honesty. Fix only Stage 3 defects, run the complete suite, and record
+  evidence under `artifacts/planlab/milestone-3/`. — `terra-max` (reason: independent review; the
+  orchestrator judges Terra-authored work)
+
+**Hard gate at the end of Stage 3:** the architect/user explicitly approves mathematical usefulness
+and the scoring language before any polished UI work. Do not merge that decision solo.
+
 Future milestones remain defined in
 [`knowledge/planlab/IMPLEMENTATION_PLAN.md`](./knowledge/planlab/IMPLEMENTATION_PLAN.md) and are not active.
