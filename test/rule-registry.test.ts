@@ -154,7 +154,7 @@ function validFixture(): { layout: Layout; project: NormalizedProject } {
 }
 
 test("every pipeline definition is registered with a stable id and version", () => {
-  assert.equal(PLANLAB_CORE_PIPELINE.length, 32);
+  assert.equal(PLANLAB_CORE_PIPELINE.length, 33);
   assert.equal(new Set(PLANLAB_CORE_PIPELINE).size, PLANLAB_CORE_PIPELINE.length);
   for (const id of PLANLAB_CORE_PIPELINE) {
     const definition = PLANLAB_CORE_DEFINITIONS.get(id);
@@ -198,6 +198,7 @@ test("the pipeline order follows the eight RULE_ENGINE stages", () => {
       "garage-missing-south-frontage",
       "relationship-selector-unresolved",
       "must-share-wall-unsatisfied",
+      "relationship-aggregation-unsupported",
     ],
   ];
   assert.deepEqual(PLANLAB_CORE_PIPELINE, stages.flat());

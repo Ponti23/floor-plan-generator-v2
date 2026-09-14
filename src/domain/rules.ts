@@ -174,6 +174,7 @@ export type ViolationCode =
   | "GARAGE_MISSING_SOUTH_FRONTAGE"
   | "RELATIONSHIP_SELECTOR_UNRESOLVED"
   | "MUST_SHARE_WALL_UNSATISFIED"
+  | "RELATIONSHIP_AGGREGATION_UNSUPPORTED"
   | "RULE_DEFINITION_UNSUPPORTED";
 
 export interface RuleEvaluation {
@@ -997,27 +998,75 @@ const PLANLAB_CORE_DEFINITIONS_ARRAY: readonly RuleDefinition[] = [
       const from = selectedSpaces(relationship.from, context.project, context.roomSpaces);
       const to = selectedSpaces(relationship.to, context.project, context.roomSpaces);
       if (from.length === 0 || to.length === 0) continue;
+      // Normalization always writes an aggregation; `any` stays the documented
+      // default for raw normalized data that predates the field.
+      const aggregation = relationship.aggregation ?? "any";
+      // `nearest` and `average` aggregate distance rather than wall contact.
+      // `relationship-aggregation-unsupported` reports them; this rule stays
+      // silent so one defect produces one finding.
+      if (aggregation !== "any" && aggregation !== "all") continue;
       const threshold = Math.max(
         MIN_MEANINGFUL_SHARED_WALL_UNITS,
         relationship.minSharedWallM === undefined
           ? 0
           : Math.ceil(relationship.minSharedWallM / GRID_UNIT_METRES),
       );
-      let satisfied = false;
+      // Selector expansion is explicit: every (from, to) pair except an
+      // instance paired with itself is evaluated, and the declared aggregation
+      // decides what the pair results mean.
+      const pairLengths: number[] = [];
       for (const a of from) {
         for (const b of to) {
           if (a.instanceId === b.instanceId) continue;
-          if (sharedWallLength(a.rect, b.rect) >= threshold) satisfied = true;
+          pairLengths.push(sharedWallLength(a.rect, b.rect));
         }
       }
+      // An empty expansion is never vacuously satisfied: `all` over no pairs
+      // would otherwise pass a relationship that cannot be checked at all.
+      const satisfied = aggregation === "any"
+        ? pairLengths.some((lengthUnits) => lengthUnits >= threshold)
+        : pairLengths.length > 0 && pairLengths.every((lengthUnits) => lengthUnits >= threshold);
       if (!satisfied) {
         failures.push(failEvaluation(
           rule,
           "MUST_SHARE_WALL_UNSATISFIED",
           [relationship.id],
-          [scalarEvidence("thresholdUnits", threshold)],
+          [
+            scalarEvidence("thresholdUnits", threshold),
+            scalarEvidence("aggregation", aggregation),
+            scalarEvidence("evaluatedPairs", pairLengths.length),
+            scalarEvidence(
+              "shortestSharedWallUnits",
+              pairLengths.length === 0 ? 0 : Math.min(...pairLengths),
+            ),
+          ],
         ));
       }
+    }
+    return failures.length > 0 ? failures : [passEvaluation(rule)];
+  }),
+
+  // `nearest`/`average` are distance aggregations.  A hard wall-contact rule
+  // cannot honour them, and silently reading them as `any` would turn an
+  // unusable declaration into a hidden pass, so they are reported explicitly.
+  defineRule("relationship-aggregation-unsupported", "relationship", emptyParameters, (
+    context,
+    rule,
+  ) => {
+    const failures: RuleEvaluation[] = [];
+    for (const relationship of context.project.relationships) {
+      if (relationship.kind !== "mustShareWall") continue;
+      const aggregation = relationship.aggregation ?? "any";
+      if (aggregation === "any" || aggregation === "all") continue;
+      failures.push(failEvaluation(
+        rule,
+        "RELATIONSHIP_AGGREGATION_UNSUPPORTED",
+        [relationship.id],
+        [
+          scalarEvidence("aggregation", aggregation),
+          scalarEvidence("relationshipKind", relationship.kind),
+        ],
+      ));
     }
     return failures.length > 0 ? failures : [passEvaluation(rule)];
   }),
@@ -1065,6 +1114,7 @@ const SCOPE_BY_DEFINITION_ID: Readonly<Record<string, RuleScope>> = Object.freez
   "garage-missing-south-frontage": { kind: "room" },
   "relationship-selector-unresolved": { kind: "relationship" },
   "must-share-wall-unsatisfied": { kind: "relationship" },
+  "relationship-aggregation-unsupported": { kind: "relationship" },
 });
 
 function projectParameters(project: NormalizedProject): Readonly<Record<string, RuleParameters>> {
