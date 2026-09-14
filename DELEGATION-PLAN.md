@@ -92,12 +92,12 @@ contracts and proving the claims it currently asserts.
   or feasibility, and make the strategy trade-off language inspectable so the architect can
   calibrate thresholds. Verify weights normalize as documented, profiles differ only through
   weights, and a profile change cannot flip a hard verdict. — `luna-max` (`c5bff25`)
-- [ ] **3.3 Interchangeable matching, diversity, and joint triplet selection.** Harden
+- [x] **3.3 Interchangeable matching, diversity, and joint triplet selection.** Harden
   interchangeable-instance matching so a bedroom-number swap or a mirror is not a new design, keep
   the diversity distance metric symmetric and bounded, and ensure joint triplet selection reports
   "fewer than three" and "infeasible" as distinct outcomes rather than conflating them. Verify
   mirror/duplicate/topology diversity fixtures, distance symmetry and bounds, and the
-  distinct-outcome matrix. — `luna-max`
+  distinct-outcome matrix. — `luna-max` (`e301ed4`, `e8d4b45`)
 - [ ] **3.4 Determinism, pruning oracle, and regression benchmark.** Pin seeded tie-breaking and the
   fixed expansion budgets, add a pruning oracle proving a pruned branch could not have contained the
   selected optimum, and turn the Stage 0 benchmark into a repeatable regression harness with

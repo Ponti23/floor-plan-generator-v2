@@ -2,9 +2,17 @@
 
 **Active plan:** [`DELEGATION-PLAN.md`](./DELEGATION-PLAN.md) · **Live queue:** [`knowledge/BOARD.md`](./knowledge/BOARD.md) · **Planning package:** [`knowledge/planlab/README.md`](./knowledge/planlab/README.md)
 
-**Status:** Stage 0 is complete and approved. Stage 1 is complete (independent domain API review passed 2026-09-14). **Stage 2 (access, rules, and validation) is complete** — all five buckets landed on `main` and the independent review (2.5) passed on 2026-09-14 with three access-layer defects fixed. **Stage 3 (generator, metrics, scoring, and diversity) is active**; buckets 3.1–3.2 are complete and bucket 3.3 is the next dispatch.
+**Status:** Stage 0 is complete and approved. Stage 1 is complete (independent domain API review passed 2026-09-14). **Stage 2 (access, rules, and validation) is complete** — all five buckets landed on `main` and the independent review (2.5) passed on 2026-09-14 with three access-layer defects fixed. **Stage 3 (generator, metrics, scoring, and diversity) is active**; buckets 3.1–3.3 are complete and bucket 3.4 is the next dispatch.
 
 ## Last checkpoint
+
+- Bucket 3.3 landed as `e301ed4` plus review correction `e8d4b45` (`feat: harden PlanLab diversity
+  and triplet outcomes`; `fix: keep empty PlanLab pools non-infeasible`). Interchangeable room labels
+  and mirrors now share a canonical identity; diversity is deterministic, symmetric, and bounded;
+  and selection distinguishes proved infeasibility, no candidates found, fewer than three valid
+  candidates, and insufficient diversity. Orchestrator review caught and corrected an initial
+  overclaim that labeled a budget-exhausted empty search “infeasible.” Verification: `npm test`
+  **116 passing**; `npm run typecheck` 0 errors; canonical diagnostics clean.
 
 - Bucket 3.2 landed as `c5bff25` (`feat: add PlanLab scoring calibration surface`). A frozen,
   validated calibration surface now owns the five-category strategy weights, metric and diversity
@@ -128,7 +136,7 @@ for the Milestone 4 worker protocol. Raised for bucket 2.5 and for the user.
 
 ## Next step
 
-1. Execute Stage 3 in plan order. Bucket 3.3 (interchangeable matching, diversity, and joint selection,
+1. Execute Stage 3 in plan order. Bucket 3.4 (determinism, pruning oracle, and regression benchmark,
    `luna-max`) is the next dispatch.
 2. Stage 3's definition of done is the architect usefulness/scoring-language **hard gate** — it
    stops for the user and is never merged solo.
