@@ -8,7 +8,7 @@ default while requiring it to stay settable (D2/D3), and asked for the engineeri
 to be done rather than returned as questions (D4). All of it is implemented, verified and green
 (136 tests, full regression gate PASS at median 1,750 ms). Record:
 [`artifacts/planlab/milestone-3/gate-amendment-d1-d4.md`](artifacts/planlab/milestone-3/gate-amendment-d1-d4.md).
-**Next: build Milestone 4.**
+**Next: verify the Milestone 4 worker shell in a browser, then stage Milestone 5.**
 
 ## D5 remote checkpoint — approved
 
@@ -26,9 +26,13 @@ Two things a resuming session should know before it re-measures anything:
    value-level derived drift must call `serializeCanonical(result)` explicitly.
 
 **Milestone 4 status:** bucket 4.1 (worker + three-pane UI shell per
-`knowledge/planlab/UI_ARCHITECTURE.md`) was dispatched to a sub-agent that stalled for ~40 minutes
-without writing a single file and was interrupted. No `app/` directory exists. The bucket is back in
-the queue.
+`knowledge/planlab/UI_ARCHITECTURE.md`) is complete on the working tree. It adds the versioned
+worker protocol, `GenerationController`, cooperative cancellation through a shared signal,
+progress counters with monotonic clamping, stale-response rejection, watchdog `budgetExceeded`,
+worker crash/retry recovery, a plain three-pane shell, and a Node worker benchmark. Verification:
+`npm test` **145 passing**, `npm run typecheck` 0 errors, `npm run build` clean, and
+`npm run benchmark:worker` median **174.6 ms**. The bucket is uncommitted at the time of writing;
+manual browser verification remains before Milestone 4 is declared complete.
 
 ## Last checkpoint
 
@@ -192,15 +196,14 @@ for the Milestone 4 worker protocol. Raised for bucket 2.5 and for the user.
 
 ## Next step
 
-1. Stage and execute Milestone 4 in plan order, beginning with bucket 4.1 (worker protocol and
-   three-pane UI shell) using `knowledge/planlab/UI_ARCHITECTURE.md`.
-2. Preserve the D4 payload boundary: worker transport uses the semantic result projection rather
-   than the full in-memory derived indexes.
-3. Orchestrator note for future stages: every dispatched executor in Stage 2 stalled at least once
-   by reporting status and asking for authorization instead of implementing, and two spawned nested
-   helpers. Four of the five buckets were finished by the orchestrator. Executor briefs must state
-   "do the work now, do not ask, do not spawn sub-agents" — and a stalled executor should be
-   interrupted and the bucket done directly rather than re-dispatched a third time.
+1. Commit bucket 4.1 once its final checks are green, then verify the browser path manually:
+   generate, cancel, edit mid-run, retry, and simulate a worker failure.
+2. Stage Milestone 5 (minimal functional workspace) from
+   `knowledge/planlab/IMPLEMENTATION_PLAN.md`, keeping the D4 payload boundary in place for the
+   worker transport.
+3. Orchestrator note for future stages: dispatched executors in this project have repeatedly stalled
+   by asking for authorization instead of implementing. Brief them to "do the work now, do not ask,
+   do not spawn sub-agents" and do a stalled bucket directly rather than re-dispatching it.
 
 ## Open findings
 

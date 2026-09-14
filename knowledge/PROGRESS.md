@@ -38,24 +38,28 @@ tags: [progress, resume]
 - **Open threads:**
   1. **D5 — push.** Approved by the user on 2026-09-15; this checkpoint is being pushed to
      `origin/main` before Milestone 4 starts.
-  2. **Milestone 4 (UI).** Unblocked. Bucket 4.1 was dispatched to a sub-agent that stalled
-     for ~40 minutes without writing a single file and was interrupted; it is back in the queue.
+  2. **Milestone 4 (UI).** Unblocked. Bucket 4.1 is complete on the working tree: versioned worker
+     protocol, controller, cooperative cancellation, progress monotonicity, stale-response
+     rejection, watchdog/crash recovery, a three-pane shell, and a Node worker benchmark
+     (median 174.6 ms). Manual browser verification remains before Milestone 4 is declared complete.
   3. Product/UX/copy and money/payment decisions remain human hard gates. The calibration override
      seam deliberately makes copy-adjacent values *settable* without freezing them.
   4. **Evidence-resolution caveat** in D4 above — a future review needing value-level derived drift
      detection must use `serializeCanonical(result)` explicitly.
-- **Next step:** build Milestone 4 (worker/UI scaffolding) from
-  `knowledge/planlab/IMPLEMENTATION_PLAN.md`, following `knowledge/planlab/UI_ARCHITECTURE.md`.
+- **Next step:** commit bucket 4.1 after its final checks, verify the browser path manually
+  (generate/cancel/edit/retry/worker failure), then stage Milestone 5 from
+  `knowledge/planlab/IMPLEMENTATION_PLAN.md`.
 - **In-flight branches:** all work is on `main` (Milestone 0 baseline `8171058`, Stage 1
   `0e8589b`…`e1c6f38` plus typecheck infra `19916f1`, Stage 2 `9a24738`…`ded4d73`, Stage 3
   `6089c48`…`99e1904` plus the 3.5 review); `stage0-planlab-spike` is retained at the completed gate
   checkpoint `b8aba2a`.
-- **Deferred:** Milestone 4+ product implementation (worker/UI scaffolding) is unstarted until the
-  Stage 3 gate closes. `INSTANCES_BY_PROJECT` in `rules.ts` caches instances per project object
+- **Deferred:** Milestone 5+ product implementation is unstarted until Milestone 4 is committed and
+  browser-verified. `INSTANCES_BY_PROJECT` in `rules.ts` caches instances per project object
   identity — revisit when the project document becomes editable (Milestone 6).
 
-**Evidence after the gate amendment:** `npm test` **136 passing** (122 → 129 → 136: +4 room-shape
-policy, +7 calibration overrides, +3 result payload); `npm run typecheck` 0 errors;
+**Evidence after the gate amendment:** `npm test` **145 passing** (122 → 129 → 136 → 145: +4
+room-shape policy, +7 calibration overrides, +3 result payload, +9 worker protocol/controller);
+`npm run typecheck` 0 errors; `npm run build` clean;
 `npm run diagnostics:canonical -- --check` clean at fingerprint `sha256:8efe5b5e…`;
 `npm run benchmark:stage0:check` **`baselineMatch: true`** with every gate line PASS at median
 **1,749.5 ms** / p95 **1,831.1 ms** (record run 1,786.9 ms; bounded 1,774.8 ms) on a quiet machine.

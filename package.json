@@ -5,6 +5,9 @@
   "scripts": {
     "test": "node --test",
     "typecheck": "tsc -p tsconfig.json",
+    "dev": "vite",
+    "build": "vite build",
+    "benchmark:worker": "node scripts/benchmark-worker.mjs",
     "benchmark:stage0": "node scripts/benchmark-stage0.mjs",
     "benchmark:stage0:check": "node scripts/benchmark-stage0.mjs --check",
     "benchmark:stage0:bounded": "node scripts/benchmark-stage0.mjs --check --bounded",
@@ -12,6 +15,7 @@
   },
   "devDependencies": {
     "@types/node": "^24.13.4",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "vite": "^7.1.5"
   }
 }

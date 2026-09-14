@@ -30,7 +30,7 @@ Active design: [`planlab/README.md`](./planlab/README.md) · staged plan: [`../D
 | 3.7 | D1 room-shape policy and preferred-area allocation | terra-max | orchestrator (`/root`) | done | `main` (uncommitted at time of writing) |
 | 3.8 | D2/D3 settable calibration surface | terra-max | orchestrator (`/root`) | done | `main` (uncommitted) |
 | 3.9 | D4 generation-result payload projection | terra-max | orchestrator (`/root`) | done | `main` (uncommitted) |
-| 4.1 | Milestone 4 UI shell (worker + three-pane app) | terra-max | orchestrator (`/root`) | todo | — |
+| 4.1 | Milestone 4 UI shell (worker + three-pane app) | terra-max | orchestrator (`/root`) | done | `main` (uncommitted at time of writing) |
 
 ## Handoff rules
 
@@ -67,5 +67,9 @@ Active design: [`planlab/README.md`](./planlab/README.md) · staged plan: [`../D
 - Buckets 3.7–3.9 carry that work. The room-shape values, the calibration overrides and the payload
   projection are all **data or seam changes with the approved defaults preserved**, so the approved
   scoring language is still the default rather than a replaced one.
-- Milestone 4 is unblocked. 4.1 was dispatched to a sub-agent and that agent
-  stalled without writing a file; the bucket is back in the queue for the orchestrator.
+- Milestone 4 is unblocked. Bucket 4.1 is complete on `main`: versioned worker
+  protocol, `GenerationController`, cooperative cancellation via a shared
+  signal, progress monotonicity, stale-response rejection, watchdog outcomes,
+  worker error recovery, a plain three-pane UI shell, and a Node worker
+  benchmark. Verification: 145 tests, typecheck clean, Vite build clean,
+  `benchmark:worker` median 174.6 ms on the reference machine.

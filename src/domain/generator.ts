@@ -108,6 +108,31 @@ export interface GenerationOptions {
   calibration?: ScoringCalibrationSurface;
 }
 
+/** Runtime-only observability. These hooks never participate in result semantics. */
+export interface GenerationRuntime {
+  shouldCancel?: () => boolean;
+  onProgress?: (progress: GenerationProgress) => void;
+}
+
+export interface GenerationProgress {
+  phase: "preflight" | "search" | "scoring" | "selection";
+  topology: CirculationSkeletonKind | null;
+  expandedStates: number;
+  validCandidates: number;
+}
+
+export class GenerationCancelledError extends Error {
+  constructor() {
+    super("generation cancelled");
+    this.name = "GenerationCancelledError";
+  }
+}
+
+function observeRuntime(runtime: GenerationRuntime | undefined, progress: GenerationProgress): void {
+  if (runtime?.shouldCancel?.()) throw new GenerationCancelledError();
+  runtime?.onProgress?.(progress);
+}
+
 export interface GenerationDiagnostic {
   code:
     | "NORMALIZATION_FAILED"
@@ -1081,6 +1106,9 @@ function searchTopology(
   seed: string,
   budget: GenerationBudget,
   candidateOffset: number,
+  runtime?: GenerationRuntime,
+  priorExpandedStates = 0,
+  priorValidCandidates = 0,
 ): { candidates: SearchCandidate[]; expandedStates: number; budgetExceeded: boolean; pruning: PruningStats } {
   const footprint = footprintPlacement(project.site.envelope, footprintVariant.width, footprintVariant.depth);
   const skeleton = makeSkeleton(project, footprint, topology, seed);
@@ -1126,6 +1154,14 @@ function searchTopology(
     const room = roomOrder[roomIndex];
     const next: SearchState[] = [];
     for (const state of beam) {
+      if ((expandedStates & 31) === 0) {
+        observeRuntime(runtime, {
+          phase: "search",
+          topology,
+          expandedStates: priorExpandedStates + expandedStates,
+          validCandidates: priorValidCandidates,
+        });
+      }
       if (expandedStates >= budget.maxExpansionsPerTopology) {
         budgetExceeded = true;
         break;
@@ -1338,7 +1374,9 @@ function appendSelectionDiagnostics(
 export function generateLayouts(
   projectOrBrief: NormalizedProject | Parameters<typeof normalizeProject>[0],
   options?: string | GenerationOptions,
+  runtime?: GenerationRuntime,
 ): GenerationResult {
+  observeRuntime(runtime, { phase: "preflight", topology: null, expandedStates: 0, validCandidates: 0 });
   const normalized = normalizeInput(projectOrBrief);
   const seed = normalized.project
     ? projectSeed(normalized.project, options)
@@ -1422,6 +1460,9 @@ export function generateLayouts(
         seed,
         { ...budget, maxExpansionsPerTopology: remainingExpansions },
         ordinal,
+        runtime,
+        expandedStates,
+        layouts.length + topologyCandidates.length,
       );
       topologyExpanded += search.expandedStates;
       expandedStates += search.expandedStates;
@@ -1468,7 +1509,9 @@ export function generateLayouts(
     diagnostics.push({ code: "NO_VALID_LAYOUT", message: "bounded search found no hard-valid layout" });
   }
   emptyMetadata.expandedStates = expandedStates;
+  observeRuntime(runtime, { phase: "scoring", topology: null, expandedStates, validCandidates: layouts.length });
   const analyses = scoreCandidates(layouts, project, { calibration });
+  observeRuntime(runtime, { phase: "selection", topology: null, expandedStates, validCandidates: layouts.length });
   const selection = selectDiverseTriplet(analyses, project, { calibration });
   appendSelectionDiagnostics(diagnostics, selection);
   return {

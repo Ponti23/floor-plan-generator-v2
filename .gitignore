@@ -1,4 +1,5 @@
 node_modules/
+dist/
 
 # Local secrets and environment overrides are never committed.
 .env
