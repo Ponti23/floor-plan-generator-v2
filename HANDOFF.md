@@ -6,6 +6,16 @@
 
 ## Last checkpoint
 
+- Bucket 2.1 landed as `9a24738` (`refactor: add PlanLab layout facts pass and edge indexes`).
+  `src/domain/facts.ts` now computes one immutable geometry index per candidate — per-space
+  coverage, pairwise overlaps with clipped rects, shared-wall intervals plus a `a|b` pair index,
+  footprint-boundary and exposed exterior contact per space per side, and unallocated interior
+  area — and `metrics.ts` / `validation.ts` consume it instead of rescanning pairs. New
+  `test/layout-facts.test.ts` covers hand-checked cases and an **occupancy-grid oracle** property
+  test over 60 generated layouts that shares no code with `geometry.ts` (verified to have teeth by
+  a temporary mutation of the shared-wall scan, which it caught). Verification: `npm test` 77
+  passing; `npm run typecheck` 0 errors; `npm run diagnostics:canonical -- --check` clean with the
+  fingerprint unchanged at `sha256:95d89f35db8b7eea5bc52196cb70f49a8885cf37bbdde5a82a5caff50cbc061d`.
 - Bucket 1.4 passed and landed as `e1c6f38` (`fix: resolve Stage 1 review findings in domain APIs`) plus `19916f1` (`build: add TypeScript typecheck gate and node typings`). Review evidence: [`artifacts/planlab/milestone-1/domain-api-review.md`](./artifacts/planlab/milestone-1/domain-api-review.md).
 - Four Stage 1 findings fixed:
   1. Normalization collapsed typed `RoomSelector` objects to strings and accepted an undocumented `"group"` variant. Object selectors are now preserved in normalized relationships, `"group"` is removed, and unresolved-selector checks are intent-aware (an instance selector no longer silently retargets to a colliding requirement id). Two new tests pin preservation and the no-retarget rule.
@@ -17,12 +27,16 @@
 
 ## Next step
 
-1. Execute Stage 2 in plan order. Bucket 2.1 (layout facts pass and edge indexes, `luna-max`) is the
-   next dispatch.
+1. Execute Stage 2 in plan order. Bucket 2.2 (portal geometry and access graph hardening,
+   `luna-max`) is the next dispatch.
 2. Bucket 2.3 is Terra-authored (integration-heavy registry refactor), so the orchestrator judges
    its result and 2.5 provides independent review of the whole validation stack.
 3. Stage 2 must not change Stage 1 canonical fingerprints or existing fixture verdicts; a change is
-   a defect, not a permitted side effect.
+   a defect, not a permitted side effect. (2.1 held this: the fingerprint is unchanged.)
+4. Orchestrator note: the first two 2.1 executors stalled by reporting status and asking for
+   authorization instead of implementing, and one spawned nested helpers. The bucket was finished
+   and judged by the orchestrator, which also added the missing occupancy-grid oracle test. Future
+   executor briefs must state "do the work now, do not ask, do not spawn sub-agents".
 
 ## Open findings
 

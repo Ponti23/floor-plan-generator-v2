@@ -16,7 +16,7 @@ Active design: [`planlab/README.md`](./planlab/README.md) · staged plan: [`../D
 | 1.2 | Production geometry primitives and property oracles | luna-max | luna-max | done | `main` (`ff99f7c`) |
 | 1.3 | Canonical serialization, fingerprinting, and diagnostics | luna-max | luna-max | done | `main` (`113d1d3`) |
 | 1.4 | Independent domain API review | terra-max | terra-max | done | `main` (`e1c6f38`) |
-| 2.1 | Layout facts pass and edge indexes | luna-max | — | todo | `main` |
+| 2.1 | Layout facts pass and edge indexes | luna-max | luna-max | done | `main` (`9a24738`) |
 | 2.2 | Portal geometry and access graph hardening | luna-max | — | todo | `main` |
 | 2.3 | Rule definitions, instances, and ordered validator | terra-max | — | todo | `main` |
 | 2.4 | Relationship, garage, and circulation hard rules | luna-max | — | todo | `main` |
