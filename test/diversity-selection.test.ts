@@ -98,15 +98,15 @@ test("a topology change remains a distinct design", () => {
   assert.ok(comparison.components.adjacency > 0 || comparison.components.circulation > 0);
 });
 
-test("selection distinguishes infeasible, fewer-than-three, and insufficient-diversity outcomes", () => {
+test("selection distinguishes no-candidate, fewer-than-three, and insufficient-diversity outcomes", () => {
   const other = generated.layouts.find((candidate) => candidate.id !== layout.id);
   assert.ok(other);
   const mirrored = mirroredLayout(layout, project);
 
-  const infeasible = selectDiverseTriplet([], project);
-  assert.equal(infeasible.status, "infeasible");
-  assert.equal(infeasible.partial, false);
-  assert.equal(infeasible.reason, "NO_VALID_CANDIDATES");
+  const noCandidates = selectDiverseTriplet([], project);
+  assert.equal(noCandidates.status, "partial");
+  assert.equal(noCandidates.partial, true);
+  assert.equal(noCandidates.reason, "NO_VALID_CANDIDATES");
 
   const fewer = selectDiverseTriplet([layout, other!], project);
   assert.equal(fewer.status, "partial");
@@ -130,4 +130,17 @@ test("preflight contradictions surface as infeasible generation results", () => 
   assert.equal(result.selection.status, "infeasible");
   assert.equal(result.selection.partial, false);
   assert.ok(result.diagnostics.some((diagnostic) => diagnostic.code === "INFEASIBLE"));
+});
+
+test("bounded search with no found layouts remains a non-infeasible no-candidate result", () => {
+  const result = generateLayouts(project, {
+    seed: "bucket-3.3-zero-result-search",
+    budget: { maxExpansionsPerTopology: 1, maxCandidatesPerTopology: 1, maxTotalCandidates: 1 },
+  });
+  assert.equal(result.layouts.length, 0);
+  assert.equal(result.selection.status, "partial");
+  assert.equal(result.selection.partial, true);
+  assert.equal(result.selection.reason, "NO_VALID_CANDIDATES");
+  assert.ok(result.diagnostics.some((diagnostic) => diagnostic.code === "NO_VALID_LAYOUT"));
+  assert.ok(!result.diagnostics.some((diagnostic) => diagnostic.code === "INFEASIBLE"));
 });

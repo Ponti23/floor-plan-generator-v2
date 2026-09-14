@@ -676,9 +676,9 @@ export function selectDiverseTriplet(
     diagnostics.push({ code: "NO_VALID_CANDIDATES", message: "no hard-valid candidates are available for strategy selection", candidateCount: 0, threshold });
     return {
       version: DIVERSITY_VERSION,
-      status: "infeasible",
+      status: "partial",
       complete: false,
-      partial: false,
+      partial: true,
       threshold,
       selected: [],
       layouts: [],
