@@ -155,10 +155,10 @@ direction plus screenshot acceptance contract in
 - [ ] **5.0 Product copy + shell decision.** Confirm the final strategy names, conceptual-use
   disclaimer, metric names, infeasibility/budget language, and whether the MVP continues on the
   existing Vite/TS shell or migrates to Next.js. — `astra-plan`; **HARD GATE, owned by the user**
-- [ ] **5.1 Brief editor state and committed form.** Replace the vertical-slice form with typed
+- [x] **5.1 Brief editor state and committed form.** Replace the vertical-slice form with typed
   editor state: site, offsets, area policy, room program, relationships, and planning assumptions.
   Keep local form state separate from committed normalized project state; a changed brief marks
-  previous results stale. Use replaceable recommended copy. — `luna-max`
+  previous results stale. Use replaceable recommended copy. — `luna-max` (`c63a1d2`)
 - [ ] **5.2 SVG projection, layers, pan/zoom/fit, and evidence highlight.** Render stable layers in
   order (grid, site, envelope, footprint, spaces/portals, labels, evidence, north/scale) using a
   grid-unit viewBox and a single viewport transform. Add zoom/fit and observation-to-geometry

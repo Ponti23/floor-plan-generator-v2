@@ -19,19 +19,19 @@ site/footprint hierarchy, muted plan surface, north/zoom scaffolding, and horizo
 All worker/domain behavior remains unchanged. This visual approval does not freeze final product
 copy.
 
-**Flash continuation boundary:** do not redo the CSS foundation. Continue by restructuring
-`src/app/main.ts` into the mockup composition and wiring real payload data. Highest-priority gaps are
-the grouped semantic toolbar; Site/Rooms/Constraints editor rows; category-aware room classes and
-area labels; actual option thumbnails; selected-option metrics, score bars and observations; and
-real viewport controls. The starter was visually checked in the browser in both idle and completed
-three-layout states. It is intentionally incomplete and must still pass the 1536 × 1024 comparison
-loop in `FRONTEND_MOCKUP_BRIEF.md`.
+**Current continuation boundary:** bucket 5.1 is complete at `c63a1d2`. It adds typed local
+draft/committed editor state, stale-result handling, centralized replaceable copy, mockup-aligned
+Site/Rooms/Constraints editing, and focused tests. Continue with 5.2; do not redo the CSS or editor
+state foundations. Highest-priority gaps are the full layered SVG projection, category-aware room
+fills and area labels, real option thumbnails, and working pan/zoom/fit plus evidence highlight.
+The workspace must still pass the 1536 × 1024 comparison loop in `FRONTEND_MOCKUP_BRIEF.md`.
 
 1. Read `AGENTS.md`, `knowledge/PROGRESS.md`, `knowledge/BOARD.md`, `DELEGATION-PLAN.md`, and this
    handoff before acting.
 2. Stay on clean, synchronized `main`. The user authorized the mockup-driven visual starter; do not
    interpret that as approval to freeze copy or expand scope beyond the fidelity brief.
-3. Claim 5.1 and continue the frontend from the CSS foundation. In parallel, prepare one concise
+3. Claim 5.2 and continue the SVG/viewport work from the verified 5.1 foundation. In parallel,
+   prepare one concise
    5.0 final-copy decision package containing:
    - the recommendation to retain the existing Vite/TS shell, with the short reason that this MVP
      has no backend, SSR, routing, or server actions requiring Next.js;
@@ -60,8 +60,8 @@ default while requiring it to stay settable (D2/D3), and asked for the engineeri
 to be done rather than returned as questions (D4). All of it is implemented, verified and green
 (145 tests, full regression gate PASS at median 1,750 ms). Record:
 [`artifacts/planlab/milestone-3/gate-amendment-d1-d4.md`](artifacts/planlab/milestone-3/gate-amendment-d1-d4.md).
-**Milestone 4 is closed for browser smoke; Milestone 5 is staged. Next: close 5.0 (product copy +
-Vite/Next.js decision), then execute 5.1–5.4.**
+**Milestone 4 is closed; Milestone 5 is active. Bucket 5.1 is complete. Next: execute 5.2 while
+keeping final copy replaceable and awaiting user approval.**
 
 ## D5 remote checkpoint — approved
 
@@ -263,12 +263,9 @@ for the Milestone 4 worker protocol. Raised for bucket 2.5 and for the user.
 
 ## Next step
 
-1. Close **5.0**: get user approval for Milestone 5 product copy (strategy names, conceptual-use
-   disclaimer, metric names, infeasibility language) and the Vite-vs-Next.js shell decision.
-   Recommended technical default: keep the existing Vite/TS shell; this client-only MVP has no
-   backend, SSR, routing, or server actions that justify Next.js.
-2. After 5.0, execute 5.1 → 5.2 → 5.3 → 5.4 with replaceable recommended copy until final copy is
-   approved. Do not freeze copy unilaterally.
+1. Claim and execute **5.2** from `c63a1d2`, following `FRONTEND_MOCKUP_BRIEF.md`; do not redo 5.1.
+2. Continue 5.3 → 5.4 with centralized replaceable copy; do not freeze copy or close 5.0 without
+   explicit user approval.
 3. Run the Milestone 5 independent review (5.5) before closing the stage.
 4. Orchestrator note for future stages: dispatched executors in this project have repeatedly stalled
    by asking for authorization instead of implementing. Brief them to "do the work now, do not ask,

@@ -66,11 +66,10 @@ tags: [progress, resume]
      enough. A verified CSS foundation now matches the reference's main proportions, white toolbar,
      blue accent, planning grid and compact density; `HANDOFF.md` records the precise remaining
      `main.ts` and visual-QA work for DeepSeek-Flash.
-- **Next step:** DeepSeek-Flash reads `AGENTS.md`, this file, `knowledge/BOARD.md`,
-  `DELEGATION-PLAN.md`, `HANDOFF.md`, and `knowledge/planlab/FRONTEND_MOCKUP_BRIEF.md`, claims 5.1,
-  and continues the mockup-driven frontend without redoing the CSS foundation. Keep strategy names,
-  disclaimer, metric labels, and failure wording centralized and replaceable; present those final
-  copy choices to the user before freezing them.
+- **Next step:** bucket 5.1 is complete at `c63a1d2` with 151 passing tests, clean typecheck/build,
+  canonical diagnostics, and browser smoke. DeepSeek-Flash or the available Luna fallback reads the
+  resume files, claims 5.2, and implements the SVG projection, stable layers, pan/zoom/fit, and
+  evidence highlighting without redoing the CSS/editor foundation. Keep final copy replaceable.
 - **In-flight branches:** all work is on `main` (Milestone 0 baseline `8171058`, Stage 1
   `0e8589b`…`e1c6f38` plus typecheck infra `19916f1`, Stage 2 `9a24738`…`ded4d73`, Stage 3
   `6089c48`…`99e1904` plus the 3.5 review); `stage0-planlab-spike` is retained at the completed gate
