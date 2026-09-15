@@ -9,8 +9,10 @@ import {
   PROJECT_STORE_PREFIX,
   PROJECT_STORE_VERSION,
   recoveryKeyFor,
+  storageNoticeKind,
   type StoragePort,
 } from "../src/app/project-store.ts";
+import { RECOMMENDED_PRESENTATION_COPY } from "../src/app/presentation-copy.ts";
 
 /**
  * Milestone 6.1: the local project store.  Every test runs against an in-memory
@@ -187,4 +189,26 @@ test("two stores with different prefixes never see each other's documents", () =
   if (firstRead.status !== "loaded" || secondRead.status !== "loaded") return;
   assert.equal(firstRead.document.project.projectId, CANONICAL_PROJECT.projectId);
   assert.equal(secondRead.document.project.projectId, "other");
+});
+
+test("each read outcome maps to the notice the workspace should show", () => {
+  assert.equal(storageNoticeKind({ status: "empty" }), null);
+  assert.equal(storageNoticeKind({ status: "loaded", document: { storeVersion: 1, savedAt: "x", project: CANONICAL_PROJECT } }), null);
+  assert.equal(storageNoticeKind({ status: "corrupt", reason: "bad" }), "recovered");
+  assert.equal(storageNoticeKind({ status: "unsupportedVersion", foundVersion: 2 }), "newerVersion");
+  assert.equal(storageNoticeKind({ status: "outdated", foundVersion: 0 }), "olderVersion");
+  assert.equal(storageNoticeKind({ status: "unavailable", reason: "denied" }), "unavailable");
+});
+
+test("every storage notice and save label has real copy", () => {
+  const storage = RECOMMENDED_PRESENTATION_COPY.storage;
+  for (const label of [storage.savedLabel, storage.savingLabel, storage.failedLabel, storage.unavailableLabel]) {
+    assert.ok(typeof label === "string" && label.length > 0);
+  }
+  for (const kind of ["recovered", "newerVersion", "olderVersion", "unavailable"] as const) {
+    assert.ok(storage.notices[kind].length > 0, `${kind} notice is written`);
+  }
+  // The failure copy must not claim the data was saved.
+  assert.equal(/saved/i.test(storage.failedLabel), false);
+  assert.equal(/saved/i.test(storage.unavailableLabel), false);
 });

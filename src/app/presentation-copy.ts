@@ -191,6 +191,19 @@ export interface PlanLabPresentationCopy {
     staleAction: string;
     conceptualUseNotice: string;
   };
+  /** Milestone 6 local-persistence language. Replaceable while 6.4's reset copy is unreviewed. */
+  storage: {
+    savedLabel: string;
+    savingLabel: string;
+    failedLabel: string;
+    unavailableLabel: string;
+    notices: {
+      recovered: string;
+      newerVersion: string;
+      olderVersion: string;
+      unavailable: string;
+    };
+  };
 }
 
 /**
@@ -409,6 +422,18 @@ export const RECOMMENDED_PRESENTATION_COPY: Readonly<PlanLabPresentationCopy> = 
     staleAction: "Regenerate",
     conceptualUseNotice: "Conceptual layout only — verify dimensions, regulations, and construction requirements before use.",
   },
+  storage: {
+    savedLabel: "Saved locally",
+    savingLabel: "Saving…",
+    failedLabel: "Local save failed",
+    unavailableLabel: "Local saving unavailable",
+    notices: {
+      recovered: "The saved project could not be read, so the default brief was loaded. The unreadable copy was kept in local storage.",
+      newerVersion: "The saved project was written by a newer build of PlanLab and was not loaded.",
+      olderVersion: "The saved project was written by an older build of PlanLab and was not loaded.",
+      unavailable: "This browser is not allowing local storage, so edits will not survive a refresh.",
+    },
+  },
 });
 
 export interface PresentationCopyOverrides {
@@ -436,6 +461,9 @@ export interface PresentationCopyOverrides {
     selectionReasons?: Partial<PlanLabPresentationCopy["analysis"]["selectionReasons"]>;
   };
   status?: Partial<PlanLabPresentationCopy["status"]>;
+  storage?: Omit<Partial<PlanLabPresentationCopy["storage"]>, "notices"> & {
+    notices?: Partial<PlanLabPresentationCopy["storage"]["notices"]>;
+  };
 }
 
 /** Resolve recommended copy with shallow per-group overrides for future approval/locales. */
@@ -470,5 +498,10 @@ export function resolvePresentationCopy(
       selectionReasons: { ...RECOMMENDED_PRESENTATION_COPY.analysis.selectionReasons, ...overrides.analysis?.selectionReasons },
     },
     status: { ...RECOMMENDED_PRESENTATION_COPY.status, ...overrides.status },
+    storage: {
+      ...RECOMMENDED_PRESENTATION_COPY.storage,
+      ...overrides.storage,
+      notices: { ...RECOMMENDED_PRESENTATION_COPY.storage.notices, ...overrides.storage?.notices },
+    },
   };
 }

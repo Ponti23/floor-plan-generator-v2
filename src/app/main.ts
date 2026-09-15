@@ -21,6 +21,14 @@ import {
 } from "./editor-state.ts";
 import { resolvePresentationCopy } from "./presentation-copy.ts";
 import {
+  createProjectStore,
+  preserveUnreadableDocument,
+  storageNoticeKind,
+  type ProjectStore,
+  type StorageNoticeKind,
+  type StoragePort,
+} from "./project-store.ts";
+import {
   candidateEvidence,
   observationLabel,
   observationExplanations,
@@ -46,7 +54,39 @@ import { GenerationController, type GenerationState, type WorkerPort } from "../
 
 const app = document.querySelector<HTMLDivElement>("#app")!;
 const copy = resolvePresentationCopy();
-let editor: BriefEditorState = createBriefEditorState(CANONICAL_PROJECT);
+
+/**
+ * Local persistence (Milestone 6).  A browser that refuses storage must still
+ * get a working workspace, so the port is resolved defensively and every
+ * failure is a value the UI can render.
+ */
+function browserStoragePort(): StoragePort | null {
+  try {
+    return window.localStorage;
+  } catch {
+    return null;
+  }
+}
+
+const storagePort = browserStoragePort();
+const projectStore: ProjectStore | null = storagePort === null ? null : createProjectStore(storagePort);
+const storedOutcome = projectStore === null
+  ? ({ status: "unavailable", reason: "local storage is not reachable" } as const)
+  : projectStore.read();
+const storageNotice: StorageNoticeKind | null = storageNoticeKind(storedOutcome);
+if (storedOutcome.status === "corrupt" && projectStore !== null && storagePort !== null) {
+  // Keep the unreadable copy rather than letting the next save overwrite it.
+  preserveUnreadableDocument(storagePort, projectStore);
+}
+
+let editor: BriefEditorState = createBriefEditorState(
+  storedOutcome.status === "loaded" ? storedOutcome.document.project : CANONICAL_PROJECT,
+);
+let saveState: "saved" | "saving" | "failed" | "unavailable" = storageNotice === "unavailable" || projectStore === null
+  ? "unavailable"
+  : "saved";
+let lastSavedRevision = editor.revision;
+let saveTimer: ReturnType<typeof setTimeout> | null = null;
 let selectedLayoutId: string | null = null;
 let generationRevision: number | null = null;
 let expandedRoomId: string | null = "kitchen";
@@ -196,6 +236,9 @@ function renderBriefPane(state: Readonly<GenerationState>): string {
     ? `<p class="form-error" role="alert">${escapeText(issueSummary())}</p>`
     : "";
   const generating = state.status === "generating";
+  const storageMarkup = storageNotice === null
+    ? ""
+    : `<p class="storage-notice" role="status">${escapeText(copy.storage.notices[storageNotice])}</p>`;
   return `<aside class="brief-pane" aria-label="${escapeAttribute(copy.ui.briefTitle)}">
     <div class="brief-scroll">
       <div class="pane-title"><div><span class="eyebrow">${escapeText(copy.ui.briefEyebrow)}</span><h1>${escapeText(copy.ui.briefTitle)}</h1></div><span class="revision">${escapeText(copy.ui.versionPrefix)}${editor.revision + 1}</span></div>
@@ -224,6 +267,7 @@ function renderBriefPane(state: Readonly<GenerationState>): string {
         <p class="helper-text">${escapeText(copy.ui.planningHelper)}</p>
       </section>
       ${issueMarkup}
+      ${storageMarkup}
     </div>
     <div class="brief-footer">
       <div class="brief-status" aria-live="polite"><span class="status-dot ${editor.resultsStale ? "warning" : "ok"}" aria-hidden="true"></span><span class="brief-state">${escapeText(statusLabel(state))}</span><span data-live-status>${escapeText(statusDetail(state))}</span></div>
@@ -508,9 +552,72 @@ function updateBrief(patch: Parameters<typeof editBriefDraft>[1]): void {
 function commitEditorDraft(): boolean {
   const outcome = commitBriefDraft(editor);
   editor = outcome.state;
-  if (outcome.ok) committedProjects.set(editor.revision, editor.committedProject);
+  if (outcome.ok) {
+    committedProjects.set(editor.revision, editor.committedProject);
+    scheduleSave();
+  }
   render(controller.state);
   return outcome.ok;
+}
+
+/**
+ * Debounced local save of the committed brief.
+ *
+ * The brief is written from `committedBrief` — the authored document — rather
+ * than from the normalized solver input, so a stored project reopens as the
+ * form the author typed.  A page hide flushes immediately, because a debounce
+ * that never fires is a lost project.
+ */
+function scheduleSave(): void {
+  if (projectStore === null || saveState === "unavailable") return;
+  if (editor.revision === lastSavedRevision) return;
+  if (saveState !== "saving") {
+    saveState = "saving";
+    renderSaveStatus();
+  }
+  if (saveTimer !== null) clearTimeout(saveTimer);
+  saveTimer = setTimeout(flushSave, 400);
+}
+
+function flushSave(): void {
+  if (saveTimer !== null) {
+    clearTimeout(saveTimer);
+    saveTimer = null;
+  }
+  if (projectStore === null) return;
+  if (editor.revision === lastSavedRevision && saveState === "saved") return;
+  const outcome = projectStore.write(editor.committedBrief);
+  if (outcome.status === "saved") {
+    saveState = "saved";
+    lastSavedRevision = editor.revision;
+  } else {
+    saveState = "failed";
+  }
+  renderSaveStatus();
+}
+
+function saveStatusText(): string {
+  if (saveState === "unavailable") return copy.storage.unavailableLabel;
+  if (saveState === "saving") return copy.storage.savingLabel;
+  if (saveState === "failed") return copy.storage.failedLabel;
+  return copy.storage.savedLabel;
+}
+
+/**
+ * Update the save indicator in place, without a full re-render.
+ *
+ * The toolbar is rendered from one template, so this locates the indicator by
+ * its class and rewrites only its dot and its label.
+ */
+function renderSaveStatus(): void {
+  const indicator = app.querySelector<HTMLElement>(".save-indicator");
+  if (!indicator) return;
+  indicator.dataset.state = saveState;
+  const dot = indicator.querySelector<HTMLElement>(".status-dot");
+  if (dot) dot.classList.toggle("warning", saveState === "failed");
+  const label = indicator.querySelector<HTMLElement>("[data-save-status]") ??
+    indicator.querySelectorAll<HTMLElement>("span")[1] ?? null;
+  if (label) label.textContent = saveStatusText();
 }
 
 function roomWithField(index: number, field: keyof DraftRoom, value: string): void {
@@ -622,6 +729,8 @@ function bindFormEvents(): void {
 
 function startGeneration(): void {
   if (!commitEditorDraft()) return;
+  // Generating is a natural flush point: the user has committed to this brief.
+  flushSave();
   generationRevision = editor.revision;
   focusedEvidenceRefs = [];
   controller.start(editor.committedProject, editor.committedProject.generation.seed);
@@ -709,8 +818,14 @@ function render(state: Readonly<GenerationState>): void {
   app.innerHTML = `<header class="toolbar"><div class="brand"><span class="brand-mark" aria-hidden="true">${toolbarIcon("brand")}</span><strong>${escapeText(copy.productName)}</strong><span class="brand-subtitle">${escapeText(copy.subtitle)}</span></div><div class="toolbar-group toolbar-middle"><button type="button" class="toolbar-button" disabled title="${escapeAttribute(`${copy.toolbar.newProject} — ${copy.toolbar.disabledReason}`)}">${escapeText(copy.toolbar.newProject)}</button><span class="save-indicator"><span class="status-dot ok" aria-hidden="true"></span>${escapeText(copy.toolbar.saveStatus)}</span></div><div class="toolbar-group toolbar-right">${shellControl(copy.toolbar.grid, "grid")}${shellControl(copy.toolbar.measurements, "measurements")}${shellControl(copy.toolbar.settings, "settings")}</div></header><main class="workspace">${renderBriefPane(state)}${renderCanvas(state)}${renderAnalysis(state)}</main>`;
   bindFormEvents();
   bindViewportEvents();
+  renderSaveStatus();
   restoreFocus(focus);
   syncProgressTicker(state);
 }
 
 controller.subscribe(render);
+
+// A debounced save that never fires is a lost project, so hide/unload flush
+// immediately.  `pagehide` fires on refresh, tab close and bfcache entry.
+window.addEventListener("pagehide", () => flushSave());
+window.addEventListener("beforeunload", () => flushSave());

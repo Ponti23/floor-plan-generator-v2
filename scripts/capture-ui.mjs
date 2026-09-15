@@ -21,6 +21,7 @@
  *   --pre <js>        run JavaScript after load and before clicking Generate
  *   --post <js>       run JavaScript after generation settles, before capture
  *   --immediate       capture while the run is still in flight instead of waiting
+ *   --reload          reload the page (same profile, so storage persists) before capturing
  *   --json <path>     also write the DOM digest as JSON
  */
 import { execFile, spawn } from "node:child_process";
@@ -41,6 +42,7 @@ function parseArgs(argv) {
     pre: null,
     post: null,
     immediate: false,
+    reload: false,
     json: null,
     chrome: null,
   };
@@ -56,6 +58,7 @@ function parseArgs(argv) {
     else if (arg === "--pre") options.pre = next;
     else if (arg === "--post") options.post = next;
     else if (arg === "--immediate") options.immediate = true;
+    else if (arg === "--reload") options.reload = true;
     else if (arg === "--no-generate") options.generate = false;
   }
   return options;
@@ -155,6 +158,12 @@ const DOM_DIGEST = [
   "    analysisPane: box('.analysis'),",
   "    statusLabel: text('.brief-state'),",
   "    statusDetail: text('.brief-status'),",
+  "    saveStatus: text('.save-indicator'),",
+  "    projectName: document.querySelector('#project-name')?.value ?? null,",
+  "    siteWidth: document.querySelector('#site-width')?.value ?? null,",
+  "    siteDepth: document.querySelector('#site-depth')?.value ?? null,",
+  "    variationSeed: document.querySelector('#generation-seed')?.value ?? null,",
+  "    storageNotice: text('.storage-notice'),",
   "    optionCards: [...document.querySelectorAll('.option-card')].map((node) => ({",
   "      slot: node.querySelector('.option-badge')?.textContent?.trim() ?? null,",
   "      name: node.querySelector('.option-name')?.textContent?.trim() ?? null,",
@@ -235,7 +244,14 @@ async function main() {
     if (options.post) {
       const post = await client.send("Runtime.evaluate", { expression: options.post, returnByValue: true });
       if (post.exceptionDetails) throw new Error(`--post script failed: ${post.exceptionDetails.text}`);
-      await delay(250);
+      await delay(700);
+    }
+
+    if (options.reload) {
+      const reloaded = client.once("Page.loadEventFired");
+      await client.send("Page.reload", { ignoreCache: false });
+      await reloaded;
+      await delay(700);
     }
 
     const digest = await client.send("Runtime.evaluate", {

@@ -59,6 +59,28 @@ export type ProjectWriteOutcome =
   | { status: "saved"; savedAt: string }
   | { status: "failed"; reason: string };
 
+/**
+ * What the workspace should tell the user about the last read.
+ *
+ * `null` means "nothing worth saying": an empty store is the normal first run.
+ */
+export type StorageNoticeKind = "recovered" | "newerVersion" | "olderVersion" | "unavailable";
+
+export function storageNoticeKind(outcome: ProjectReadOutcome): StorageNoticeKind | null {
+  switch (outcome.status) {
+    case "corrupt":
+      return "recovered";
+    case "unsupportedVersion":
+      return "newerVersion";
+    case "outdated":
+      return "olderVersion";
+    case "unavailable":
+      return "unavailable";
+    default:
+      return null;
+  }
+}
+
 export interface ProjectStore {
   /** Key the current document is written to. */
   readonly key: string;

@@ -40,7 +40,7 @@ Active design: [`planlab/README.md`](./planlab/README.md) · staged plan: [`../D
 | 5.6 | Stage 0 baseline provenance fix | terra-max | orchestrator (`/root`) | done | `main` |
 | 6.1 | Versioned local storage repository | luna-max | orchestrator (`/root`) | done | `main` |
 | 6.2 | Sequential migrations and recovery key | luna-max | unassigned | todo | — |
-| 6.3 | Debounced autosave, flush and save status | luna-max | unassigned | todo | — |
+| 6.3 | Debounced autosave, flush and save status | luna-max | orchestrator (`/root`) | done | `main` |
 | 6.4 | Reset flow and destructive confirmation (copy = hard gate) | luna-max | unassigned | todo | — |
 | 6.5 | Engine-version result invalidation | terra-max | unassigned | todo | — |
 | 6.6 | Independent Stage 6 review | terra-max | sol-max | todo | — |
