@@ -23,11 +23,13 @@ import { resolvePresentationCopy } from "./presentation-copy.ts";
 import {
   createProjectStore,
   preserveUnreadableDocument,
+  RESULT_STORE_KEY,
   storageNoticeKind,
   type ProjectStore,
   type StorageNoticeKind,
   type StoragePort,
 } from "./project-store.ts";
+import { projectStoredResult, readStoredResult } from "./stored-result.ts";
 import {
   candidateEvidence,
   observationLabel,
@@ -79,6 +81,30 @@ if (storedOutcome.status === "corrupt" && projectStore !== null && storagePort !
   preserveUnreadableDocument(storagePort, projectStore);
 }
 
+/**
+ * A stored generation result is only restored when every version that can change
+ * what a score means still matches this build; otherwise it is dropped and the
+ * brief simply has no results yet.
+ */
+function readStoredResultRaw(): string | null {
+  try {
+    return storagePort?.getItem(RESULT_STORE_KEY) ?? null;
+  } catch {
+    return null;
+  }
+}
+
+const storedResult = readStoredResult(projectStore === null ? null : readStoredResultRaw());
+if (storedResult.status === "outdated" || storedResult.status === "corrupt") {
+  try {
+    storagePort?.removeItem(RESULT_STORE_KEY);
+  } catch {
+    // Leaving an unusable document behind is harmless; refusing to start is not.
+  }
+}
+/** Set when stored layouts were discarded because the build moved. */
+let resultsOutdated = storedResult.status === "outdated";
+
 let editor: BriefEditorState = createBriefEditorState(
   storedOutcome.status === "loaded" ? storedOutcome.document.project : CANONICAL_PROJECT,
 );
@@ -89,6 +115,7 @@ let lastSavedRevision = editor.revision;
 let saveTimer: ReturnType<typeof setTimeout> | null = null;
 /** Reset is destructive, so it waits for an explicit confirmation. */
 let resetPending = false;
+let lastPersistedPayload: GenerationResultPayload | null = null;
 let selectedLayoutId: string | null = null;
 let generationRevision: number | null = null;
 let expandedRoomId: string | null = "kitchen";
@@ -103,6 +130,19 @@ const committedProjects = new Map<number, NormalizedProject>([
 const controller = new GenerationController(
   () => new Worker(new URL("../worker/generation.worker.ts", import.meta.url), { type: "module" }) as WorkerPort,
 );
+
+/**
+ * Put the stored result back only when it belongs to the brief we just loaded.
+ * A result restored against a different brief would present old layouts as the
+ * answer to the current one.
+ */
+function restoreStoredResult(): void {
+  if (storedOutcome.status !== "loaded" || storedResult.status !== "usable") return;
+  controller.restore(storedResult.document.payload);
+  generationRevision = editor.revision;
+  editor = markBriefResultCurrent(editor, editor.revision);
+  lastPersistedPayload = storedResult.document.payload;
+}
 
 function escapeText(value: string): string {
   return value.replace(/[&<>"']/g, (character) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[character]!);
@@ -238,9 +278,12 @@ function renderBriefPane(state: Readonly<GenerationState>): string {
     ? `<p class="form-error" role="alert">${escapeText(issueSummary())}</p>`
     : "";
   const generating = state.status === "generating";
-  const storageMarkup = storageNotice === null
+  const storageMessages: string[] = [];
+  if (storageNotice !== null) storageMessages.push(copy.storage.notices[storageNotice]);
+  if (resultsOutdated) storageMessages.push(copy.storage.notices.resultsOutdated);
+  const storageMarkup = storageMessages.length === 0
     ? ""
-    : `<p class="storage-notice" role="status">${escapeText(copy.storage.notices[storageNotice])}</p>`;
+    : `<p class="storage-notice" role="status">${escapeText(storageMessages.join(" "))}</p>`;
   const resetMarkup = resetPending
     ? `<div class="reset-confirm" role="alertdialog" aria-label="${escapeAttribute(copy.reset.title)}">
         <strong>${escapeText(copy.reset.title)}</strong>
@@ -589,13 +632,20 @@ function scheduleSave(): void {
   saveTimer = setTimeout(flushSave, 400);
 }
 
-function flushSave(): void {
+/**
+ * Write the committed brief now.
+ *
+ * `force` writes even when the revision has not moved.  Generate uses it: the
+ * user has just said this brief matters, and a stored result is useless without
+ * the brief it belongs to.
+ */
+function flushSave(force = false): void {
   if (saveTimer !== null) {
     clearTimeout(saveTimer);
     saveTimer = null;
   }
   if (projectStore === null) return;
-  if (editor.revision === lastSavedRevision && saveState === "saved") return;
+  if (!force && editor.revision === lastSavedRevision && saveState === "saved") return;
   const outcome = projectStore.write(editor.committedBrief);
   if (outcome.status === "saved") {
     saveState = "saved";
@@ -743,7 +793,7 @@ function bindFormEvents(): void {
 function startGeneration(): void {
   if (!commitEditorDraft()) return;
   // Generating is a natural flush point: the user has committed to this brief.
-  flushSave();
+  flushSave(true);
   generationRevision = editor.revision;
   focusedEvidenceRefs = [];
   controller.start(editor.committedProject, editor.committedProject.generation.seed);
@@ -874,9 +924,31 @@ function render(state: Readonly<GenerationState>): void {
   renderSaveStatus();
   restoreFocus(focus);
   syncProgressTicker(state);
+  persistResultIfCurrent(state);
+}
+
+/**
+ * Store the result once it belongs to the current committed brief.
+ *
+ * The written document is the trimmed projection (bucket 6.5): the three
+ * selected layouts and their scorecards, not the whole candidate pool.
+ */
+function persistResultIfCurrent(state: Readonly<GenerationState>): void {
+  const payload = state.lastCompatibleResult;
+  if (storagePort === null || payload === null || payload === lastPersistedPayload) return;
+  if (state.status === "generating" || state.requestId !== null) return;
+  if (editor.resultRevision === null || editor.resultRevision !== editor.revision) return;
+  lastPersistedPayload = payload;
+  resultsOutdated = false;
+  try {
+    storagePort.setItem(RESULT_STORE_KEY, JSON.stringify(projectStoredResult(payload)));
+  } catch {
+    // A full store must not break the workspace; the brief is still saved.
+  }
 }
 
 controller.subscribe(render);
+restoreStoredResult();
 
 // A debounced save that never fires is a lost project, so hide/unload flush
 // immediately.  `pagehide` fires on refresh, tab close and bfcache entry.

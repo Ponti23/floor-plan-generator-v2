@@ -19,6 +19,8 @@ import { tryNormalizeProject } from "../domain/normalization.ts";
 export const PROJECT_STORE_NAMESPACE = "planlab";
 export const PROJECT_STORE_PREFIX = `${PROJECT_STORE_NAMESPACE}:v1:`;
 export const PROJECT_STORE_KEY = `${PROJECT_STORE_PREFIX}project`;
+/** Stored generation result for the saved brief (bucket 6.5). */
+export const RESULT_STORE_KEY = `${PROJECT_STORE_PREFIX}result`;
 export const RECOVERY_KEY_PREFIX = `${PROJECT_STORE_PREFIX}recovery:`;
 
 /** Version of the *stored document* shape, independent of the brief schema. */
@@ -86,11 +88,29 @@ export interface ProjectStore {
   readonly key: string;
   read(): ProjectReadOutcome;
   write(project: ProjectBrief, savedAt?: string): ProjectWriteOutcome;
+  /**
+   * Bring an older stored document up to the supported version, one version at
+   * a time. A document is only rewritten once every step has succeeded, so a
+   * failed migration leaves the original bytes exactly where they were.
+   */
+  migrate(): MigrationOutcome;
   /** Remove only this app's keys; returns the keys that were removed. */
   clear(): string[];
   /** Every key this app owns, including recovery copies. */
   ownedKeys(): string[];
 }
+
+export interface StoreMigration {
+  from: number;
+  to: number;
+  /** Return the migrated document, or null when this value cannot be migrated. */
+  migrate(document: Record<string, unknown>): Record<string, unknown> | null;
+}
+
+export type MigrationOutcome =
+  | { status: "notNeeded" }
+  | { status: "migrated"; fromVersion: number; toVersion: number }
+  | { status: "failed"; reason: string };
 
 function describeError(error: unknown): string {
   if (error instanceof Error && error.message.length > 0) return error.message;
@@ -155,14 +175,23 @@ function parseDocument(raw: string, supportedVersion: number): ProjectReadOutcom
 
 export function createProjectStore(
   storage: StoragePort,
-  options: { prefix?: string; storeVersion?: number } = {},
+  options: {
+    prefix?: string;
+    storeVersion?: number;
+    key?: string;
+    migrations?: readonly StoreMigration[];
+  } = {},
 ): ProjectStore {
   const prefix = options.prefix ?? PROJECT_STORE_PREFIX;
   // The supported version is injectable so the migration seam (bucket 6.2) can
   // be tested when it lands, and so a reader can be pointed at a future version
   // deliberately rather than by editing this module.
   const supportedVersion = options.storeVersion ?? PROJECT_STORE_VERSION;
-  const key = `${prefix}project`;
+  const migrations = options.migrations ?? [];
+  // A second store instance can share this namespace with its own key (the
+  // stored result document uses `planlab:v1:result`), so `clear()` still removes
+  // everything the app owns.
+  const key = options.key ?? `${prefix}project`;
 
   const ownedKeys = (): string[] => {
     const keys: string[] = [];
@@ -204,6 +233,55 @@ export function createProjectStore(
         return { status: "failed", reason: describeError(error) };
       }
       return { status: "saved", savedAt };
+    },
+    migrate(): MigrationOutcome {
+      let raw: string | null;
+      try {
+        raw = storage.getItem(key);
+      } catch (error) {
+        return { status: "failed", reason: describeError(error) };
+      }
+      if (raw === null) return { status: "notNeeded" };
+      let current: Record<string, unknown>;
+      try {
+        const parsed = JSON.parse(raw);
+        if (!isRecord(parsed)) return { status: "failed", reason: "stored project must be a JSON object" };
+        current = parsed;
+      } catch (error) {
+        return { status: "failed", reason: `stored project is not valid JSON (${describeError(error)})` };
+      }
+      const fromVersion = typeof current.storeVersion === "number" ? current.storeVersion : 0;
+      if (fromVersion === supportedVersion) return { status: "notNeeded" };
+      if (fromVersion > supportedVersion) {
+        return { status: "failed", reason: `stored project is from a newer store version (${fromVersion})` };
+      }
+
+      let version = fromVersion;
+      let document = current;
+      while (version < supportedVersion) {
+        const step = migrations.find((candidate) => candidate.from === version);
+        if (!step || step.to <= version) {
+          return { status: "failed", reason: `no migration from store version ${version}` };
+        }
+        let migrated: Record<string, unknown> | null;
+        try {
+          migrated = step.migrate(document);
+        } catch (error) {
+          return { status: "failed", reason: `migration ${version} → ${step.to} threw (${describeError(error)})` };
+        }
+        if (!migrated || !isRecord(migrated)) {
+          return { status: "failed", reason: `migration ${version} → ${step.to} produced no document` };
+        }
+        document = { ...migrated, storeVersion: step.to };
+        version = step.to;
+      }
+
+      try {
+        storage.setItem(key, JSON.stringify(document));
+      } catch (error) {
+        return { status: "failed", reason: describeError(error) };
+      }
+      return { status: "migrated", fromVersion, toVersion: version };
     },
     clear(): string[] {
       const removed: string[] = [];

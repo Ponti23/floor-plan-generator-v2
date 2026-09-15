@@ -212,3 +212,62 @@ test("every storage notice and save label has real copy", () => {
   assert.equal(/saved/i.test(storage.failedLabel), false);
   assert.equal(/saved/i.test(storage.unavailableLabel), false);
 });
+
+test("migrations run one version at a time and only rewrite after every step succeeds", () => {
+  const storage = new MemoryStorage();
+  const older = JSON.stringify({ storeVersion: 1, savedAt: "2026-01-01T00:00:00.000Z", project: { legacy: true } });
+  storage.plant(`${PROJECT_STORE_PREFIX}project`, older);
+
+  const store = createProjectStore(storage, {
+    storeVersion: 3,
+    migrations: [
+      { from: 1, to: 2, migrate: (document) => ({ ...document, project: { ...(document.project as object), step2: true } }) },
+      { from: 2, to: 3, migrate: (document) => ({ ...document, project: { ...(document.project as object), step3: true } }) },
+    ],
+  });
+
+  assert.deepEqual(store.migrate(), { status: "migrated", fromVersion: 1, toVersion: 3 });
+  const migrated = JSON.parse(storage.raw(store.key)!);
+  assert.equal(migrated.storeVersion, 3);
+  assert.deepEqual(migrated.project, { legacy: true, step2: true, step3: true });
+  assert.equal(store.migrate().status, "notNeeded", "a second run has nothing to do");
+});
+
+test("a missing or failing migration leaves the original document untouched", () => {
+  const storage = new MemoryStorage();
+  const original = JSON.stringify({ storeVersion: 1, project: { legacy: true } });
+
+  storage.plant(`${PROJECT_STORE_PREFIX}project`, original);
+  const noStep = createProjectStore(storage, { storeVersion: 2 });
+  const missing = noStep.migrate();
+  assert.equal(missing.status, "failed");
+  assert.match(missing.status === "failed" ? missing.reason : "", /no migration from store version 1/);
+  assert.equal(storage.raw(noStep.key), original);
+
+  const throwing = createProjectStore(storage, {
+    storeVersion: 2,
+    migrations: [{ from: 1, to: 2, migrate: () => { throw new Error("bad document"); } }],
+  });
+  const failed = throwing.migrate();
+  assert.equal(failed.status, "failed");
+  assert.match(failed.status === "failed" ? failed.reason : "", /threw/);
+  assert.equal(storage.raw(throwing.key), original);
+
+  const empty = createProjectStore(storage, {
+    storeVersion: 2,
+    migrations: [{ from: 1, to: 2, migrate: () => null }],
+  });
+  assert.equal(empty.migrate().status, "failed");
+  assert.equal(storage.raw(empty.key), original);
+
+  const newer = createProjectStore(storage, { storeVersion: 0 });
+  const refused = newer.migrate();
+  assert.equal(refused.status, "failed");
+  assert.match(refused.status === "failed" ? refused.reason : "", /newer store version/);
+  assert.equal(storage.raw(newer.key), original);
+});
+
+test("an empty store has nothing to migrate", () => {
+  const store = createProjectStore(new MemoryStorage(), { storeVersion: 2 });
+  assert.deepEqual(store.migrate(), { status: "notNeeded" });
+});

@@ -102,6 +102,21 @@ export class GenerationController {
     this.finish({ status: "idle", requestId: null, progress: null, lastCompatibleResult: null, error: null });
   }
 
+  /**
+   * Adopt a result that was produced earlier by this same build (Milestone 6.5).
+   *
+   * Only the caller can decide whether a stored payload is still trustworthy;
+   * this method just puts an already-validated payload back into the observable
+   * state, with the same status mapping the worker path uses.
+   */
+  restore(payload: GenerationResultPayload): void {
+    if (this.stateValue.status === "generating") this.cancel();
+    const status: GenerationStatus = !payload.ok
+      ? "infeasible"
+      : payload.selection.complete ? "complete" : "partial";
+    this.finish({ status, requestId: null, progress: null, lastCompatibleResult: payload, error: null });
+  }
+
   dispose(): void {
     this.clearWatchdog();
     this.worker.terminate();

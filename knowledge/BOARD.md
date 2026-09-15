@@ -39,10 +39,10 @@ Active design: [`planlab/README.md`](./planlab/README.md) · staged plan: [`../D
 | 5.5 | Independent Milestone 5 review | terra-max | independent review agent (`/root/milestone5_review`); judged by orchestrator | done | `main` |
 | 5.6 | Stage 0 baseline provenance fix | terra-max | orchestrator (`/root`) | done | `main` |
 | 6.1 | Versioned local storage repository | luna-max | orchestrator (`/root`) | done | `main` |
-| 6.2 | Sequential migrations and recovery key | luna-max | unassigned | todo (no v2 exists yet; recovery key done in 6.1) | — |
+| 6.2 | Sequential migrations and recovery key | luna-max | orchestrator (`/root`) | done (mechanism; no v2 to migrate yet) | `main` |
 | 6.3 | Debounced autosave, flush and save status | luna-max | orchestrator (`/root`) | done | `main` |
 | 6.4 | Reset flow and destructive confirmation (copy = hard gate) | luna-max | orchestrator (`/root`) | done + copy `needs-human` | `main` |
-| 6.5 | Engine-version result invalidation | terra-max | unassigned | todo (blocked: results are not persisted) | — |
+| 6.5 | Engine-version result invalidation | terra-max | orchestrator (`/root`) | done | `main` |
 | 6.6 | Independent Stage 6 review | terra-max | sol-max | todo | — |
 | 7.1 | Responsive panel collapse and accessibility sweep | terra-max | unassigned | todo | — |
 | 7.2 | Production deployment config and support limitations | luna-max | unassigned | todo | — |
