@@ -34,10 +34,20 @@ Active design: [`planlab/README.md`](./planlab/README.md) · staged plan: [`../D
 | 5.0 | Milestone 5 product copy + Vite/Next.js shell decision | astra-plan | user | done | `main` (approved 2026-09-15) |
 | 5.1 | Brief editor state and committed form | luna-max | luna-max | done | `main` (`c63a1d2`) |
 | 5.2 | SVG projection, layers, pan/zoom/fit, evidence highlight | luna-max | luna-max | done | `main` (`96ba89f`) |
-| 5.3 | Result selector and analysis projection | luna-max | orchestrator (`/root`) | done | `main` |
-| 5.4 | Generation states, stale-result affordances, keyboard/a11y | terra-max | orchestrator (`/root`) | done | `main` |
+| 5.3 | Result selector and analysis projection | luna-max | orchestrator (`/root`) | done | `main` (`09a9662`) |
+| 5.4 | Generation states, stale-result affordances, keyboard/a11y | terra-max | orchestrator (`/root`) | done | `main` (`3a769e2`) |
 | 5.5 | Independent Milestone 5 review | terra-max | sol-max | todo | `main` |
 | 5.6 | Stage 0 baseline provenance fix | terra-max | orchestrator (`/root`) | done | `main` |
+| 6.1 | Versioned local storage repository | luna-max | unassigned | todo | — |
+| 6.2 | Sequential migrations and recovery key | luna-max | unassigned | todo | — |
+| 6.3 | Debounced autosave, flush and save status | luna-max | unassigned | todo | — |
+| 6.4 | Reset flow and destructive confirmation (copy = hard gate) | luna-max | unassigned | todo | — |
+| 6.5 | Engine-version result invalidation | terra-max | unassigned | todo | — |
+| 6.6 | Independent Stage 6 review | terra-max | sol-max | todo | — |
+| 7.1 | Responsive panel collapse and accessibility sweep | terra-max | unassigned | todo | — |
+| 7.2 | Production deployment config and support limitations | luna-max | unassigned | todo | — |
+| 7.3 | Rendering and performance profile | terra-max | unassigned | todo | — |
+| 7.4 | Release approval **(HARD GATE)** | astra-plan | user | todo | — |
 
 ## Handoff rules
 
@@ -115,3 +125,12 @@ Active design: [`planlab/README.md`](./planlab/README.md) · staged plan: [`../D
   instead of looking live. "New variations" implements the UI_ARCHITECTURE retry-vs-new-variations
   split with a deterministic seed bump. 175 tests, typecheck/build/diagnostics clean, four
   1536 × 1024 state captures with DOM digests.
+- **Bucket 5.5 is the active bucket** (`todo`, owner `sol-max`). It needs an agent that did not
+  author 5.3/5.4, a real 1536 × 1024 comparison against `knowledge/PlanLab-Mockup.png`, and Sol's
+  judgment. Two housekeeping facts for whoever picks it up: the committed
+  `5.5-review.png` / `5.5-review.json` were byte-identical copies of the 5.4 `complete` capture and
+  were removed (they asserted evidence for a review that had not run), and the toolbar/plan
+  composition in `5.4-complete.png` is visibly below the mockup, so a fidelity pass may be required
+  before 5.5 can pass. 2026-09-15 session constraint: the user asked for the stage to be run without
+  a sub-agent fleet, so the fidelity work is done inline and only the independent review is
+  delegated.

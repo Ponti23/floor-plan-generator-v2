@@ -83,10 +83,13 @@ tags: [progress, resume]
   typecheck/build/diagnostics, and 1536 × 1024 browser captures with DOM digests under
   `artifacts/planlab/milestone-5/`. Next is 5.4 (generation states, stale-result affordances,
   keyboard/a11y), then 5.5 (independent review incl. the mockup comparison).
-- **New open finding:** `benchmark:stage0:check` passes every substantive gate line but reports
-  `baselineMatch: false` because the manifest hashes raw working-tree bytes and
-  `core.autocrlf=true` rewrites line endings; the recorded baseline fingerprint matches no committed
-  tree. Fix the manifest hashing (or pin `.gitattributes`) and re-record once.
+- **Baseline provenance fixed (bucket 5.6).** `benchmarkInputManifest()` now hashes LF-normalised
+  content, so the fingerprint describes the source instead of the checkout. The re-record is proven
+  drift-free: every canonical per-seed hash, impossible fixture, historical baseline, budget and seed
+  value is identical between the old and new baselines — only the fingerprint moved.
+  `benchmark:stage0:check` is now **pass: true, baselineMatch: true** at median 1815.5 ms / p95
+  1845.0 ms (measured with a review agent loading the machine). Record:
+  `artifacts/planlab/milestone-5/5.6-baseline-provenance.md`.
 - **In-flight branches:** all work is on `main` (Milestone 0 baseline `8171058`, Stage 1
   `0e8589b`…`e1c6f38` plus typecheck infra `19916f1`, Stage 2 `9a24738`…`ded4d73`, Stage 3
   `6089c48`…`99e1904` plus the 3.5 review); `stage0-planlab-spike` is retained at the completed gate

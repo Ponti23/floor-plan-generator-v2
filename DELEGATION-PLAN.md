@@ -152,9 +152,12 @@ Spec: [`UI_ARCHITECTURE.md`](./knowledge/planlab/UI_ARCHITECTURE.md),
 direction plus screenshot acceptance contract in
 [`FRONTEND_MOCKUP_BRIEF.md`](./knowledge/planlab/FRONTEND_MOCKUP_BRIEF.md).
 
-- [ ] **5.0 Product copy + shell decision.** Confirm the final strategy names, conceptual-use
+- [x] **5.0 Product copy + shell decision.** Confirm the final strategy names, conceptual-use
   disclaimer, metric names, infeasibility/budget language, and whether the MVP continues on the
   existing Vite/TS shell or migrates to Next.js. — `astra-plan`; **HARD GATE, owned by the user**
+  (answered 2026-09-15: Vite/TS retained, three strategy names, five score rows,
+  real-value-only metric rows, disclaimer/prohibited-claims/failure wording all approved; record:
+  `artifacts/planlab/milestone-5/5.0-copy-decision-package.md`)
 - [x] **5.1 Brief editor state and committed form.** Replace the vertical-slice form with typed
   editor state: site, offsets, area policy, room program, relationships, and planning assumptions.
   Keep local form state separate from committed normalized project state; a changed brief marks
@@ -165,15 +168,16 @@ direction plus screenshot acceptance contract in
   highlighting without letting rendering own authoritative geometry. Match the centre-viewport
   hierarchy, framing, palette, and controls in `PlanLab-Mockup.png` without fabricating decorative
   architectural data. — `luna-max` (`96ba89f`)
-- [ ] **5.3 Result selector and analysis projection.** Show up to three strategy options with honest
+- [x] **5.3 Result selector and analysis projection.** Show up to three strategy options with honest
   empty/partial states, selection updates the main plan, and the analysis panel projects raw metrics,
   whole-number category scores, observations, and PASS/WARNING/FAIL rule checks from the canonical
   result payload. Match the mockup's horizontal thumbnail cards, selected-option summary, score
-  bars, observations, and notice hierarchy. — `luna-max`
-- [ ] **5.4 Generation states, stale-result affordances, keyboard/a11y.** Cover `idle`,
+  bars, observations, and notice hierarchy. — `luna-max` (`09a9662`; actual executor:
+  orchestrator `/root` — Git cannot distinguish the two)
+- [x] **5.4 Generation states, stale-result affordances, keyboard/a11y.** Cover `idle`,
   `invalidBrief`, `generating`, `complete`, `partial`, `infeasible`, `budgetExceeded`, and
   `workerError`; make stale results obvious; provide labels, visible focus, keyboard order, and
-  non-colour status indicators. — `terra-max`
+  non-colour status indicators. — `terra-max` (`3a769e2`; actual executor: orchestrator `/root`)
 - [ ] **5.5 Independent Milestone 5 review.** Review the editor/projection stack for state ownership
   leaks, stale-result handling, copy hard-gate compliance, SVG accessibility, keyboard behaviour, and
   false-precision presentation. Fix only Milestone 5 defects and record evidence under
@@ -181,5 +185,61 @@ direction plus screenshot acceptance contract in
   `knowledge/PlanLab-Mockup.png`; functional equivalence without recognizable visual fidelity is a
   review failure. — `terra-max` (independent review; Sol judges)
 
-Milestones 6–7 remain defined in
-[`knowledge/planlab/IMPLEMENTATION_PLAN.md`](./knowledge/planlab/IMPLEMENTATION_PLAN.md) and are not active.
+## Stage 6 — Local persistence and recovery
+
+Goal (from `IMPLEMENTATION_PLAN.md` Milestone 6): make the single local project survive a refresh and
+a schema change without a backend. **Staged 2026-09-15; active once 5.5 closes.** No user decision
+blocks the engineering work. One copy item is a hard gate and stays replaceable until answered:
+the reset-confirmation wording and the save-failure wording (see 6.4).
+
+Spec: [`UI_ARCHITECTURE.md`](./knowledge/planlab/UI_ARCHITECTURE.md) "Persistence experience",
+[`TESTING_STRATEGY.md`](./knowledge/planlab/TESTING_STRATEGY.md).
+
+- [ ] **6.1 Versioned local storage repository.** A `ProjectStore` adapter over `localStorage` behind
+  an interface: namespaced keys (`planlab:v1:*`), a stored schema/engine version, runtime parse and
+  validation of whatever is read, and an injectable storage port so tests never touch a real browser
+  store. Acceptance: a round-tripped project is byte-identical after canonical normalization; a
+  missing key, a corrupt payload, and an unknown future schema version each return a typed outcome
+  rather than throwing. — `luna-max`
+- [ ] **6.2 Sequential migrations and recovery key.** Migrate older stored documents forward one
+  version at a time; when a document cannot be migrated, retain the original under a separate
+  recovery key instead of deleting it, and surface that fact in the UI. Acceptance: an old fixture
+  migrates to current; a corrupt fixture is preserved under the recovery key and the app still starts.
+  — `luna-max`
+- [ ] **6.3 Debounced autosave, flush and save status.** Commit-triggered debounce, immediate flush on
+  Generate and on page hide, and a save-status projection (`Saved locally` / `Saving` / `Local save
+  failed`) that never claims success after a failed write. Acceptance: simulating a storage failure
+  leaves the in-memory project intact and shows the failure state; a successful write clears it.
+  — `luna-max`
+- [ ] **6.4 Reset flow and destructive confirmation.** Reset removes only PlanLab-owned keys (proved
+  by a test that plants a foreign key), requires an explicit confirmation, and states that local data
+  will be removed. **Copy is a user hard gate**: ship replaceable defaults and record the pending
+  approval rather than freezing wording. — `luna-max`
+- [ ] **6.5 Engine-version result invalidation.** A stored result whose engine/scoring version no
+  longer matches the running build must be marked stale rather than shown as current. Acceptance: a
+  stored payload written under an older version surfaces the stale affordance and is regenerated on
+  demand. — `terra-max`
+- [ ] **6.6 Independent Stage 6 review.** Adversarial pass over storage, migration, failure and reset
+  paths: injected corrupt documents, denied storage, version skew, and a refresh/restore browser run.
+  Record under `artifacts/planlab/milestone-6/`. — `terra-max` (independent; Sol judges)
+
+## Stage 7 — UX, performance, and deployment
+
+Goal (from `IMPLEMENTATION_PLAN.md` Milestone 7): make the validated MVP responsibly deployable.
+**Not active.** Engineering items (7.1–7.3) can be staged without a user decision; 7.4 is a hard
+gate owned by the user.
+
+- [ ] **7.1 Responsive panel collapse and accessibility sweep.** Panel collapse below the desktop
+  breakpoint without shrinking the plan into a sliver; contrast, focus order, and non-colour status
+  re-checked across every state. — `terra-max`
+- [ ] **7.2 Production deployment configuration and support limitations.** Reproducible Vite
+  production build, static-host configuration (Vercel preset: build `npm run build`, output `dist`),
+  a README that states the conceptual-use limitation, and a production worker-path smoke test.
+  — `luna-max`
+- [ ] **7.3 Rendering and performance profile with recorded budgets.** Measure the real workspace
+  (generation, first paint, SVG projection, thumbnail rendering) and either meet the recorded target
+  or revise it explicitly with evidence. Must re-measure the Stage 0 timing gate on a quiet machine
+  because its margin is thin. — `terra-max`
+- [ ] **7.4 Release approval.** Architect acceptance session using several briefs (not only the
+  canonical fixture), plus explicit user approval of product/UX/copy and release. **HARD GATE, owned
+  by the user.** — `astra-plan`
