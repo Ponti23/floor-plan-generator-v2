@@ -52,10 +52,18 @@ tags: [progress, resume]
      at the cost of one bulk renormalisation commit.
   5. **`INSTANCES_BY_PROJECT`** in `rules.ts` caches instances per project object identity — revisit
      when the project document becomes editable under Stage 6.
-- **Next step:** execute Stage 6 in order, starting with **bucket 6.1 (versioned local storage
-  repository)**: a `ProjectStore` adapter over `localStorage` with namespaced keys and an injectable
-  storage port, typed outcomes for missing/corrupt/future-version documents, and tests that never
-  touch a real browser store.
+- **Next step (Stage 6, partially done):** 6.1 (store), 6.3 (autosave/restore/save status) and 6.4
+  (confirmed reset) are complete — records under `artifacts/planlab/milestone-6/`. Remaining: 6.2
+  (migrations — nothing to migrate until a store v2 exists; the recovery-key half is done), 6.5
+  (engine-version result invalidation — blocked because results are not persisted), and 6.6
+  (independent Stage 6 review by an agent that did not author it). The app now restores the stored
+  brief on load, autosaves on committed revisions, flushes on Generate and page hide, and shows
+  `Saved locally` / `Saving…` / `Local save failed` / `Local saving unavailable`.
+- **Two decisions are waiting on the user:**
+  1. **Push.** `main` is unpushed since `baa9a54`; everything after it (Milestones 5 and the Stage 6
+     work) is local. Pushing is the user's call.
+  2. **Reset copy.** The 6.4 confirmation wording is new user-facing copy that the 5.0 gate does not
+     cover. It ships as a replaceable default and is marked `needs-human` on the board.
 - **In-flight branches:** all work is on `main` (Milestone 0 baseline `8171058`, Stage 1
   `0e8589b`…`e1c6f38` plus typecheck infra `19916f1`, Stage 2 `9a24738`…`ded4d73`, Stage 3
   `6089c48`…`99e1904`, Stage 4 `89b9fc7`, Stage 5 `c63a1d2`…`784b9b8`); `stage0-planlab-spike` is
