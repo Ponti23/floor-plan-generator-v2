@@ -85,5 +85,6 @@ Active design: [`planlab/README.md`](./planlab/README.md) · staged plan: [`../D
   shell is the recommended technical default for this client-only app; the
   reference plan says Next.js, so that is still an architecture/product choice
   for Sol/Astra. Strategy names, conceptual-use language, metric names, and
-  infeasibility copy are user product/UX/copy hard gates. No executor may claim
-  5.1–5.4 with final copy; use replaceable recommended text until approved.
+  infeasibility copy are user product/UX/copy hard gates. No executor may claim or
+  implement 5.1–5.4 until the user approves 5.0. After approval, implementation may
+  keep approved copy in a replaceable presentation layer.

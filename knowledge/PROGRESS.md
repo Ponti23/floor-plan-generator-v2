@@ -9,10 +9,10 @@ tags: [progress, resume]
 
 - **Checkpoint date:** 2026-09-15.
 - **Current focus:** Milestone 4 is closed and pushed; **Milestone 5 is staged, not active**. The
-  Stage 3 hard gate is answered and implemented (D1–D4), the worker/UI vertical slice is verified in
-  the real browser, and the next blocker is Milestone 5 preconditions: product/UX/copy approval and
-  the Vite-vs-Next.js shell decision. Full Stage 3 record:
-  `artifacts/planlab/milestone-3/gate-amendment-d1-d4.md`.
+  user requested a DeepSeek-Flash takeover before clearing context. Resume from the bounded brief at
+  the top of `HANDOFF.md`: prepare and present the 5.0 decision package, but do not claim or
+  implement 5.1–5.4 until the user explicitly approves the product/UX/copy and Vite-vs-Next.js
+  decisions. Full Stage 3 record: `artifacts/planlab/milestone-3/gate-amendment-d1-d4.md`.
 - **What changed (D1).** Minimum area alone admitted unusable rooms: the brief declared no minimum
   **short side** for the bathroom, kitchen, living room or laundry, so seed 01 passed hard validity
   with a **7.00 × 0.75 m bathroom**. A `ROOM_SHAPE_POLICY` table in `src/domain/constants.ts`,
@@ -32,9 +32,11 @@ tags: [progress, resume]
   the indexes. **Reduced resolution:** the benchmark's `evidenceHash` now hashes derived schema keys
   rather than every value, so a silent value-level change that leaves layouts byte-identical is no
   longer caught by that hash.
-- **Cost, stated honestly.** Expansions per seed rose **6,779 → 15,456** and the full-gate median
-  **904 ms → 1,750 ms**. Targets still met (median <2,000, p95 <4,000, 20,000 expansions) but the
-  median margin fell from ~55% to ~13%, and expansions now sit close to the cap.
+- **Cost, stated honestly.** Expansions per seed rose **6,779 → 15,456**. The recorded quiet
+  full-gate median is **1,709.8 ms**, but the 2026-09-15 takeover audit reproduced a PASS at
+  **1,973.5 ms** median / **2,070.5 ms** p95. The median had only ~1.3% headroom against the
+  <2,000 ms gate on that run, and expansions use ~77% of the 20,000 cap. Treat runtime margin as a
+  yellow risk, not a closed performance concern.
 - **Open threads:**
   1. **D5 — push.** Approved and completed. `main` was pushed to `origin/main` on 2026-09-15
      (`60cfa73..baa9a54`).
@@ -52,11 +54,15 @@ tags: [progress, resume]
      only; no polished UI copy is implemented or frozen.
   4. **Evidence-resolution caveat** in D4 above — a future review needing value-level derived drift
      detection must use `serializeCanonical(result)` explicitly.
-- **Next step:** begin Milestone 5 execution only after its two preconditions are closed:
-  the Vite-vs-Next.js shell decision and the user product/UX/copy approval. Until then, continue
-  with non-hard-gated Milestone 5 preparation: brief-editor state, SVG projection/pan-zoom-fit,
-  result-analysis projection, and keyboard/accessibility scaffolding, using the existing Vite/TS
-  shell and recommended copy as replaceable defaults rather than frozen product copy.
+  5. DeepSeek-Flash authorship cannot be reconstructed from Git because commits use the shared
+     `Ponti23` identity and completed buckets do not record Flash as owner. Record the actual
+     executor in `knowledge/BOARD.md` for every future claimed bucket; do not rewrite provenance
+     retroactively without evidence.
+- **Next step:** DeepSeek-Flash reads `AGENTS.md`, this file, `knowledge/BOARD.md`,
+  `DELEGATION-PLAN.md`, and `HANDOFF.md`, then prepares a concise 5.0 decision package for the user.
+  Recommend retaining Vite/TS, propose final strategy names, conceptual-use disclaimer, metric
+  names, and infeasibility/budget language, and wait for explicit approval. No 5.1–5.4 code or
+  bucket claim is authorized before that approval.
 - **In-flight branches:** all work is on `main` (Milestone 0 baseline `8171058`, Stage 1
   `0e8589b`…`e1c6f38` plus typecheck infra `19916f1`, Stage 2 `9a24738`…`ded4d73`, Stage 3
   `6089c48`…`99e1904` plus the 3.5 review); `stage0-planlab-spike` is retained at the completed gate
@@ -66,10 +72,12 @@ tags: [progress, resume]
   instances per project object identity — revisit when the project document becomes editable
   (Milestone 6).
 
-**Evidence this session:** `npm test` **145 passing**; `npm run typecheck` 0 errors; `npm run build`
-clean; `npm run diagnostics:canonical -- --check` clean at fingerprint `sha256:8efe5b5e…`;
-`npm run benchmark:stage0:check` **`baselineMatch: true`** with every gate line PASS at median
-**1,709.8 ms** / p95 **1,779.6 ms**; `npm run benchmark:worker` median **174.1 ms**. Browser smoke:
+**Evidence this session:** takeover audit reproduced `npm test` **145 passing**;
+`npm run typecheck` 0 errors; `npm run build` clean; `npm run diagnostics:canonical -- --check`
+clean at fingerprint `sha256:8efe5b5e…`; `npm run benchmark:stage0:check`
+**`baselineMatch: true`** with every gate line PASS at median **1,973.5 ms** / p95
+**2,070.5 ms**; `npm run benchmark:worker` median **188.8 ms**. The earlier quiet reference was
+1,709.8 ms / 1,779.6 ms and 174.1 ms respectively. Browser smoke remains:
 generate reaches `complete` with three options and an SVG plan; cancel returns to `idle` and keeps
 the last compatible result; committing a site edit (`18000 × 26000 mm`) regenerates a changed
 viewBox (`86x126` → `78x110`) and layout set.

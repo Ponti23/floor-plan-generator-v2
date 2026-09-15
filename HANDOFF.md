@@ -2,6 +2,38 @@
 
 **Active plan:** [`DELEGATION-PLAN.md`](./DELEGATION-PLAN.md) · **Live queue:** [`knowledge/BOARD.md`](./knowledge/BOARD.md) · **Planning package:** [`knowledge/planlab/README.md`](./knowledge/planlab/README.md)
 
+## DeepSeek-Flash takeover brief — 2026-09-15
+
+The user is nearly out of tokens and explicitly asked to prepare this repository for a
+DeepSeek-Flash takeover. **Do the work now; do not ask for permission to inspect or prepare the
+decision package, and do not spawn sub-agents.** This handoff is not approval of the Milestone 5
+hard gate.
+
+1. Read `AGENTS.md`, `knowledge/PROGRESS.md`, `knowledge/BOARD.md`, `DELEGATION-PLAN.md`, and this
+   handoff before acting.
+2. Stay on clean, synchronized `main` (`8647236` before this checkpoint). Do not claim or implement
+   buckets 5.1–5.4 until the user explicitly closes 5.0.
+3. First deliverable: prepare and present one concise 5.0 decision package containing:
+   - the recommendation to retain the existing Vite/TS shell, with the short reason that this MVP
+     has no backend, SSR, routing, or server actions requiring Next.js;
+   - proposed final strategy names and one-line descriptions;
+   - proposed conceptual-use disclaimer and prohibited-claims wording;
+   - proposed metric labels; and
+   - proposed honest infeasibility, partial-result, and budget-exceeded language.
+4. Stop for the user's explicit product/UX/copy and shell approval. Do not treat silence, this
+   checkpoint, or "take over" as approval.
+5. After approval, update 5.0 to `done`, claim only the next bucket, record the actual executor as
+   `deepseek-flash` when Flash is used, execute buckets 5.1 → 5.2 → 5.3 sequentially, and route 5.4
+   plus independent review according to the delegation playbook. Each bucket must be verified and
+   committed before the next begins.
+
+Audit evidence immediately before handoff: clean/synced repository; 145/145 tests, typecheck,
+production build, and canonical diagnostics all green; worker median 188.8 ms. The full Stage 0
+gate passed with `baselineMatch: true` at 1,973.5 ms median / 2,070.5 ms p95. That median has only
+~1.3% headroom against the <2,000 ms gate, while expansions are 15,456 / 20,000, so avoid adding
+generator work without re-measuring on a quiet machine. Git uses the shared `Ponti23` author and
+cannot prove which historical commits were Flash-authored; record actual ownership going forward.
+
 **Status:** Stages 0–3 are complete. The **Stage 3 hard gate is answered** (2026-09-14): the user
 did not approve the usefulness claim for D1 but directed a fix, approved the scoring language as the
 default while requiring it to stay settable (D2/D3), and asked for the engineering-shaped decisions
@@ -231,12 +263,11 @@ for the Milestone 4 worker protocol. Raised for bucket 2.5 and for the user.
   shell is the recommended technical default.
 - Milestone 5 product copy is a hard gate: strategy names, the conceptual-use disclaimer, metric
   names, and infeasibility language must be user-approved before they are frozen.
-- **Waiting on the user (decision, not a blocker):** the Stage 0 benchmark hashes no longer
-  reproduce after bucket 2.1 (derived-facts evidence is serialized into `GenerationResult`;
-  layouts and selections are byte-identical). Either accept the evidence evolution or stop
-  serializing the derived indexes so the canonical result stays byte-stable. The 342 MB canonical
-  result also bears on the Milestone 4 worker protocol. Full detail in the checkpoint note above
-  and in `artifacts/planlab/milestone-2/validation-review.md`.
+- The Stage 0 evidence-shape question is resolved by D4: worker transport and normal canonical
+  payloads use the semantic projection in `src/domain/resultPayload.ts`, and the current baseline
+  intentionally records the evolved evidence shape. The remaining caveat is evidence resolution:
+  use `serializeCanonical(result)` explicitly when a review must detect value-level drift inside
+  recomputable derived indexes.
 - `INSTANCES_BY_PROJECT` in `rules.ts` caches rule instances per project object identity; a caller
   that mutates a normalized project in place would keep stale parameters. No caller does this
   today; revisit when the project document becomes editable (Milestone 6).
