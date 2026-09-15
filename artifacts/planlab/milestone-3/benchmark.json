@@ -1,7 +1,7 @@
 {
   "reportVersion": "planlab-stage0-regression-0.1",
   "suiteVersion": "planlab-stage0-seed-suite-0.6",
-  "recordedAt": "2026-09-14T20:31:22.788Z",
+  "recordedAt": "2026-09-15T04:47:27.049Z",
   "engineVersion": "planlab-generator-0.4",
   "ruleVersion": "planlab-core-2",
   "determinismVersion": "planlab-generator-determinism-1",
@@ -13,18 +13,18 @@
     "footprintVariantLimit": 64
   },
   "environment": {
-    "gitHeadAtRun": "cd0723cf6c534b540de024d042122e782d161430",
-    "workingTreeStatusAtRun": "",
-    "workingTreeCleanAtRun": true,
-    "benchmarkInputFingerprint": "9d0bcfc3b1c6c9f98ae2a51e5952a5fa51362a7c6890cf3e4e463e58c87e2fa5",
+    "gitHeadAtRun": "3a769e29925469ac33fcee7eb810f4b05c51ba76",
+    "workingTreeStatusAtRun": "M scripts/benchmark-stage0.mjs\n?? artifacts/planlab/milestone-5/5.5-review.json\n?? artifacts/planlab/milestone-5/5.5-review.png",
+    "workingTreeCleanAtRun": false,
+    "benchmarkInputFingerprint": "b85af1b697103d951cf1d850b78661fc46b4e0b93f57ee2b6db76c149961711c",
     "benchmarkInputFiles": [
       {
         "path": "package.json",
-        "sha256": "65b55c4b16ee32620af9b68c8b6e6fa03dd9442fef2fa83dd62680aba52decba"
+        "sha256": "adc06a7fda4524bba70b46f3374dcff6d25f6685838b4581910f3a0c6a926110"
       },
       {
         "path": "scripts/benchmark-stage0.mjs",
-        "sha256": "a0465e39d3fb9abf753aadb4a280902bb5b7ac15a9c24df5a16fd611e8bd2d80"
+        "sha256": "c953a0e5496b4c48ef061835aaa881035e4a167702f0a227c413d53d33af2ab4"
       },
       {
         "path": "src/domain/calibration.ts",
@@ -32,15 +32,15 @@
       },
       {
         "path": "src/domain/constants.ts",
-        "sha256": "1eee85a218788cb39f994a6cf082da9f30ea82cbb3d36bc72ed4149a1cddbffc"
+        "sha256": "02232e999ab06b504990dcb7e3075bfbd938b46fdcf466952e8721158df7c5cd"
       },
       {
         "path": "src/domain/diagnostics.ts",
-        "sha256": "03e086fef4ca10cba819d85aa01a3f2e0a595a0fb6aff0822ef6f54460b4804a"
+        "sha256": "67990a90af791de91f9b56bcd70338b8662baf56cf7d39b370fafcfaf0b50ca9"
       },
       {
         "path": "src/domain/diversity.ts",
-        "sha256": "96688870a4fa2444d3ff20d2121d6c7fb58716fb26ae0aa3a471dfef6e6a5b83"
+        "sha256": "76610fed535bb612178b9a1f46245dbc82053f40508c6c0ac93e741cd2191c22"
       },
       {
         "path": "src/domain/facts.ts",
@@ -48,23 +48,23 @@
       },
       {
         "path": "src/domain/fixtures.ts",
-        "sha256": "8962b1968c4ce05a0ed81ef7a7f567e5c88e3c1bc916a8fa7976dc415c2a0bd6"
+        "sha256": "604bad1cf2a0722efe3a3303bf847e085a8f2b6ded131b3cff86e27725648c1b"
       },
       {
         "path": "src/domain/generate.ts",
-        "sha256": "5c220f032ec58050a146bdedc9f054d57ff9abfb476a19bed461c78097558fcb"
+        "sha256": "b99831e1ba4f90104252af24d8ce035d98b9145f36585c7818df4ac3fd269452"
       },
       {
         "path": "src/domain/generator.ts",
-        "sha256": "0a243b1ceee82bfe90e3dbeefa0f8893ab6f74fa51f49f0d97f394eda775015c"
+        "sha256": "78ab0514902c7bce4d168791c3327530fd3494af9ca2c28dda64d3c6d98c9f56"
       },
       {
         "path": "src/domain/geometry.ts",
-        "sha256": "5539fa6072cf9677bfb681155f056659b06d847e838a9404936ad8ede83dee2a"
+        "sha256": "c78f873f5baab79e69738f468aea21d853c9c26bc172b4135740343986717b48"
       },
       {
         "path": "src/domain/index.ts",
-        "sha256": "fd77454f0346b0e08dce9344f900244320c016642424a2440048338a1e6039c2"
+        "sha256": "e5d198299bf246c0dc790f3b06f2cf0aa8859297d8f79b76056ec3fefb455594"
       },
       {
         "path": "src/domain/inspection.ts",
@@ -72,15 +72,15 @@
       },
       {
         "path": "src/domain/layout.ts",
-        "sha256": "1f981826444072b72c6b6307d7b6401f00a1412034edf09767a0fdb52814a628"
+        "sha256": "c54052869d71c23a7e9a509f836f25830f170dee2a66bff3b8c8b9ac8015b779"
       },
       {
         "path": "src/domain/metrics.ts",
-        "sha256": "e6537e0df8f9a96c08b49ec3b972fa5fed80fffc2ba7ab6eb6494f3ec1f2d901"
+        "sha256": "6e48f28c0380e3ae7f035ce9b8a8dbbfe51e6d8cf0191c6328edf30493ca79bf"
       },
       {
         "path": "src/domain/model.ts",
-        "sha256": "308fea284e548899fd8457522f9714ece341e4452ba13372e0bc96290d6737c6"
+        "sha256": "b550a43bea9c0bf806139be5ef825389f40c42d2d0496ade398c373eb52d6578"
       },
       {
         "path": "src/domain/normalization.ts",
@@ -92,7 +92,7 @@
       },
       {
         "path": "src/domain/prng.ts",
-        "sha256": "993ba2fbc325ba9610e560c1bcb06827a823655779223f688c9544a9351cf5d9"
+        "sha256": "69b9d7257d9208a8f136463c8de8a975a4c5a240a802c2d010917103623d6462"
       },
       {
         "path": "src/domain/pruning.ts",
@@ -108,7 +108,7 @@
       },
       {
         "path": "src/domain/scoring.ts",
-        "sha256": "7a3dbe568e9c3f0343cbd1d220df5da1e33e116515a3806144b6c5d3de2982d0"
+        "sha256": "e72fdf1e2a50fcd561048634168fe6f014269db7e7f1b440401404633e395d3b"
       },
       {
         "path": "src/domain/serialization.ts",
@@ -116,7 +116,7 @@
       },
       {
         "path": "src/domain/validateLayout.ts",
-        "sha256": "4e301af30b2e3c82c048f0e888fd11222daa3d04386e33e06d260016cb1c8a3b"
+        "sha256": "fe829509fb6634b614c2dc9a983005dd00e208e5532bc9fefbae420fa268e3a0"
       },
       {
         "path": "src/domain/validation.ts",
@@ -176,10 +176,10 @@
     "boundedMode": null
   },
   "summary": {
-    "medianMs": 1658.955,
-    "p95Ms": 1701.935,
-    "minimumMs": 1606.577,
-    "maximumMs": 1715.236
+    "medianMs": 1807.011,
+    "p95Ms": 1841.526,
+    "minimumMs": 1710.951,
+    "maximumMs": 1863.231
   },
   "gate": {
     "threeValidLayoutsPerSeed": true,
@@ -199,18 +199,18 @@
   "canonical": [
     {
       "seed": "planlab-canonical-01",
-      "elapsedMs": 1660.687,
+      "elapsedMs": 1831.632,
       "timingSamplesMs": [
-        1702.319,
-        1660.687,
-        1641.019
+        1863.231,
+        1831.632,
+        1802.402
       ],
       "timingSamplesRawMs": [
-        1702.3192000000001,
-        1660.6874000000003,
-        1641.0194000000001
+        1863.2311,
+        1831.6315000000004,
+        1802.4021999999995
       ],
-      "replayElapsedMs": 1639.335,
+      "replayElapsedMs": 1817.714,
       "deterministic": true,
       "outputHash": "9a5bf7e368ffacd4b2fcabe971e205826c56c1a192a03ff588007aa003f8b49c",
       "layoutHash": "0df06e8639bcd012ac898040c0955ae48080304885749827135aba278032ff30",
@@ -309,18 +309,18 @@
     },
     {
       "seed": "planlab-canonical-02",
-      "elapsedMs": 1648.154,
+      "elapsedMs": 1763.565,
       "timingSamplesMs": [
-        1633.475,
-        1661.766,
-        1648.154
+        1710.951,
+        1763.565,
+        1775.897
       ],
       "timingSamplesRawMs": [
-        1633.4749999999985,
-        1661.7659000000021,
-        1648.1538
+        1710.9506999999994,
+        1763.5650000000023,
+        1775.8970000000008
       ],
-      "replayElapsedMs": 1665.537,
+      "replayElapsedMs": 1785.542,
       "deterministic": true,
       "outputHash": "d0fc97a52f7cebc249b1a4b62af2fd290872372488b3d86c4a4998bc77f6831f",
       "layoutHash": "aaecabc4e9b5e1305744eab13098a403774bc7e5cc53bb92d51eabc17566f13a",
@@ -419,18 +419,18 @@
     },
     {
       "seed": "planlab-canonical-03",
-      "elapsedMs": 1657.223,
+      "elapsedMs": 1824.551,
       "timingSamplesMs": [
-        1606.577,
-        1657.223,
-        1681.699
+        1827.415,
+        1804.195,
+        1824.551
       ],
       "timingSamplesRawMs": [
-        1606.5773000000008,
-        1657.2230999999992,
-        1681.6988999999994
+        1827.4153000000006,
+        1804.1945000000014,
+        1824.551199999998
       ],
-      "replayElapsedMs": 1666.602,
+      "replayElapsedMs": 1795.878,
       "deterministic": true,
       "outputHash": "3a5661de9c6624c8f6583c9820fa4b7a2246e0d7fae6471ae326fa7e1b39907c",
       "layoutHash": "681913bed108a0e8749e52981b363374b2d16042c720f49be66f2bbcf7e6075e",
@@ -529,18 +529,18 @@
     },
     {
       "seed": "planlab-canonical-04",
-      "elapsedMs": 1654.749,
+      "elapsedMs": 1806.958,
       "timingSamplesMs": [
-        1667.53,
-        1654.749,
-        1645.714
+        1830.693,
+        1806.958,
+        1802.52
       ],
       "timingSamplesRawMs": [
-        1667.5299999999988,
-        1654.7494000000006,
-        1645.714399999997
+        1830.6926000000021,
+        1806.9576000000015,
+        1802.520199999999
       ],
-      "replayElapsedMs": 1630.497,
+      "replayElapsedMs": 1829.973,
       "deterministic": true,
       "outputHash": "33b66103b458c2e5aadc532c4f3df8376ee7f7d24fa9894cc79b4e97c3791d88",
       "layoutHash": "725ca3feefce67830fd5e4edfb96cf985e37ffa3cbf53e596a2c4e447aaec938",
@@ -639,18 +639,18 @@
     },
     {
       "seed": "planlab-canonical-05",
-      "elapsedMs": 1681.812,
+      "elapsedMs": 1829.571,
       "timingSamplesMs": [
-        1701.465,
-        1681.812,
-        1671.747
+        1829.571,
+        1807.064,
+        1849.621
       ],
       "timingSamplesRawMs": [
-        1701.4648000000016,
-        1681.8116999999984,
-        1671.7465999999986
+        1829.5705000000016,
+        1807.064099999996,
+        1849.6210999999967
       ],
-      "replayElapsedMs": 1666.984,
+      "replayElapsedMs": 1810.635,
       "deterministic": true,
       "outputHash": "3a7e55c8f3eefd931db5d030c4477b9bc104e12a753d5a30fc6d82d5b8ba4f5a",
       "layoutHash": "2a2bc566fa977bd5004a798fed6a738e7f6d500b423e2da13839ddb64c5eb169",
@@ -749,18 +749,18 @@
     },
     {
       "seed": "planlab-canonical-06",
-      "elapsedMs": 1667.285,
+      "elapsedMs": 1788.424,
       "timingSamplesMs": [
-        1667.285,
-        1655.521,
-        1715.236
+        1817.173,
+        1788.424,
+        1758.528
       ],
       "timingSamplesRawMs": [
-        1667.2852000000057,
-        1655.5213000000003,
-        1715.2359999999899
+        1817.1730000000098,
+        1788.423999999999,
+        1758.5280000000057
       ],
-      "replayElapsedMs": 1696.248,
+      "replayElapsedMs": 1789.466,
       "deterministic": true,
       "outputHash": "5c2d8b359e2101580e93ee0a055c612b72db514aba2035fb560489abf90e2b56",
       "layoutHash": "5db7e555aaa274c40621bc49f7c55cd0613ef903432f1db30108c2cc07fe39b9",
@@ -859,18 +859,18 @@
     },
     {
       "seed": "planlab-canonical-07",
-      "elapsedMs": 1644.163,
+      "elapsedMs": 1804.792,
       "timingSamplesMs": [
-        1632.681,
-        1644.163,
-        1664.199
+        1773.945,
+        1804.792,
+        1825.733
       ],
       "timingSamplesRawMs": [
-        1632.6805999999924,
-        1644.1631000000052,
-        1664.199099999998
+        1773.9447000000073,
+        1804.7920999999915,
+        1825.7330999999976
       ],
-      "replayElapsedMs": 1636.812,
+      "replayElapsedMs": 1816.159,
       "deterministic": true,
       "outputHash": "1dfcc3bafce93fefcc089c290e3363ae92e75b117d7a28f3f700bb68f3ef2a33",
       "layoutHash": "cc0e4725918bc0b30ff7a24676ebfe619b1c7fe79dee33bcea851f811088a29a",
@@ -969,18 +969,18 @@
     },
     {
       "seed": "planlab-canonical-08",
-      "elapsedMs": 1660.991,
+      "elapsedMs": 1815.317,
       "timingSamplesMs": [
-        1695.584,
-        1660.991,
-        1643.063
+        1823.283,
+        1815.317,
+        1793.504
       ],
       "timingSamplesRawMs": [
-        1695.5838999999978,
-        1660.9912999999942,
-        1643.062699999995
+        1823.2834000000003,
+        1815.3168000000005,
+        1793.5043000000005
       ],
-      "replayElapsedMs": 1635.356,
+      "replayElapsedMs": 1757.198,
       "deterministic": true,
       "outputHash": "bf556ed2f0616685c593afc717de3c85e34892a2ce1f2351bef431924fcd9e2b",
       "layoutHash": "f3f9893a095d7a2521b3f967b4f04a1e1462548fd6e34bf0f80683a532e15367",
@@ -1079,18 +1079,18 @@
     },
     {
       "seed": "planlab-canonical-09",
-      "elapsedMs": 1651.526,
+      "elapsedMs": 1809.488,
       "timingSamplesMs": [
-        1678.094,
-        1629.253,
-        1651.526
+        1818.605,
+        1763.964,
+        1809.488
       ],
       "timingSamplesRawMs": [
-        1678.0938000000024,
-        1629.252600000007,
-        1651.5264000000025
+        1818.6046999999962,
+        1763.964399999997,
+        1809.488200000007
       ],
-      "replayElapsedMs": 1660.856,
+      "replayElapsedMs": 1794.103,
       "deterministic": true,
       "outputHash": "cb6fadaf04466c21c2a251d964127822b3017a4266602a216775a3c6bfa8a89b",
       "layoutHash": "1ef35ea802bff3f2ff6b7e591532d136555b2012c4f29aaedd4f2deffa4322ca",
@@ -1189,18 +1189,18 @@
     },
     {
       "seed": "planlab-canonical-10",
-      "elapsedMs": 1647.254,
+      "elapsedMs": 1751.957,
       "timingSamplesMs": [
-        1647.254,
-        1632.963,
-        1691.635
+        1751.957,
+        1743.862,
+        1821.693
       ],
       "timingSamplesRawMs": [
-        1647.2535999999964,
-        1632.962599999999,
-        1691.6347999999998
+        1751.9569000000047,
+        1743.8619999999937,
+        1821.6929999999993
       ],
-      "replayElapsedMs": 1662.673,
+      "replayElapsedMs": 1759.757,
       "deterministic": true,
       "outputHash": "3b6ca303b17e0711825e47a57a0a021989bfab4f52b32c894943274d503cec49",
       "layoutHash": "0ae73be71fb6d57684b88cc8f20beae75c3ebebc99f21e34319741bc2379b0e3",
@@ -1302,7 +1302,7 @@
     {
       "fixture": "envelopeConsumesSite",
       "seed": "impossible-envelope",
-      "elapsedMs": 0.319,
+      "elapsedMs": 0.265,
       "ok": false,
       "candidateCount": 0,
       "selectedCount": 0,
@@ -1339,7 +1339,7 @@
     {
       "fixture": "roomCannotFitEnvelope",
       "seed": "impossible-room",
-      "elapsedMs": 0.083,
+      "elapsedMs": 0.069,
       "ok": false,
       "candidateCount": 0,
       "selectedCount": 0,
@@ -1376,7 +1376,7 @@
     {
       "fixture": "programExceedsInstanceLimit",
       "seed": "impossible-program-size",
-      "elapsedMs": 0.054,
+      "elapsedMs": 0.039,
       "ok": false,
       "candidateCount": 0,
       "selectedCount": 0,

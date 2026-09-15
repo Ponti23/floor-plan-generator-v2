@@ -113,6 +113,19 @@ function collectFiles(directory) {
 }
 
 /**
+ * Hash a source file with its line endings normalised to LF.
+ *
+ * The provenance fingerprint must identify the source, not the checkout.  With
+ * `core.autocrlf=true` a Windows working tree holds CRLF bytes while the
+ * committed blobs hold LF, so hashing raw bytes made the fingerprint — and the
+ * whole regression baseline check — depend on who checked the repository out
+ * (see `artifacts/planlab/milestone-5/5.3-result-selector.md`).
+ */
+function hashSourceFile(path) {
+  return sha256(readFileSync(path, "utf8").replace(/\r\n/g, "\n"));
+}
+
+/**
  * A Git HEAD alone is not sufficient provenance when a benchmark is run from
  * a worktree before its generated artifacts are committed. Hash every local
  * source input that can affect the Stage 0 result instead.
@@ -125,7 +138,7 @@ function benchmarkInputManifest() {
   ].sort((a, b) => a < b ? -1 : a > b ? 1 : 0)
     .map((path) => ({
       path: relative(REPO_ROOT, path).replaceAll("\\", "/"),
-      sha256: sha256(readFileSync(path)),
+      sha256: hashSourceFile(path),
     }));
   return {
     files,

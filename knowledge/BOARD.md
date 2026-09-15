@@ -37,6 +37,7 @@ Active design: [`planlab/README.md`](./planlab/README.md) · staged plan: [`../D
 | 5.3 | Result selector and analysis projection | luna-max | orchestrator (`/root`) | done | `main` |
 | 5.4 | Generation states, stale-result affordances, keyboard/a11y | terra-max | orchestrator (`/root`) | done | `main` |
 | 5.5 | Independent Milestone 5 review | terra-max | sol-max | todo | `main` |
+| 5.6 | Stage 0 baseline provenance fix | terra-max | orchestrator (`/root`) | done | `main` |
 
 ## Handoff rules
 
@@ -98,11 +99,15 @@ Active design: [`planlab/README.md`](./planlab/README.md) · staged plan: [`../D
   category bars, PASS/WARNING/FAIL rule checks from the authoritative evaluator, and honest
   empty/infeasible states. 169 tests, typecheck/build/diagnostics clean, browser 1536 × 1024 evidence
   captured with a DOM digest.
-- **Open finding (not 5.3's):** `benchmark:stage0:check` reports every substantive gate line PASS but
-  `baselineMatch: false`. The recorded baseline's `benchmarkInputFingerprint` matches no committed
-  tree, and the manifest hashes raw working-tree bytes, so `core.autocrlf` changes it. Needs a
-  normalised-content hash (or a `.gitattributes` pin) plus one baseline re-record. Do not paper over
-  it by re-recording without that fix.
+- **Bucket 5.6 closes the baseline-provenance finding.** `benchmarkInputManifest()` now hashes
+  LF-normalised content, so the fingerprint describes the source rather than the checkout, and the
+  baseline was re-recorded. Record: `artifacts/planlab/milestone-5/5.6-baseline-provenance.md`. Proof
+  the re-record hid no drift: comparing the old and new baselines, every canonical per-seed hash,
+  impossible fixture, historical baseline, budget and seed value is byte-identical — only
+  `benchmarkInputFingerprint` moved. `benchmark:stage0:check` is now **pass: true,
+  baselineMatch: true** at median 1815.5 ms / p95 1845.0 ms (measured with a review agent loaded on
+  the machine). A `.gitattributes` with `eol=lf` would remove the underlying checkout difference
+  entirely and can be done with a bulk renormalisation commit later.
 - **Bucket 5.4 is complete** (record: `artifacts/planlab/milestone-5/5.4-generation-states.md`).
   All eight generation states render honestly, the stale affordance is a banner with a working
   Regenerate action (plus an amber status dot and a dimmed plan), the progress readout shows elapsed
