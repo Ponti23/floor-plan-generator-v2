@@ -9,6 +9,13 @@ DeepSeek-Flash takeover. **Do the work now; do not ask for permission to inspect
 decision package, and do not spawn sub-agents.** This handoff is not approval of the Milestone 5
 hard gate.
 
+**Visual direction is approved:** the frontend must closely recreate
+`knowledge/PlanLab-Mockup.png`, following the measurable fidelity and screenshot-QA requirements in
+`knowledge/planlab/FRONTEND_MOCKUP_BRIEF.md`. The current vertical-slice frontend is not an
+acceptable visual approximation. The user explicitly asked for preparation only in this checkpoint,
+so no frontend code was changed. This visual approval does not approve final product copy or decide
+Vite versus Next.js.
+
 1. Read `AGENTS.md`, `knowledge/PROGRESS.md`, `knowledge/BOARD.md`, `DELEGATION-PLAN.md`, and this
    handoff before acting.
 2. Stay on clean, synchronized `main` (`8647236` before this checkpoint). Do not claim or implement
@@ -23,9 +30,11 @@ hard gate.
 4. Stop for the user's explicit product/UX/copy and shell approval. Do not treat silence, this
    checkpoint, or "take over" as approval.
 5. After approval, update 5.0 to `done`, claim only the next bucket, record the actual executor as
-   `deepseek-flash` when Flash is used, execute buckets 5.1 → 5.2 → 5.3 sequentially, and route 5.4
-   plus independent review according to the delegation playbook. Each bucket must be verified and
-   committed before the next begins.
+   `deepseek-flash` when Flash is used, and implement against
+   `knowledge/planlab/FRONTEND_MOCKUP_BRIEF.md`. Execute buckets 5.1 → 5.2 → 5.3 sequentially, then
+   route 5.4 plus independent review according to the delegation playbook. Each bucket must be
+   verified and committed before the next begins. Do not declare UI completion without the required
+   1536 × 1024 reference comparison and iteration.
 
 Audit evidence immediately before handoff: clean/synced repository; 145/145 tests, typecheck,
 production build, and canonical diagnostics all green; worker median 188.8 ms. The full Stage 0

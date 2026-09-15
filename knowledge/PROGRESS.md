@@ -12,7 +12,10 @@ tags: [progress, resume]
   user requested a DeepSeek-Flash takeover before clearing context. Resume from the bounded brief at
   the top of `HANDOFF.md`: prepare and present the 5.0 decision package, but do not claim or
   implement 5.1–5.4 until the user explicitly approves the product/UX/copy and Vite-vs-Next.js
-  decisions. Full Stage 3 record: `artifacts/planlab/milestone-3/gate-amendment-d1-d4.md`.
+  decisions. The user has approved `knowledge/PlanLab-Mockup.png` as the required visual direction;
+  the implementation and screenshot-QA contract is in
+  `knowledge/planlab/FRONTEND_MOCKUP_BRIEF.md`. Full Stage 3 record:
+  `artifacts/planlab/milestone-3/gate-amendment-d1-d4.md`.
 - **What changed (D1).** Minimum area alone admitted unusable rooms: the brief declared no minimum
   **short side** for the bathroom, kitchen, living room or laundry, so seed 01 passed hard validity
   with a **7.00 × 0.75 m bathroom**. A `ROOM_SHAPE_POLICY` table in `src/domain/constants.ts`,
@@ -58,11 +61,14 @@ tags: [progress, resume]
      `Ponti23` identity and completed buckets do not record Flash as owner. Record the actual
      executor in `knowledge/BOARD.md` for every future claimed bucket; do not rewrite provenance
      retroactively without evidence.
+  6. **Frontend visual direction:** approved by the user on 2026-09-15. Recreate
+     `knowledge/PlanLab-Mockup.png` closely; functional similarity to the current shell is not
+     enough. No frontend code changed in this preparation-only checkpoint.
 - **Next step:** DeepSeek-Flash reads `AGENTS.md`, this file, `knowledge/BOARD.md`,
-  `DELEGATION-PLAN.md`, and `HANDOFF.md`, then prepares a concise 5.0 decision package for the user.
-  Recommend retaining Vite/TS, propose final strategy names, conceptual-use disclaimer, metric
-  names, and infeasibility/budget language, and wait for explicit approval. No 5.1–5.4 code or
-  bucket claim is authorized before that approval.
+  `DELEGATION-PLAN.md`, `HANDOFF.md`, and `knowledge/planlab/FRONTEND_MOCKUP_BRIEF.md`, then prepares
+  a concise 5.0 decision package for the user. Recommend retaining Vite/TS, propose final strategy
+  names, conceptual-use disclaimer, metric names, and infeasibility/budget language, and wait for
+  explicit approval. No 5.1–5.4 code or bucket claim is authorized before that approval.
 - **In-flight branches:** all work is on `main` (Milestone 0 baseline `8171058`, Stage 1
   `0e8589b`…`e1c6f38` plus typecheck infra `19916f1`, Stage 2 `9a24738`…`ded4d73`, Stage 3
   `6089c48`…`99e1904` plus the 3.5 review); `stage0-planlab-spike` is retained at the completed gate

@@ -148,7 +148,9 @@ with no backend, SSR, routing, or server actions.
 
 Spec: [`UI_ARCHITECTURE.md`](./knowledge/planlab/UI_ARCHITECTURE.md),
 [`PRODUCT_SPEC.md`](./knowledge/planlab/PRODUCT_SPEC.md),
-[`TESTING_STRATEGY.md`](./knowledge/planlab/TESTING_STRATEGY.md).
+[`TESTING_STRATEGY.md`](./knowledge/planlab/TESTING_STRATEGY.md), and the user-approved visual
+direction plus screenshot acceptance contract in
+[`FRONTEND_MOCKUP_BRIEF.md`](./knowledge/planlab/FRONTEND_MOCKUP_BRIEF.md).
 
 - [ ] **5.0 Product copy + shell decision.** Confirm the final strategy names, conceptual-use
   disclaimer, metric names, infeasibility/budget language, and whether the MVP continues on the
@@ -160,11 +162,14 @@ Spec: [`UI_ARCHITECTURE.md`](./knowledge/planlab/UI_ARCHITECTURE.md),
 - [ ] **5.2 SVG projection, layers, pan/zoom/fit, and evidence highlight.** Render stable layers in
   order (grid, site, envelope, footprint, spaces/portals, labels, evidence, north/scale) using a
   grid-unit viewBox and a single viewport transform. Add zoom/fit and observation-to-geometry
-  highlighting without letting rendering own authoritative geometry. — `luna-max`
+  highlighting without letting rendering own authoritative geometry. Match the centre-viewport
+  hierarchy, framing, palette, and controls in `PlanLab-Mockup.png` without fabricating decorative
+  architectural data. — `luna-max`
 - [ ] **5.3 Result selector and analysis projection.** Show up to three strategy options with honest
   empty/partial states, selection updates the main plan, and the analysis panel projects raw metrics,
   whole-number category scores, observations, and PASS/WARNING/FAIL rule checks from the canonical
-  result payload. — `luna-max`
+  result payload. Match the mockup's horizontal thumbnail cards, selected-option summary, score
+  bars, observations, and notice hierarchy. — `luna-max`
 - [ ] **5.4 Generation states, stale-result affordances, keyboard/a11y.** Cover `idle`,
   `invalidBrief`, `generating`, `complete`, `partial`, `infeasible`, `budgetExceeded`, and
   `workerError`; make stale results obvious; provide labels, visible focus, keyboard order, and
@@ -172,7 +177,9 @@ Spec: [`UI_ARCHITECTURE.md`](./knowledge/planlab/UI_ARCHITECTURE.md),
 - [ ] **5.5 Independent Milestone 5 review.** Review the editor/projection stack for state ownership
   leaks, stale-result handling, copy hard-gate compliance, SVG accessibility, keyboard behaviour, and
   false-precision presentation. Fix only Milestone 5 defects and record evidence under
-  `artifacts/planlab/milestone-5/`. — `terra-max` (independent review; Sol judges)
+  `artifacts/planlab/milestone-5/`. Include a 1536 × 1024 side-by-side comparison against
+  `knowledge/PlanLab-Mockup.png`; functional equivalence without recognizable visual fidelity is a
+  review failure. — `terra-max` (independent review; Sol judges)
 
 Milestones 6–7 remain defined in
 [`knowledge/planlab/IMPLEMENTATION_PLAN.md`](./knowledge/planlab/IMPLEMENTATION_PLAN.md) and are not active.
