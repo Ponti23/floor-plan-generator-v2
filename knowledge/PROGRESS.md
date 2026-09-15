@@ -66,10 +66,10 @@ tags: [progress, resume]
      enough. A verified CSS foundation now matches the reference's main proportions, white toolbar,
      blue accent, planning grid and compact density; `HANDOFF.md` records the precise remaining
      `main.ts` and visual-QA work for DeepSeek-Flash.
-- **Next step:** bucket 5.1 is complete at `c63a1d2` with 151 passing tests, clean typecheck/build,
-  canonical diagnostics, and browser smoke. DeepSeek-Flash or the available Luna fallback reads the
-  resume files, claims 5.2, and implements the SVG projection, stable layers, pan/zoom/fit, and
-  evidence highlighting without redoing the CSS/editor foundation. Keep final copy replaceable.
+- **Next step:** buckets 5.1/5.2 are complete at `c63a1d2` / `96ba89f`; 5.2 reports 159 passing
+  tests, clean typecheck/build/diagnostics, and browser viewport/evidence smoke. DeepSeek-Flash or
+  the available Luna fallback claims 5.3 and implements real option thumbnails plus the result and
+  analysis projection without redoing the editor/SVG foundations. Keep final copy replaceable.
 - **In-flight branches:** all work is on `main` (Milestone 0 baseline `8171058`, Stage 1
   `0e8589b`…`e1c6f38` plus typecheck infra `19916f1`, Stage 2 `9a24738`…`ded4d73`, Stage 3
   `6089c48`…`99e1904` plus the 3.5 review); `stage0-planlab-spike` is retained at the completed gate

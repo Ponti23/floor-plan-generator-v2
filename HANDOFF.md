@@ -19,18 +19,18 @@ site/footprint hierarchy, muted plan surface, north/zoom scaffolding, and horizo
 All worker/domain behavior remains unchanged. This visual approval does not freeze final product
 copy.
 
-**Current continuation boundary:** bucket 5.1 is complete at `c63a1d2`. It adds typed local
-draft/committed editor state, stale-result handling, centralized replaceable copy, mockup-aligned
-Site/Rooms/Constraints editing, and focused tests. Continue with 5.2; do not redo the CSS or editor
-state foundations. Highest-priority gaps are the full layered SVG projection, category-aware room
-fills and area labels, real option thumbnails, and working pan/zoom/fit plus evidence highlight.
-The workspace must still pass the 1536 × 1024 comparison loop in `FRONTEND_MOCKUP_BRIEF.md`.
+**Current continuation boundary:** buckets 5.1 and 5.2 are complete at `c63a1d2` and `96ba89f`.
+Typed editor state, stale-result handling, centralized replaceable copy, stable layered SVG,
+category-aware rooms, pan/zoom/fit, and evidence highlighting are implemented and tested. Continue
+with 5.3; do not redo the editor or viewport foundations. Highest-priority gaps are real option
+thumbnails, the selected-option summary, raw metrics, score bars, observations, rule status, and
+the final right-pane hierarchy. The workspace must still pass the 1536 × 1024 comparison loop.
 
 1. Read `AGENTS.md`, `knowledge/PROGRESS.md`, `knowledge/BOARD.md`, `DELEGATION-PLAN.md`, and this
    handoff before acting.
 2. Stay on clean, synchronized `main`. The user authorized the mockup-driven visual starter; do not
    interpret that as approval to freeze copy or expand scope beyond the fidelity brief.
-3. Claim 5.2 and continue the SVG/viewport work from the verified 5.1 foundation. In parallel,
+3. Claim 5.3 and continue the result/analysis projection from the verified 5.1/5.2 foundation. In parallel,
    prepare one concise
    5.0 final-copy decision package containing:
    - the recommendation to retain the existing Vite/TS shell, with the short reason that this MVP
@@ -60,7 +60,7 @@ default while requiring it to stay settable (D2/D3), and asked for the engineeri
 to be done rather than returned as questions (D4). All of it is implemented, verified and green
 (145 tests, full regression gate PASS at median 1,750 ms). Record:
 [`artifacts/planlab/milestone-3/gate-amendment-d1-d4.md`](artifacts/planlab/milestone-3/gate-amendment-d1-d4.md).
-**Milestone 4 is closed; Milestone 5 is active. Bucket 5.1 is complete. Next: execute 5.2 while
+**Milestone 4 is closed; Milestone 5 is active. Buckets 5.1 and 5.2 are complete. Next: execute 5.3 while
 keeping final copy replaceable and awaiting user approval.**
 
 ## D5 remote checkpoint — approved
@@ -263,8 +263,8 @@ for the Milestone 4 worker protocol. Raised for bucket 2.5 and for the user.
 
 ## Next step
 
-1. Claim and execute **5.2** from `c63a1d2`, following `FRONTEND_MOCKUP_BRIEF.md`; do not redo 5.1.
-2. Continue 5.3 → 5.4 with centralized replaceable copy; do not freeze copy or close 5.0 without
+1. Claim and execute **5.3** from `96ba89f`, following `FRONTEND_MOCKUP_BRIEF.md`; do not redo 5.1/5.2.
+2. Continue 5.4 with centralized replaceable copy; do not freeze copy or close 5.0 without
    explicit user approval.
 3. Run the Milestone 5 independent review (5.5) before closing the stage.
 4. Orchestrator note for future stages: dispatched executors in this project have repeatedly stalled

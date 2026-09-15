@@ -159,12 +159,12 @@ direction plus screenshot acceptance contract in
   editor state: site, offsets, area policy, room program, relationships, and planning assumptions.
   Keep local form state separate from committed normalized project state; a changed brief marks
   previous results stale. Use replaceable recommended copy. — `luna-max` (`c63a1d2`)
-- [ ] **5.2 SVG projection, layers, pan/zoom/fit, and evidence highlight.** Render stable layers in
+- [x] **5.2 SVG projection, layers, pan/zoom/fit, and evidence highlight.** Render stable layers in
   order (grid, site, envelope, footprint, spaces/portals, labels, evidence, north/scale) using a
   grid-unit viewBox and a single viewport transform. Add zoom/fit and observation-to-geometry
   highlighting without letting rendering own authoritative geometry. Match the centre-viewport
   hierarchy, framing, palette, and controls in `PlanLab-Mockup.png` without fabricating decorative
-  architectural data. — `luna-max`
+  architectural data. — `luna-max` (`96ba89f`)
 - [ ] **5.3 Result selector and analysis projection.** Show up to three strategy options with honest
   empty/partial states, selection updates the main plan, and the analysis panel projects raw metrics,
   whole-number category scores, observations, and PASS/WARNING/FAIL rule checks from the canonical
