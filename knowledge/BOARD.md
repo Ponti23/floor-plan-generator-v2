@@ -33,7 +33,7 @@ Active design: [`planlab/README.md`](./planlab/README.md) · staged plan: [`../D
 | 4.1 | Milestone 4 UI shell (worker + three-pane app) | terra-max | orchestrator (`/root`) | done | `main` (`89b9fc7`) |
 | 5.0 | Milestone 5 product copy + Vite/Next.js shell decision | astra-plan | user | needs-human | — |
 | 5.1 | Brief editor state and committed form | luna-max | luna-max | done | `main` (`c63a1d2`) |
-| 5.2 | SVG projection, layers, pan/zoom/fit, evidence highlight | luna-max | unassigned | todo | `main` |
+| 5.2 | SVG projection, layers, pan/zoom/fit, evidence highlight | luna-max | luna-max | in-progress | `main` |
 | 5.3 | Result selector and analysis projection | luna-max | unassigned | todo | `main` |
 | 5.4 | Generation states, stale-result affordances, keyboard/a11y | terra-max | unassigned | todo | `main` |
 | 5.5 | Independent Milestone 5 review | terra-max | sol-max | todo | `main` |

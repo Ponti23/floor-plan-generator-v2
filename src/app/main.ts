@@ -19,6 +19,17 @@ import {
   type DraftRoom,
 } from "./editor-state.ts";
 import { resolvePresentationCopy } from "./presentation-copy.ts";
+import { projectEvidenceGeometry, projectPlanSvg } from "./svg-projection.ts";
+import {
+  createViewportState,
+  fitViewport,
+  panViewport,
+  pointerToViewBox,
+  VIEWPORT_ZOOM_FACTOR,
+  viewportTransformAttribute,
+  zoomViewport,
+  type ViewportModeState,
+} from "./viewport.ts";
 import { GenerationController, type GenerationState, type WorkerPort } from "../worker/controller.ts";
 
 const app = document.querySelector<HTMLDivElement>("#app")!;
@@ -27,6 +38,10 @@ let editor: BriefEditorState = createBriefEditorState(CANONICAL_PROJECT);
 let selectedLayoutId: string | null = null;
 let generationRevision: number | null = null;
 let expandedRoomId: string | null = "kitchen";
+let viewport: ViewportModeState = createViewportState();
+let viewportProjectKey = `${editor.committedProject.projectId}:${editor.committedProject.site.site.width}:${editor.committedProject.site.site.depth}`;
+let focusedEvidenceRefs: readonly string[] = [];
+let pointerSession: { pointerId: number; clientX: number; clientY: number } | null = null;
 const committedProjects = new Map<number, NormalizedProject>([
   [editor.revision, editor.committedProject],
 ]);
@@ -45,35 +60,6 @@ function escapeAttribute(value: string | number): string {
 
 function roomKindClass(kind: RoomKind): string {
   return `room-kind-${kind}`;
-}
-
-function formatAreaUnits(areaUnits2: number): string {
-  return `${(areaUnits2 * (GRID_MM / 1_000) ** 2).toFixed(1)} ${copy.ui.units.squareMetre}`;
-}
-
-function planSvg(layout: Layout | undefined, project: NormalizedProject, stale: boolean): string {
-  const site = project.site.site;
-  const envelope = project.site.envelope;
-  const roomById = new Map(project.rooms.map((room) => [room.id, room]));
-  const spaces = layout?.spaces.map((space) => {
-    const { x, y, width, depth } = space.rect;
-    const room = roomById.get(space.instanceId);
-    const label = room?.displayName ?? (space.role === "circulation" ? copy.ui.circulationLegend : space.instanceId);
-    const area = formatAreaUnits(width * depth);
-    return `<g class="space-group ${space.role}"><rect class="space ${room ? roomKindClass(room.kind) : space.role}" x="${x}" y="${y}" width="${width}" height="${depth}"/><text class="space-label" x="${x + width / 2}" y="${y + depth / 2 - 1}">${escapeText(label)}<tspan x="${x + width / 2}" dy="2.6">${escapeText(area)}</tspan></text></g>`;
-  }).join("") ?? "";
-  const footprint = layout
-    ? `<rect class="footprint" x="${layout.footprint.x}" y="${layout.footprint.y}" width="${layout.footprint.width}" height="${layout.footprint.depth}"/>`
-    : "";
-  const staleClass = stale ? " stale-plan" : "";
-  return `<svg class="plan-svg${staleClass}" role="img" aria-label="${escapeAttribute(stale ? copy.ui.stalePlanAria : copy.ui.generatedPlanAria)}" viewBox="-3 -3 ${site.width + 6} ${site.depth + 6}">
-    <defs><pattern id="plan-grid" width="4" height="4" patternUnits="userSpaceOnUse"><path d="M 4 0 L 0 0 0 4"/></pattern></defs>
-    <rect class="grid" x="0" y="0" width="${site.width}" height="${site.depth}"/>
-    <rect class="site" x="0" y="0" width="${site.width}" height="${site.depth}"/>
-    <rect class="envelope" x="${envelope.x}" y="${envelope.y}" width="${envelope.width}" height="${envelope.depth}"/>
-    ${footprint}${spaces}
-    <text class="north" x="${site.width - 4}" y="5">${escapeText(copy.ui.northSymbol)} ↑</text>
-  </svg>`;
 }
 
 function selectedResult(
@@ -219,15 +205,140 @@ function renderBriefPane(state: Readonly<GenerationState>): string {
   </aside>`;
 }
 
+function viewportKey(project: NormalizedProject): string {
+  const site = project.site.site;
+  const envelope = project.site.envelope;
+  return [project.projectId, site.width, site.depth, envelope.x, envelope.y, envelope.width, envelope.depth].join(":");
+}
+
+function syncViewportProject(project: NormalizedProject): void {
+  const key = viewportKey(project);
+  if (key === viewportProjectKey) return;
+  viewportProjectKey = key;
+  viewport = createViewportState();
+  focusedEvidenceRefs = [];
+}
+
+function rootViewBox(project: NormalizedProject): { x: number; y: number; width: number; depth: number } {
+  const margin = 4;
+  const site = project.site.site;
+  return { x: -margin, y: -margin, width: site.width + margin * 2, depth: site.depth + margin * 2 };
+}
+
+function rootCentre(project: NormalizedProject): { x: number; y: number } {
+  const root = rootViewBox(project);
+  return { x: root.x + root.width / 2, y: root.y + root.depth / 2 };
+}
+
+function updateViewportTransformMarkup(): void {
+  const svg = app.querySelector<SVGSVGElement>(".plan-svg");
+  const group = svg?.querySelector<SVGGElement>("[data-viewport-transform]");
+  if (!svg || !group) return;
+  group.setAttribute("transform", viewportTransformAttribute(viewport.transform));
+  svg.classList.toggle("pan-mode", viewport.mode === "pan");
+  const zoom = app.querySelector<HTMLElement>("[data-zoom-value]");
+  if (zoom) zoom.textContent = `${Math.round(viewport.transform.scale * 100)}%`;
+}
+
+function svgPointerAnchor(svg: SVGSVGElement, event: PointerEvent | WheelEvent, project: NormalizedProject): { x: number; y: number } {
+  const rect = svg.getBoundingClientRect();
+  const root = rootViewBox(project);
+  return pointerToViewBox(event.clientX, event.clientY, {
+    left: rect.left,
+    top: rect.top,
+    width: rect.width,
+    height: rect.height,
+  }, {
+    x: root.x,
+    y: root.y,
+    width: root.width,
+    depth: root.depth,
+  });
+}
+
+function pointerPanDelta(svg: SVGSVGElement, previous: { clientX: number; clientY: number }, event: PointerEvent, project: NormalizedProject): { x: number; y: number } {
+  const rect = svg.getBoundingClientRect();
+  const root = rootViewBox(project);
+  const basePixelsPerUnit = Math.min(rect.width / root.width, rect.height / root.depth);
+  if (!Number.isFinite(basePixelsPerUnit) || basePixelsPerUnit <= 0) return { x: 0, y: 0 };
+  return {
+    x: (event.clientX - previous.clientX) / basePixelsPerUnit,
+    y: (event.clientY - previous.clientY) / basePixelsPerUnit,
+  };
+}
+
+function bindViewportEvents(): void {
+  const svg = app.querySelector<SVGSVGElement>(".plan-svg");
+  if (!svg) return;
+  const selected = selectedResult(controller.state);
+  const project = selected.project;
+  const root = rootViewBox(project);
+  const setTransform = (next: typeof viewport.transform): void => {
+    viewport = { ...viewport, transform: next };
+    updateViewportTransformMarkup();
+  };
+  for (const button of app.querySelectorAll<HTMLButtonElement>("[data-viewport-action]")) {
+    button.addEventListener("click", () => {
+      const action = button.dataset.viewportAction;
+      if (action === "select" || action === "pan") {
+        viewport = { ...viewport, mode: action };
+        render(controller.state);
+      } else if (action === "zoom-in") {
+        setTransform(zoomViewport(viewport.transform, VIEWPORT_ZOOM_FACTOR, rootCentre(project)));
+      } else if (action === "zoom-out") {
+        setTransform(zoomViewport(viewport.transform, 1 / VIEWPORT_ZOOM_FACTOR, rootCentre(project)));
+      } else if (action === "fit") {
+        setTransform(fitViewport(project.site.site, root, { width: svg.clientWidth, height: svg.clientHeight }));
+      }
+    });
+  }
+  svg.addEventListener("wheel", (event) => {
+    event.preventDefault();
+    const direction = event.deltaY < 0 ? VIEWPORT_ZOOM_FACTOR : 1 / VIEWPORT_ZOOM_FACTOR;
+    const pointer = svgPointerAnchor(svg, event, project);
+    const scale = viewport.transform.scale;
+    const anchor = {
+      x: (pointer.x - viewport.transform.translateX) / scale,
+      y: (pointer.y - viewport.transform.translateY) / scale,
+    };
+    setTransform(zoomViewport(viewport.transform, direction, anchor));
+  }, { passive: false });
+  svg.addEventListener("pointerdown", (event) => {
+    if (viewport.mode !== "pan" && event.button !== 1) return;
+    pointerSession = { pointerId: event.pointerId, clientX: event.clientX, clientY: event.clientY };
+    svg.setPointerCapture(event.pointerId);
+    svg.classList.add("dragging");
+  });
+  svg.addEventListener("pointermove", (event) => {
+    if (!pointerSession || pointerSession.pointerId !== event.pointerId) return;
+    const delta = pointerPanDelta(svg, pointerSession, event, project);
+    pointerSession = { pointerId: event.pointerId, clientX: event.clientX, clientY: event.clientY };
+    setTransform(panViewport(viewport.transform, delta.x, delta.y));
+  });
+  const finishPointer = (event: PointerEvent): void => {
+    if (!pointerSession || pointerSession.pointerId !== event.pointerId) return;
+    pointerSession = null;
+    svg.classList.remove("dragging");
+    if (svg.hasPointerCapture(event.pointerId)) svg.releasePointerCapture(event.pointerId);
+  };
+  svg.addEventListener("pointerup", finishPointer);
+  svg.addEventListener("pointercancel", finishPointer);
+  svg.addEventListener("pointerleave", (event) => {
+    if (pointerSession && svg.hasPointerCapture(event.pointerId)) return;
+    finishPointer(event);
+  });
+}
+
 function renderCanvas(state: Readonly<GenerationState>): string {
   const selected = selectedResult(state);
+  syncViewportProject(selected.project);
   const progress = state.progress
     ? `${state.progress.phase} · ${state.progress.expandedStates.toLocaleString()} ${copy.status.progressExpansions}`
     : copy.ui.canvasReady;
   return `<section class="canvas" aria-label="${escapeAttribute(copy.ui.viewportAria)}">
-    <div class="viewport-tools" aria-label="${escapeAttribute(copy.ui.viewportToolsAria)}"><button type="button" aria-label="${escapeAttribute(copy.ui.selectTool)}" class="active">↖</button><button type="button" aria-label="${escapeAttribute(copy.ui.panTool)}">✋</button><span class="tool-divider"></span><button type="button" aria-label="${escapeAttribute(copy.ui.zoomOut)}">−</button><span class="zoom-value">${escapeText(copy.ui.zoomValue)}</span><button type="button" aria-label="${escapeAttribute(copy.ui.zoomIn)}">+</button><button type="button" aria-label="${escapeAttribute(copy.ui.fitPlan)}">${escapeText(copy.ui.fitPlan)}</button></div>
+    <div class="viewport-tools" aria-label="${escapeAttribute(copy.ui.viewportToolsAria)}"><button type="button" aria-label="${escapeAttribute(copy.ui.selectTool)}" data-viewport-action="select" class="${viewport.mode === "select" ? "active" : ""}">↖</button><button type="button" aria-label="${escapeAttribute(copy.ui.panTool)}" data-viewport-action="pan" class="${viewport.mode === "pan" ? "active" : ""}">✋</button><span class="tool-divider"></span><button type="button" aria-label="${escapeAttribute(copy.ui.zoomOut)}" data-viewport-action="zoom-out">−</button><span class="zoom-value" data-zoom-value>${Math.round(viewport.transform.scale * 100)}%</span><button type="button" aria-label="${escapeAttribute(copy.ui.zoomIn)}" data-viewport-action="zoom-in">+</button><button type="button" aria-label="${escapeAttribute(copy.ui.fitPlan)}" data-viewport-action="fit">${escapeText(copy.ui.fitPlan)}</button></div>
     <div class="north-indicator" aria-label="${escapeAttribute(copy.ui.northOrientation)}">${escapeText(copy.ui.northSymbol)}<span>▲</span></div>
-    ${planSvg(selected.layout, selected.project, editor.resultsStale)}
+    ${projectPlanSvg({ layout: selected.layout, project: selected.project, stale: editor.resultsStale, focusedEvidenceRefs, transform: viewport.transform, copy: copy.ui })}
     <div class="canvas-status" aria-live="polite">${escapeText(progress)}</div>
     <div class="legend" aria-label="${escapeAttribute(copy.ui.legendAria)}"><span><i class="legend-line site-line"></i>${escapeText(copy.ui.propertyBoundary)}</span><span><i class="legend-line footprint-line"></i>${escapeText(copy.ui.buildingFootprint)}</span><span><i class="legend-swatch room-line"></i>${escapeText(copy.ui.roomLegend)}</span><span><i class="legend-swatch circulation-line"></i>${escapeText(copy.ui.circulationLegend)}</span></div>
     <div class="entrance-label">${escapeText(copy.ui.entranceLabel)}</div>
@@ -254,7 +365,20 @@ function renderAnalysis(state: Readonly<GenerationState>): string {
   const metrics = balanced?.categoryScores
     ? METRIC_CATEGORIES.map((category) => `<div class="metric-row"><span>${escapeText(copy.metricLabels[category])}</span><strong>${Math.round(balanced.categoryScores[category] ?? 0)}</strong></div>`).join("")
     : `<p class="empty-state">${escapeText(copy.status.noResult)}</p>`;
-  const observations = balanced?.explanations.slice(0, 4).map((explanation) => `<li><span class="observation-icon">${explanation.impact >= 0 ? "✓" : "!"}</span><span>${escapeText(explanation.key.replaceAll(".", " "))}</span></li>`).join("") ?? "";
+  const observations = balanced?.explanations.slice(0, 4).map((explanation) => {
+    const refs = explanation.evidenceRefs.filter((reference) => reference.length > 0);
+    const hasGeometry = refs.length > 0 && (() => {
+      const evidence = projectEvidenceGeometry(selected.layout, refs);
+      return evidence.rects.length > 0 || evidence.portals.length > 0;
+    })();
+    const focused = hasGeometry && focusedEvidenceRefs.join("|") === refs.join("|");
+    const icon = `<span class="observation-icon">${explanation.impact >= 0 ? "✓" : "!"}</span>`;
+    const text = `<span>${escapeText(explanation.key.replaceAll(".", " "))}</span>`;
+    const content = hasGeometry
+      ? `<button type="button" class="observation-button" data-evidence-refs="${escapeAttribute(refs.join("|"))}" aria-pressed="${focused}" aria-label="${escapeAttribute(`Focus ${explanation.key.replaceAll(".", " ")}`)}">${icon}${text}</button>`
+      : `<span class="observation-static">${icon}${text}</span>`;
+    return `<li class="observation-item ${focused ? "focused" : ""}">${content}</li>`;
+  }).join("") ?? "";
   return `<aside class="analysis" aria-label="${escapeAttribute(`${copy.ui.optionsTitle} and ${copy.ui.analysisTitle}`)}"><div class="analysis-scroll"><div class="pane-title"><div><span class="eyebrow">${escapeText(copy.ui.compareEyebrow)}</span><h1>${escapeText(copy.ui.optionsTitle)}</h1></div><span class="count">${selected.result?.selection.selected.length ?? 0}/3</span></div><div class="options">${resultCards(selected.result)}</div><div class="analysis-heading"><h2>${balanced ? `${escapeText(copy.ui.optionPrefix)} ${escapeText(copy.strategyNames[balanced.profileId] ?? balanced.label)}` : escapeText(copy.ui.analysisFallbackTitle)}</h2>${balanced ? `<strong>${balanced.overallScore}<small>/100</small></strong>` : ""}</div><div class="metrics">${metrics}</div><h3>${escapeText(copy.ui.scoreBreakdown)}</h3><div class="score-bars">${balanced ? METRIC_CATEGORIES.map((category) => `<div class="score-bar-row"><span>${escapeText(copy.metricLabels[category])}</span><span class="bar"><i style="width:${Math.max(0, Math.min(100, balanced.categoryScores[category] ?? 0))}%"></i></span><strong>${Math.round(balanced.categoryScores[category] ?? 0)}</strong></div>`).join("") : ""}</div><h3>${escapeText(copy.ui.observations)}</h3><ul class="observations">${observations || `<li class="empty-state">${escapeText(copy.ui.noEvidence)}</li>`}</ul></div><div class="conceptual-notice"><span aria-hidden="true">ⓘ</span><span>${escapeText(copy.status.conceptualUseNotice)}</span></div></aside>`;
 }
 
@@ -380,7 +504,14 @@ function bindFormEvents(): void {
     button.addEventListener("click", () => { expandedRoomId = button.dataset.expandRoom === expandedRoomId ? null : button.dataset.expandRoom!; render(controller.state); });
   }
   for (const button of app.querySelectorAll<HTMLButtonElement>("[data-layout]")) {
-    button.addEventListener("click", () => { selectedLayoutId = button.dataset.layout!; render(controller.state); });
+    button.addEventListener("click", () => { selectedLayoutId = button.dataset.layout!; focusedEvidenceRefs = []; render(controller.state); });
+  }
+  for (const button of app.querySelectorAll<HTMLButtonElement>("[data-evidence-refs]")) {
+    button.addEventListener("click", () => {
+      const raw = button.dataset.evidenceRefs ?? "";
+      focusedEvidenceRefs = raw.split("|").filter((reference) => reference.length > 0);
+      render(controller.state);
+    });
   }
   app.querySelector<HTMLButtonElement>("#generate")?.addEventListener("click", startGeneration);
   app.querySelector<HTMLButtonElement>("#cancel")?.addEventListener("click", () => controller.cancel());
@@ -391,12 +522,14 @@ function bindFormEvents(): void {
 function startGeneration(): void {
   if (!commitEditorDraft()) return;
   generationRevision = editor.revision;
+  focusedEvidenceRefs = [];
   controller.start(editor.committedProject, editor.committedProject.generation.seed);
 }
 
 function retryGeneration(): void {
   if (!commitEditorDraft()) return;
   generationRevision = editor.revision;
+  focusedEvidenceRefs = [];
   // Retry the latest committed snapshot. The controller still supplies the
   // same seed semantics, while this guard prevents a retry after an edit from
   // accidentally re-running an older brief.
@@ -418,6 +551,7 @@ function render(state: Readonly<GenerationState>): void {
   selectedResult(state);
   app.innerHTML = `<header class="toolbar"><div class="brand"><span class="brand-mark" aria-hidden="true">⌘</span><strong>${escapeText(copy.productName)}</strong><span class="brand-subtitle">${escapeText(copy.subtitle)}</span></div><div class="toolbar-group toolbar-middle"><button type="button" class="toolbar-button">${escapeText(copy.toolbar.newProject)}</button><span class="save-indicator"><span class="status-dot ok" aria-hidden="true"></span>${escapeText(copy.toolbar.saveStatus)}</span></div><div class="toolbar-group toolbar-right"><button type="button" class="toolbar-button">▦ ${escapeText(copy.toolbar.grid)}</button><button type="button" class="toolbar-button">⌁ ${escapeText(copy.toolbar.measurements)}</button><button type="button" class="toolbar-button" aria-label="${escapeAttribute(copy.toolbar.settings)}">⚙ ${escapeText(copy.toolbar.settings)}</button><span class="toolbar-status" data-status="${escapeAttribute(statusLabel(state))}">${escapeText(statusLabel(state))}</span></div></header><main class="workspace">${renderBriefPane(state)}${renderCanvas(state)}${renderAnalysis(state)}</main>`;
   bindFormEvents();
+  bindViewportEvents();
   restoreFocus(focus);
 }
 

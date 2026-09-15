@@ -329,3 +329,32 @@ body { overflow: hidden; }
   .toolbar-middle { margin-left: 18px; }
   .brand-subtitle, .toolbar-right .toolbar-button:nth-child(2) { display: none; }
 }
+
+/* Milestone 5.2 transient viewport and evidence projection.  The SVG keeps
+   grid-unit geometry; only [data-viewport-transform] receives this transform. */
+.canvas .plan-svg { touch-action: none; user-select: none; cursor: default; }
+.canvas .plan-svg.pan-mode { cursor: grab; }
+.canvas .plan-svg.dragging { cursor: grabbing; }
+.canvas .viewport-tools [data-viewport-action] { user-select: none; }
+.canvas svg .svg-layer { vector-effect: non-scaling-stroke; }
+.canvas svg .site-layer, .canvas svg .envelope-layer, .canvas svg .footprint-layer,
+.canvas svg .spaces-portals-layer, .canvas svg .labels-layer { pointer-events: none; }
+.canvas svg .evidence-layer { pointer-events: none; }
+.canvas svg .portal { stroke: #1473e6; stroke-width: .9; stroke-linecap: round; }
+.canvas svg .portal-vehicle { stroke: #596575; stroke-width: 1.1; }
+.canvas svg .evidence-highlight { fill: #1473e6; fill-opacity: .16; stroke: #1473e6; stroke-width: .8; stroke-dasharray: 1.4 .8; }
+.canvas svg .evidence-portal-highlight { stroke: #1473e6; stroke-width: 1.7; stroke-linecap: round; }
+.canvas svg .dimension-line { stroke: #596575; stroke-width: .22; marker-start: url(#dimension-tick); marker-end: url(#dimension-tick); }
+.canvas svg .dimension-label, .canvas svg .site-dimension, .canvas svg .scale-label { fill: #3d4855; font-size: 1.65px; font-weight: 500; }
+.canvas svg .dimension-label-vertical { transform: rotate(-90deg); transform-origin: center; }
+.canvas svg .site-dimension { text-anchor: middle; }
+.canvas svg .north-scale { pointer-events: none; }
+.canvas svg .north-arrow, .canvas svg .scale-bar { fill: none; stroke: #17202b; stroke-width: .35; }
+.canvas svg .north { display: none; }
+.canvas svg .scale-label { text-anchor: end; }
+.observations .observation-item { padding: 0; }
+.observations .observation-button { display: flex; align-items: flex-start; gap: 7px; width: 100%; min-height: 27px; padding: 5px 3px; border: 1px solid transparent; border-radius: 4px; background: transparent; color: #3d4855; font: inherit; line-height: 1.35; text-align: left; }
+.observations .observation-button:hover { background: #f2f6fa; }
+.observations .observation-button:focus-visible { outline: 3px solid #77aef4; outline-offset: -1px; }
+.observations .observation-item.focused .observation-button { border-color: #9fc7f4; background: #eaf3ff; }
+.observations .observation-static { display: flex; align-items: flex-start; gap: 7px; width: 100%; min-height: 27px; padding: 5px 3px; }
