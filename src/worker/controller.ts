@@ -10,6 +10,10 @@ export interface GenerationState {
   progress: GenerationProgress | null;
   lastCompatibleResult: GenerationResultPayload | null;
   error: string | null;
+  /** Epoch milliseconds when the in-flight run started; null when idle. */
+  startedAt: number | null;
+  /** Watchdog budget in milliseconds, exposed so the UI can show the deadline. */
+  watchdogMs: number;
 }
 
 export interface WorkerPort {
@@ -34,11 +38,13 @@ export class GenerationController {
   private listeners = new Set<(state: Readonly<GenerationState>) => void>();
   private stateValue: GenerationState = {
     status: "idle", requestId: null, progress: null, lastCompatibleResult: null, error: null,
+    startedAt: null, watchdogMs: 8_000,
   };
 
   constructor(createWorker: WorkerFactory, watchdogMs = 8_000) {
     this.createWorker = createWorker;
     this.watchdogMs = watchdogMs;
+    this.stateValue = { ...this.stateValue, watchdogMs };
     this.worker = this.attach(createWorker());
   }
 
@@ -55,7 +61,7 @@ export class GenerationController {
     const requestId = `generation-${++this.sequence}`;
     this.lastAttempt = { project, seed, ...(budget === undefined ? {} : { budget }) };
     this.cancellation = typeof SharedArrayBuffer === "undefined" ? null : new Int32Array(new SharedArrayBuffer(4));
-    this.update({ status: "generating", requestId, progress: null, error: null });
+    this.update({ status: "generating", requestId, progress: null, error: null, startedAt: Date.now() });
     const request: GenerateRequest = {
       version: WORKER_PROTOCOL_VERSION, kind: "generate", requestId, project, seed,
       ...(budget === undefined ? {} : { budget }),
@@ -77,7 +83,7 @@ export class GenerationController {
     if (this.cancellation) Atomics.store(this.cancellation, 0, 1);
     else this.replaceWorker();
     this.worker.postMessage({ version: WORKER_PROTOCOL_VERSION, kind: "cancel", requestId });
-    this.finish({ status: "idle", requestId: null, progress: null, error: null });
+    this.finish({ status: "idle", requestId: null, progress: null, error: null, startedAt: null });
   }
 
   retry(): string | null {
@@ -122,7 +128,7 @@ export class GenerationController {
       const status: GenerationStatus = !message.payload.ok ? "infeasible" : message.payload.selection.complete ? "complete" : "partial";
       this.finish({ status, requestId: null, lastCompatibleResult: message.payload, error: null });
     } else if (message.kind === "cancelled") {
-      this.finish({ status: "idle", requestId: null, progress: null, error: null });
+    this.finish({ status: "idle", requestId: null, progress: null, error: null, startedAt: null });
     } else if (message.kind === "budgetExceeded") {
       this.finish({ status: "budgetExceeded", requestId: null, error: null });
     } else {
@@ -139,7 +145,9 @@ export class GenerationController {
   private finish(patch: Partial<GenerationState>): void {
     this.clearWatchdog();
     this.cancellation = null;
-    this.update(patch);
+    // Every terminal path clears the elapsed clock, so the UI can never show a
+    // stale "running for N seconds" readout after a run has ended.
+    this.update({ startedAt: null, ...patch });
   }
 
   private update(patch: Partial<GenerationState>): void {

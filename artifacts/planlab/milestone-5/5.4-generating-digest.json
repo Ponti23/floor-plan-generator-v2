@@ -1,0 +1,37 @@
+{
+  "viewport": {
+    "width": 1536,
+    "height": 1024
+  },
+  "toolbarHeight": 56,
+  "briefPane": {
+    "width": 310,
+    "height": 968,
+    "top": 56,
+    "left": 0
+  },
+  "canvas": {
+    "width": 841,
+    "height": 968,
+    "top": 56,
+    "left": 310
+  },
+  "analysisPane": {
+    "width": 385,
+    "height": 968,
+    "top": 56,
+    "left": 1151
+  },
+  "statusLabel": "Generating",
+  "statusDetail": "Generatingsearch · 5,877 expansions · 100 valid · 0.5 s / 8 s watchdog",
+  "optionCards": [],
+  "summaryHeading": null,
+  "summaryScore": null,
+  "metricRows": [],
+  "scoreRows": [],
+  "ruleSummary": null,
+  "ruleRows": [],
+  "observations": [],
+  "notice": "ⓘConceptual layout only — verify dimensions, regulations, and construction requirements before use.",
+  "svgPlan": "-6 -6 92 132"
+}

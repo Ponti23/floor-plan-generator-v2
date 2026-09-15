@@ -19,6 +19,8 @@
  *   --width/--height  viewport in CSS pixels (default 1536 x 1024)
  *   --no-generate     capture the idle state without clicking Generate
  *   --pre <js>        run JavaScript after load and before clicking Generate
+ *   --post <js>       run JavaScript after generation settles, before capture
+ *   --immediate       capture while the run is still in flight instead of waiting
  *   --json <path>     also write the DOM digest as JSON
  */
 import { execFile, spawn } from "node:child_process";
@@ -37,6 +39,8 @@ function parseArgs(argv) {
     height: 1024,
     generate: true,
     pre: null,
+    post: null,
+    immediate: false,
     json: null,
     chrome: null,
   };
@@ -50,6 +54,8 @@ function parseArgs(argv) {
     else if (arg === "--chrome") options.chrome = next;
     else if (arg === "--json") options.json = resolve(REPO_ROOT, next);
     else if (arg === "--pre") options.pre = next;
+    else if (arg === "--post") options.post = next;
+    else if (arg === "--immediate") options.immediate = true;
     else if (arg === "--no-generate") options.generate = false;
   }
   return options;
@@ -214,15 +220,22 @@ async function main() {
         expression: "document.querySelector('#generate')?.click()",
         awaitPromise: false,
       });
-      for (let attempt = 0; attempt < 100; attempt += 1) {
+      const attempts = options.immediate ? 2 : 100;
+      for (let attempt = 0; attempt < attempts; attempt += 1) {
         const probe = await client.send("Runtime.evaluate", {
           expression: "({ cards: document.querySelectorAll('.option-card').length, status: document.querySelector('.brief-status')?.textContent?.trim() ?? '' })",
           returnByValue: true,
         });
         const value = probe.result.value;
         if (value && value.cards > 0 && !/Generating|Preparing/i.test(value.status)) break;
-        await delay(250);
+        await delay(options.immediate ? 250 : 250);
       }
+    }
+
+    if (options.post) {
+      const post = await client.send("Runtime.evaluate", { expression: options.post, returnByValue: true });
+      if (post.exceptionDetails) throw new Error(`--post script failed: ${post.exceptionDetails.text}`);
+      await delay(250);
     }
 
     const digest = await client.send("Runtime.evaluate", {

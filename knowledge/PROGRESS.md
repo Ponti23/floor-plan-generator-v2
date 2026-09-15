@@ -72,7 +72,11 @@ tags: [progress, resume]
      enough. A verified CSS foundation now matches the reference's main proportions, white toolbar,
      blue accent, planning grid and compact density; `HANDOFF.md` records the precise remaining
      `main.ts` and visual-QA work for DeepSeek-Flash.
-- **Next step:** buckets 5.1–5.3 are complete (`c63a1d2`, `96ba89f`, 5.3 as of this checkpoint).
+- **Next step:** buckets 5.1–5.4 are complete (`c63a1d2`, `96ba89f`, 5.3 and 5.4 as of this
+  checkpoint). 5.4 delivered all eight generation states, the stale-results banner with a working
+  Regenerate action, elapsed/watchdog progress, disabled out-of-scope shell controls and the
+  deterministic "new variations" seed bump — record:
+  `artifacts/planlab/milestone-5/5.4-generation-states.md`.
   5.3 delivered real option thumbnails, the selected-option summary (six real-value-only metric rows),
   whole-number category bars, PASS/WARNING/FAIL rule checks and honest empty/infeasible states —
   record: `artifacts/planlab/milestone-5/5.3-result-selector.md`; evidence: 169 tests, clean

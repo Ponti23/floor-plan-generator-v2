@@ -7,6 +7,7 @@ import type { Layout } from "../domain/layout.ts";
 import type { NormalizedProject, RoomKind } from "../domain/model.ts";
 import type { GenerationResultPayload } from "../domain/resultPayload.ts";
 import {
+  bumpVariationSeed,
   CARDINAL_SIDES,
   commitBriefDraft,
   createBriefEditorState,
@@ -103,13 +104,28 @@ function statusLabel(state: Readonly<GenerationState>): string {
   return state.status;
 }
 
+/** Elapsed wall-clock seconds of the in-flight run, or null when not running. */
+function elapsedSeconds(state: Readonly<GenerationState>): number | null {
+  if (state.startedAt === null) return null;
+  return Math.max(0, (Date.now() - state.startedAt) / 1000);
+}
+
+/** Deterministic progress counters plus the watchdog deadline for the UI. */
+function progressReadout(state: Readonly<GenerationState>): string {
+  const progress = state.progress;
+  const counters = progress
+    ? `${progress.phase} · ${progress.expandedStates.toLocaleString()} ${copy.status.progressExpansions} · ${progress.validCandidates} ${copy.status.progressValid}`
+    : copy.status.preparing;
+  const elapsed = elapsedSeconds(state);
+  if (elapsed === null) return counters;
+  const budget = Math.round(state.watchdogMs / 1000);
+  return `${counters} · ${elapsed.toFixed(1)} s / ${budget} s ${copy.status.progressWatchdog}`;
+}
+
 function statusDetail(state: Readonly<GenerationState>): string {
   if (editor.issues.length > 0) return copy.status.invalidBrief;
   if (state.status === "generating") {
-    const progress = state.progress;
-    const detail = progress
-      ? `${progress.phase} · ${progress.expandedStates.toLocaleString()} ${copy.status.progressExpansions} · ${progress.validCandidates} ${copy.status.progressValid}`
-      : copy.status.preparing;
+    const detail = progressReadout(state);
     return editor.resultsStale ? `${detail} · ${copy.status.staleResults}` : detail;
   }
   if (editor.resultsStale) return copy.status.staleResults;
@@ -179,6 +195,7 @@ function renderBriefPane(state: Readonly<GenerationState>): string {
   const issueMarkup = editor.issues.length > 0
     ? `<p class="form-error" role="alert">${escapeText(issueSummary())}</p>`
     : "";
+  const generating = state.status === "generating";
   return `<aside class="brief-pane" aria-label="${escapeAttribute(copy.ui.briefTitle)}">
     <div class="brief-scroll">
       <div class="pane-title"><div><span class="eyebrow">${escapeText(copy.ui.briefEyebrow)}</span><h1>${escapeText(copy.ui.briefTitle)}</h1></div><span class="revision">${escapeText(copy.ui.versionPrefix)}${editor.revision + 1}</span></div>
@@ -209,9 +226,9 @@ function renderBriefPane(state: Readonly<GenerationState>): string {
       ${issueMarkup}
     </div>
     <div class="brief-footer">
-      <div class="brief-status" aria-live="polite"><span class="status-dot ${editor.resultsStale ? "warning" : "ok"}" aria-hidden="true"></span><span class="brief-state">${escapeText(statusLabel(state))}</span><span>${escapeText(statusDetail(state))}</span></div>
-      <div class="editor-actions"><button id="generate" class="primary-action" type="button">${escapeText(copy.actions.generate)}</button><button id="cancel" type="button" ${state.status === "generating" ? "" : "disabled"}>${escapeText(copy.actions.cancel)}</button><button id="retry" type="button" ${state.status === "workerError" || state.status === "budgetExceeded" ? "" : "disabled"}>${escapeText(copy.actions.retry)}</button></div>
-      <button id="discard-draft" class="text-action" type="button" ${editor.dirty ? "" : "disabled"}>${escapeText(copy.actions.discardDraft)}</button>
+      <div class="brief-status" aria-live="polite"><span class="status-dot ${editor.resultsStale ? "warning" : "ok"}" aria-hidden="true"></span><span class="brief-state">${escapeText(statusLabel(state))}</span><span data-live-status>${escapeText(statusDetail(state))}</span></div>
+      <div class="editor-actions"><button id="generate" class="primary-action" type="button" ${generating ? "disabled" : ""}>${escapeText(copy.actions.generate)}</button><button id="cancel" type="button" ${generating ? "" : "disabled"}>${escapeText(copy.actions.cancel)}</button><button id="retry" type="button" ${state.status === "workerError" || state.status === "budgetExceeded" ? "" : "disabled"}>${escapeText(copy.actions.retry)}</button></div>
+      <div class="text-actions"><button id="discard-draft" class="text-action" type="button" ${editor.dirty ? "" : "disabled"}>${escapeText(copy.actions.discardDraft)}</button><button id="new-variations" class="text-action" type="button" ${generating ? "disabled" : ""}>${escapeText(copy.actions.newVariations)}</button></div>
     </div>
   </aside>`;
 }
@@ -343,14 +360,12 @@ function bindViewportEvents(): void {
 function renderCanvas(state: Readonly<GenerationState>): string {
   const selected = selectedResult(state);
   syncViewportProject(selected.project);
-  const progress = state.progress
-    ? `${state.progress.phase} · ${state.progress.expandedStates.toLocaleString()} ${copy.status.progressExpansions}`
-    : copy.ui.canvasReady;
+  const progress = state.status === "generating" ? progressReadout(state) : copy.ui.canvasReady;
   return `<section class="canvas" aria-label="${escapeAttribute(copy.ui.viewportAria)}">
     <div class="viewport-tools" aria-label="${escapeAttribute(copy.ui.viewportToolsAria)}"><button type="button" aria-label="${escapeAttribute(copy.ui.selectTool)}" data-viewport-action="select" class="${viewport.mode === "select" ? "active" : ""}">↖</button><button type="button" aria-label="${escapeAttribute(copy.ui.panTool)}" data-viewport-action="pan" class="${viewport.mode === "pan" ? "active" : ""}">✋</button><span class="tool-divider"></span><button type="button" aria-label="${escapeAttribute(copy.ui.zoomOut)}" data-viewport-action="zoom-out">−</button><span class="zoom-value" data-zoom-value>${Math.round(viewport.transform.scale * 100)}%</span><button type="button" aria-label="${escapeAttribute(copy.ui.zoomIn)}" data-viewport-action="zoom-in">+</button><button type="button" aria-label="${escapeAttribute(copy.ui.fitPlan)}" data-viewport-action="fit">${escapeText(copy.ui.fitPlan)}</button></div>
     <div class="north-indicator" aria-label="${escapeAttribute(copy.ui.northOrientation)}">${escapeText(copy.ui.northSymbol)}<span>▲</span></div>
     ${projectPlanSvg({ layout: selected.layout, project: selected.project, stale: editor.resultsStale, focusedEvidenceRefs, transform: viewport.transform, copy: copy.ui })}
-    <div class="canvas-status" aria-live="polite">${escapeText(progress)}</div>
+    <div class="canvas-status" data-live-canvas aria-live="polite">${escapeText(progress)}</div>
     <div class="legend" aria-label="${escapeAttribute(copy.ui.legendAria)}"><span><i class="legend-line site-line"></i>${escapeText(copy.ui.propertyBoundary)}</span><span><i class="legend-line footprint-line"></i>${escapeText(copy.ui.buildingFootprint)}</span><span><i class="legend-swatch room-line"></i>${escapeText(copy.ui.roomLegend)}</span><span><i class="legend-swatch circulation-line"></i>${escapeText(copy.ui.circulationLegend)}</span></div>
     <div class="entrance-label">${escapeText(copy.ui.entranceLabel)}</div>
   </section>`;
@@ -372,6 +387,9 @@ function optionRowEmptyMessage(state: Readonly<GenerationState>): string {
 }
 
 function renderOptions(selected: ReturnType<typeof selectedResult>, state: Readonly<GenerationState>): string {
+  // Before the first run there is nothing to slot, so the row states the
+  // situation once.  Once a result exists, the three slots stay visible so an
+  // unfilled slot can carry its own reason.
   if (!selected.result) return `<p class="empty-state">${escapeText(optionRowEmptyMessage(state))}</p>`;
   return projectOptionCards(selected.result, selectedLayoutId, selected.project, copy).map((card) => {
     if (!card.layoutId) {
@@ -441,6 +459,11 @@ function renderAnalysis(state: Readonly<GenerationState>): string {
     : "";
   const categoryRows = projectCategoryRows(scorecard, METRIC_CATEGORIES, copy);
   const bars = categoryRows.map((row) => `<div class="score-bar-row"><span>${escapeText(row.label)}</span><span class="bar"><i style="width:${Math.max(0, Math.min(100, row.score))}%"></i></span><strong>${row.score}</strong></div>`).join("");
+  // Stale results stay visible but never look current: the banner states the
+  // problem and offers the one action that fixes it.
+  const staleBanner = editor.resultsStale
+    ? `<div class="stale-banner" role="status"><span class="stale-mark" aria-hidden="true">!</span><div class="stale-copy"><strong>${escapeText(copy.status.staleLabel)}</strong><span>${escapeText(copy.status.staleResults)}</span></div><button type="button" id="regenerate" class="stale-action">${escapeText(copy.status.staleAction)}</button></div>`
+    : "";
   // With no result to describe, the panel states the outcome once instead of
   // printing empty metric, score, rule and observation sections.
   const body = hasOptions
@@ -449,8 +472,10 @@ function renderAnalysis(state: Readonly<GenerationState>): string {
       <h3>${escapeText(copy.ui.scoreBreakdown)}</h3><div class="score-bars">${bars}</div>
       ${renderRuleChecks(evidence, selected.layout)}
       ${renderObservations(selected, observationExplanations(scorecard))}`
-    : `<p class="empty-state">${escapeText(optionRowEmptyMessage(state))}</p>`;
-  return `<aside class="analysis" aria-label="${escapeAttribute(`${copy.ui.optionsTitle} and ${copy.ui.analysisTitle}`)}"><div class="analysis-scroll"><div class="pane-title"><div><span class="eyebrow">${escapeText(copy.ui.compareEyebrow)}</span><h1>${escapeText(copy.ui.optionsTitle)}</h1></div><span class="count">${selected.result?.selection.selected.length ?? 0}/3</span></div><div class="options">${renderOptions(selected, state)}</div>${body}</div><div class="conceptual-notice"><span aria-hidden="true">ⓘ</span><span>${escapeText(copy.status.conceptualUseNotice)}</span></div></aside>`;
+    : selected.result
+      ? `<p class="empty-state">${escapeText(optionRowEmptyMessage(state))}</p>`
+      : "";
+  return `<aside class="analysis" aria-label="${escapeAttribute(`${copy.ui.optionsTitle} and ${copy.ui.analysisTitle}`)}"><div class="analysis-scroll"><div class="pane-title"><div><span class="eyebrow">${escapeText(copy.ui.compareEyebrow)}</span><h1>${escapeText(copy.ui.optionsTitle)}</h1></div><span class="count">${selected.result?.selection.selected.length ?? 0}/3</span></div>${staleBanner}<div class="options">${renderOptions(selected, state)}</div>${body}</div><div class="conceptual-notice"><span aria-hidden="true">ⓘ</span><span>${escapeText(copy.status.conceptualUseNotice)}</span></div></aside>`;
 }
 
 function preserveFocus(): { id: string | null; start: number | null; end: number | null } {
@@ -587,6 +612,8 @@ function bindFormEvents(): void {
   app.querySelector<HTMLButtonElement>("#generate")?.addEventListener("click", startGeneration);
   app.querySelector<HTMLButtonElement>("#cancel")?.addEventListener("click", () => controller.cancel());
   app.querySelector<HTMLButtonElement>("#retry")?.addEventListener("click", retryGeneration);
+  app.querySelector<HTMLButtonElement>("#new-variations")?.addEventListener("click", startVariations);
+  app.querySelector<HTMLButtonElement>("#regenerate")?.addEventListener("click", startGeneration);
   app.querySelector<HTMLButtonElement>("#discard-draft")?.addEventListener("click", () => { editor = discardBriefDraft(editor); render(controller.state); });
 }
 
@@ -595,6 +622,46 @@ function startGeneration(): void {
   generationRevision = editor.revision;
   focusedEvidenceRefs = [];
   controller.start(editor.committedProject, editor.committedProject.generation.seed);
+}
+
+/**
+ * Start a run from an explicitly different variation seed.
+ *
+ * UI_ARCHITECTURE separates "retry" (same seed, same result) from "new
+ * variations" (a different seed).  The bump is deterministic, so the sequence
+ * of variations is reproducible rather than random.
+ */
+function startVariations(): void {
+  updateBrief({ generationSeed: bumpVariationSeed(editor.draft.generationSeed) });
+  startGeneration();
+}
+
+/**
+ * Live progress readout while a run is in flight.
+ *
+ * The ticker only rewrites the two status text nodes.  Re-rendering the whole
+ * workspace four times a second would throw away focus and scroll position in
+ * the middle of an edit, so the DOM is updated in place instead.
+ */
+let progressTicker: ReturnType<typeof setInterval> | null = null;
+
+function syncProgressTicker(state: Readonly<GenerationState>): void {
+  const running = state.status === "generating" && state.startedAt !== null;
+  if (!running) {
+    if (progressTicker !== null) {
+      clearInterval(progressTicker);
+      progressTicker = null;
+    }
+    return;
+  }
+  if (progressTicker !== null) return;
+  progressTicker = setInterval(() => {
+    const live = controller.state;
+    const canvas = app.querySelector<HTMLElement>("[data-live-canvas]");
+    if (canvas) canvas.textContent = progressReadout(live);
+    const status = app.querySelector<HTMLElement>("[data-live-status]");
+    if (status) status.textContent = statusDetail(live);
+  }, 250);
 }
 
 function retryGeneration(): void {
@@ -620,10 +687,15 @@ function render(state: Readonly<GenerationState>): void {
   }
   const focus = preserveFocus();
   selectedResult(state);
-  app.innerHTML = `<header class="toolbar"><div class="brand"><span class="brand-mark" aria-hidden="true">⌘</span><strong>${escapeText(copy.productName)}</strong><span class="brand-subtitle">${escapeText(copy.subtitle)}</span></div><div class="toolbar-group toolbar-middle"><button type="button" class="toolbar-button">${escapeText(copy.toolbar.newProject)}</button><span class="save-indicator"><span class="status-dot ok" aria-hidden="true"></span>${escapeText(copy.toolbar.saveStatus)}</span></div><div class="toolbar-group toolbar-right"><button type="button" class="toolbar-button">▦ ${escapeText(copy.toolbar.grid)}</button><button type="button" class="toolbar-button">⌁ ${escapeText(copy.toolbar.measurements)}</button><button type="button" class="toolbar-button" aria-label="${escapeAttribute(copy.toolbar.settings)}">⚙ ${escapeText(copy.toolbar.settings)}</button></div></header><main class="workspace">${renderBriefPane(state)}${renderCanvas(state)}${renderAnalysis(state)}</main>`;
+  // Out-of-scope toolbar actions are present as visibly disabled shell controls
+  // rather than as buttons that look live and do nothing.
+  const shellControl = (label: string, icon: string): string =>
+    `<button type="button" class="toolbar-button" disabled title="${escapeAttribute(`${label} — ${copy.toolbar.disabledReason}`)}">${escapeText(icon)} ${escapeText(label)}</button>`;
+  app.innerHTML = `<header class="toolbar"><div class="brand"><span class="brand-mark" aria-hidden="true">⌘</span><strong>${escapeText(copy.productName)}</strong><span class="brand-subtitle">${escapeText(copy.subtitle)}</span></div><div class="toolbar-group toolbar-middle"><button type="button" class="toolbar-button" disabled title="${escapeAttribute(`${copy.toolbar.newProject} — ${copy.toolbar.disabledReason}`)}">${escapeText(copy.toolbar.newProject)}</button><span class="save-indicator"><span class="status-dot ok" aria-hidden="true"></span>${escapeText(copy.toolbar.saveStatus)}</span></div><div class="toolbar-group toolbar-right">${shellControl(copy.toolbar.grid, "▦")}${shellControl(copy.toolbar.measurements, "⌁")}${shellControl(copy.toolbar.settings, "⚙")}</div></header><main class="workspace">${renderBriefPane(state)}${renderCanvas(state)}${renderAnalysis(state)}</main>`;
   bindFormEvents();
   bindViewportEvents();
   restoreFocus(focus);
+  syncProgressTicker(state);
 }
 
 controller.subscribe(render);

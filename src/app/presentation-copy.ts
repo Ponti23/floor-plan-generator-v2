@@ -10,6 +10,8 @@ export interface PlanLabPresentationCopy {
     grid: string;
     measurements: string;
     settings: string;
+    /** Shown on the disabled shell controls that this build does not implement. */
+    disabledReason: string;
   };
   sections: {
     site: string;
@@ -23,6 +25,7 @@ export interface PlanLabPresentationCopy {
     generate: string;
     cancel: string;
     retry: string;
+    newVariations: string;
     discardDraft: string;
   };
   /**
@@ -181,6 +184,9 @@ export interface PlanLabPresentationCopy {
     draftPrompt: string;
     progressExpansions: string;
     progressValid: string;
+    /** Suffix for the watchdog deadline in the live progress readout. */
+    progressWatchdog: string;
+    staleAction: string;
     conceptualUseNotice: string;
   };
 }
@@ -201,6 +207,7 @@ export const RECOMMENDED_PRESENTATION_COPY: Readonly<PlanLabPresentationCopy> = 
     grid: "Grid",
     measurements: "Measurements",
     settings: "Settings",
+    disabledReason: "not available in this build",
   },
   sections: {
     site: "Site",
@@ -214,6 +221,7 @@ export const RECOMMENDED_PRESENTATION_COPY: Readonly<PlanLabPresentationCopy> = 
     generate: "Generate layouts",
     cancel: "Cancel",
     retry: "Retry",
+    newVariations: "New variations",
     discardDraft: "Discard edits",
   },
   ui: {
@@ -393,6 +401,8 @@ export const RECOMMENDED_PRESENTATION_COPY: Readonly<PlanLabPresentationCopy> = 
     draftPrompt: "Uncommitted edits — commit to regenerate.",
     progressExpansions: "expansions",
     progressValid: "valid",
+    progressWatchdog: "watchdog",
+    staleAction: "Regenerate",
     conceptualUseNotice: "Conceptual layout only — verify dimensions, regulations, and construction requirements before use.",
   },
 });

@@ -76,7 +76,7 @@ input, button {
 }
 
 button { cursor: pointer; }
-button:focus-visible, input:focus-visible { outline: 3px solid #77aef4; outline-offset: 1px; }
+button:focus-visible, input:focus-visible, select:focus-visible { outline: 3px solid #77aef4; outline-offset: 1px; }
 button:disabled { cursor: default; opacity: .42; }
 .hint, .progress, .error { font-size: 11px; color: #687584; }
 .error { color: #a33a3a; }
@@ -392,3 +392,16 @@ body { overflow: hidden; }
 .rule-label { flex: 1 1 auto; }
 .observation-icon.weak { background: #d68d24; }
 .observations .observation-item.focused .rule-button { border-color: #9fc7f4; background: #eaf3ff; }
+
+/* Milestone 5.4 generation states, stale affordance and keyboard support.
+   Status is never colour-only: every chip and banner carries text as well. */
+.toolbar-button:disabled { opacity: .5; }
+.text-actions { display: flex; align-items: center; gap: 12px; margin-top: 2px; }
+.text-actions .text-action { width: auto; }
+.stale-banner { display: flex; align-items: center; gap: 8px; margin: 0 0 10px; padding: 8px 9px; border: 1px solid #f0d9b0; border-radius: 4px; background: #fdf6e9; color: #6b4a12; font-size: 10px; line-height: 1.35; }
+.stale-mark { display: grid; place-items: center; flex: 0 0 auto; width: 16px; height: 16px; border-radius: 50%; background: #d68d24; color: #fff; font-size: 10px; font-weight: 700; }
+.stale-copy { display: flex; flex: 1 1 auto; flex-direction: column; gap: 1px; }
+.stale-copy strong { color: #6b4a12; }
+.stale-action { flex: 0 0 auto; min-height: 26px; padding: 3px 8px; border: 1px solid #e0b878; border-radius: 4px; background: #fff; color: #6b4a12; font-size: 10px; font-weight: 600; }
+.stale-action:hover { background: #fffaf0; }
+.brief-pane.stale .brief-status, .analysis.stale .analysis-scroll { opacity: 1; }

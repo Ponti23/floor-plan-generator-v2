@@ -625,3 +625,20 @@ export function markBriefResultCurrent(
   if (state.dirty || resultRevision !== state.revision) return state;
   return { ...state, resultRevision, resultsStale: false };
 }
+
+/**
+ * Next variation seed for an explicit "new variations" run.
+ *
+ * A trailing number is incremented; anything else gains a `-2` suffix, then
+ * `-3`, and so on.  The result is a plain deterministic string so the same
+ * starting seed always produces the same sequence of variations — "new
+ * variations" must not silently become "random".
+ */
+export function bumpVariationSeed(seed: string): string {
+  const trimmed = seed.trim();
+  const match = /^(.*?)(\d+)$/.exec(trimmed);
+  if (!match) return trimmed.length === 0 ? "1" : `${trimmed}-2`;
+  const prefix = match[1] ?? "";
+  const next = Number(match[2]) + 1;
+  return `${prefix}${next}`;
+}

@@ -35,7 +35,7 @@ Active design: [`planlab/README.md`](./planlab/README.md) · staged plan: [`../D
 | 5.1 | Brief editor state and committed form | luna-max | luna-max | done | `main` (`c63a1d2`) |
 | 5.2 | SVG projection, layers, pan/zoom/fit, evidence highlight | luna-max | luna-max | done | `main` (`96ba89f`) |
 | 5.3 | Result selector and analysis projection | luna-max | orchestrator (`/root`) | done | `main` |
-| 5.4 | Generation states, stale-result affordances, keyboard/a11y | terra-max | unassigned | todo | `main` |
+| 5.4 | Generation states, stale-result affordances, keyboard/a11y | terra-max | orchestrator (`/root`) | done | `main` |
 | 5.5 | Independent Milestone 5 review | terra-max | sol-max | todo | `main` |
 
 ## Handoff rules
@@ -103,3 +103,10 @@ Active design: [`planlab/README.md`](./planlab/README.md) · staged plan: [`../D
   tree, and the manifest hashes raw working-tree bytes, so `core.autocrlf` changes it. Needs a
   normalised-content hash (or a `.gitattributes` pin) plus one baseline re-record. Do not paper over
   it by re-recording without that fix.
+- **Bucket 5.4 is complete** (record: `artifacts/planlab/milestone-5/5.4-generation-states.md`).
+  All eight generation states render honestly, the stale affordance is a banner with a working
+  Regenerate action (plus an amber status dot and a dimmed plan), the progress readout shows elapsed
+  time against the watchdog budget, and the out-of-scope toolbar controls are now genuinely disabled
+  instead of looking live. "New variations" implements the UI_ARCHITECTURE retry-vs-new-variations
+  split with a deterministic seed bump. 175 tests, typecheck/build/diagnostics clean, four
+  1536 × 1024 state captures with DOM digests.
