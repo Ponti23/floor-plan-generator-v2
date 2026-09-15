@@ -8,7 +8,12 @@ tags: [progress, resume]
 ## Resume here
 
 - **Checkpoint date:** 2026-09-15.
-- **Current focus:** Milestone 5 frontend work is now active under explicit user direction. The user
+- **Current focus:** Milestone 5 frontend work is now active under explicit user direction. The
+  **5.0 copy and shell hard gate closed on 2026-09-15**: the user answered all five decisions
+  separately and approved each one (keep Vite/TS, the three strategy names, five score-breakdown
+  rows, real-value-only metric rows, and the disclaimer/prohibited-claims/failure wording). Record:
+  `artifacts/planlab/milestone-5/5.0-copy-decision-package.md`.
+  The user
   authorized continuing in the existing Vite shell and selected `knowledge/PlanLab-Mockup.png` as
   the required visual target. A first CSS-only foundation is implemented and verified; DeepSeek-
   Flash should continue from the exact boundary at the top of `HANDOFF.md`. Final product copy is
@@ -53,8 +58,9 @@ tags: [progress, resume]
      worker benchmark measured median **174.1 ms** on this machine, matching the recorded reference.
      `benchmark:stage0:check` is **PASS** with `baselineMatch: true` and domain output hashes
      unchanged.
-  3. Product/UX/copy and money/payment decisions remain human hard gates. Milestone 5 is staged
-     only; no polished UI copy is implemented or frozen.
+  3. Milestone 5 copy is **approved and closed** (5.0, 2026-09-15); the copy in
+     `src/app/presentation-copy.ts` is final but remains centralized and overridable. Money/payment
+     decisions have not been raised and remain a human hard gate if ever in scope.
   4. **Evidence-resolution caveat** in D4 above — a future review needing value-level derived drift
      detection must use `serializeCanonical(result)` explicitly.
   5. DeepSeek-Flash authorship cannot be reconstructed from Git because commits use the shared
@@ -67,15 +73,14 @@ tags: [progress, resume]
      blue accent, planning grid and compact density; `HANDOFF.md` records the precise remaining
      `main.ts` and visual-QA work for DeepSeek-Flash.
 - **Next step:** buckets 5.1/5.2 are complete at `c63a1d2` / `96ba89f`; 5.2 reports 159 passing
-  tests, clean typecheck/build/diagnostics, and browser viewport/evidence smoke. DeepSeek-Flash or
-  the available Luna fallback claims 5.3 and implements real option thumbnails plus the result and
-  analysis projection without redoing the editor/SVG foundations. Keep final copy replaceable.
+  tests, clean typecheck/build/diagnostics, and browser viewport/evidence smoke. 5.3 is claimed at
+  `fabf607` and implements real option thumbnails plus the result and analysis projection against
+  the now-approved copy, without redoing the editor/SVG foundations.
 - **In-flight branches:** all work is on `main` (Milestone 0 baseline `8171058`, Stage 1
   `0e8589b`…`e1c6f38` plus typecheck infra `19916f1`, Stage 2 `9a24738`…`ded4d73`, Stage 3
   `6089c48`…`99e1904` plus the 3.5 review); `stage0-planlab-spike` is retained at the completed gate
   checkpoint `b8aba2a`.
-- **Deferred:** final Milestone 5 product copy remains blocked on the 5.0 human hard gate.
-  `INSTANCES_BY_PROJECT` in `rules.ts` caches
+- **Deferred:** `INSTANCES_BY_PROJECT` in `rules.ts` caches
   instances per project object identity — revisit when the project document becomes editable
   (Milestone 6).
 

@@ -139,8 +139,11 @@ export interface PlanLabPresentationCopy {
 }
 
 /**
- * Recommended copy pending the Milestone 5.0 product hard gate. Keep this
- * object replaceable so copy approval/localisation does not touch rendering.
+ * Approved final copy. The Milestone 5.0 hard gate closed on 2026-09-15 with
+ * the user approving all five decisions recorded in
+ * `artifacts/planlab/milestone-5/5.0-copy-decision-package.md`. Do not reword
+ * these strings without a new user decision; keep the object replaceable so a
+ * future copy/localisation pass still does not touch rendering.
  */
 export const RECOMMENDED_PRESENTATION_COPY: Readonly<PlanLabPresentationCopy> = Object.freeze({
   productName: "PlanLab",

@@ -60,8 +60,10 @@ default while requiring it to stay settable (D2/D3), and asked for the engineeri
 to be done rather than returned as questions (D4). All of it is implemented, verified and green
 (145 tests, full regression gate PASS at median 1,750 ms). Record:
 [`artifacts/planlab/milestone-3/gate-amendment-d1-d4.md`](artifacts/planlab/milestone-3/gate-amendment-d1-d4.md).
-**Milestone 4 is closed; Milestone 5 is active. Buckets 5.1 and 5.2 are complete. Next: execute 5.3 while
-keeping final copy replaceable and awaiting user approval.**
+**Milestone 4 is closed; Milestone 5 is active. Buckets 5.0, 5.1 and 5.2 are complete. The 5.0 copy
+and shell gate closed on 2026-09-15 with all five decisions approved
+(`artifacts/planlab/milestone-5/5.0-copy-decision-package.md`), so copy is final and no executor needs
+to re-ask. Next: execute 5.3 (result selector + analysis projection) against that approved copy.**
 
 ## D5 remote checkpoint — approved
 

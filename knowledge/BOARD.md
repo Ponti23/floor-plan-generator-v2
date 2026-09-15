@@ -31,7 +31,7 @@ Active design: [`planlab/README.md`](./planlab/README.md) · staged plan: [`../D
 | 3.8 | D2/D3 settable calibration surface | terra-max | orchestrator (`/root`) | done | `main` (`458b5ac`) |
 | 3.9 | D4 generation-result payload projection | terra-max | orchestrator (`/root`) | done | `main` (`458b5ac`) |
 | 4.1 | Milestone 4 UI shell (worker + three-pane app) | terra-max | orchestrator (`/root`) | done | `main` (`89b9fc7`) |
-| 5.0 | Milestone 5 product copy + Vite/Next.js shell decision | astra-plan | user | needs-human | — |
+| 5.0 | Milestone 5 product copy + Vite/Next.js shell decision | astra-plan | user | done | `main` (approved 2026-09-15) |
 | 5.1 | Brief editor state and committed form | luna-max | luna-max | done | `main` (`c63a1d2`) |
 | 5.2 | SVG projection, layers, pan/zoom/fit, evidence highlight | luna-max | luna-max | done | `main` (`96ba89f`) |
 | 5.3 | Result selector and analysis projection | luna-max | deepseek-flash | in-progress | `main` |
@@ -83,7 +83,11 @@ Active design: [`planlab/README.md`](./planlab/README.md) · staged plan: [`../D
   Retry/worker-failure are unit-tested but not manually re-simulated.
 - Milestone 5 frontend implementation is active by explicit user direction on 2026-09-15. Continue
   in the existing Vite/TS shell and use `knowledge/PlanLab-Mockup.png` as the visual target; fidelity
-  and screenshot-QA requirements are in `knowledge/planlab/FRONTEND_MOCKUP_BRIEF.md`. Strategy
-  names, conceptual-use language, metric names, and infeasibility copy remain a user hard gate:
-  implementation may use centralized replaceable defaults, but no executor may freeze final copy or
-  close 5.0 without user approval.
+  and screenshot-QA requirements are in `knowledge/planlab/FRONTEND_MOCKUP_BRIEF.md`.
+- **Bucket 5.0 is closed.** The user approved D1–D5 on 2026-09-15 in five separate answers: keep
+  Vite/TS (Vercel-deployable static build, verified `npm run build` → `dist/`), the three strategy
+  names, a five-row score breakdown, real-value-only metric rows, and the disclaimer/prohibited-claims/
+  failure wording. Decision record:
+  `artifacts/planlab/milestone-5/5.0-copy-decision-package.md`. Copy is still centralized in
+  `src/app/presentation-copy.ts` and stays replaceable, but it is no longer pending approval — no
+  executor needs to re-ask, and no executor may silently reword it.
