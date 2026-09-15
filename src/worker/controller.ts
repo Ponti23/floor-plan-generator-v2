@@ -90,6 +90,18 @@ export class GenerationController {
     return this.lastAttempt ? this.start(this.lastAttempt.project, this.lastAttempt.seed, this.lastAttempt.budget) : null;
   }
 
+  /**
+   * Return to a clean idle state, dropping the last compatible result.
+   *
+   * Used when the workspace itself is reset (Milestone 6): keeping an earlier
+   * brief's layouts on screen after a reset would present them as current.
+   */
+  reset(): void {
+    if (this.stateValue.status === "generating") this.cancel();
+    this.lastAttempt = null;
+    this.finish({ status: "idle", requestId: null, progress: null, lastCompatibleResult: null, error: null });
+  }
+
   dispose(): void {
     this.clearWatchdog();
     this.worker.terminate();

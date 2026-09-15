@@ -27,6 +27,9 @@ export interface PlanLabPresentationCopy {
     retry: string;
     newVariations: string;
     discardDraft: string;
+    resetProject: string;
+    resetConfirm: string;
+    resetCancel: string;
   };
   /**
    * Non-domain UI language lives here as well, so a copy/localisation pass
@@ -191,6 +194,14 @@ export interface PlanLabPresentationCopy {
     staleAction: string;
     conceptualUseNotice: string;
   };
+  /**
+   * Reset confirmation. This wording is a user hard gate (bucket 6.4): it ships
+   * as a replaceable default and must not be treated as approved final copy.
+   */
+  reset: {
+    title: string;
+    detail: string;
+  };
   /** Milestone 6 local-persistence language. Replaceable while 6.4's reset copy is unreviewed. */
   storage: {
     savedLabel: string;
@@ -238,6 +249,9 @@ export const RECOMMENDED_PRESENTATION_COPY: Readonly<PlanLabPresentationCopy> = 
     retry: "Retry",
     newVariations: "New variations",
     discardDraft: "Discard edits",
+    resetProject: "Reset project",
+    resetConfirm: "Reset",
+    resetCancel: "Keep project",
   },
   ui: {
     briefEyebrow: "Project brief",
@@ -434,6 +448,10 @@ export const RECOMMENDED_PRESENTATION_COPY: Readonly<PlanLabPresentationCopy> = 
       unavailable: "This browser is not allowing local storage, so edits will not survive a refresh.",
     },
   },
+  reset: {
+    title: "Reset project?",
+    detail: "This deletes the project saved in this browser and starts again from the default brief. It cannot be undone.",
+  },
 });
 
 export interface PresentationCopyOverrides {
@@ -464,6 +482,7 @@ export interface PresentationCopyOverrides {
   storage?: Omit<Partial<PlanLabPresentationCopy["storage"]>, "notices"> & {
     notices?: Partial<PlanLabPresentationCopy["storage"]["notices"]>;
   };
+  reset?: Partial<PlanLabPresentationCopy["reset"]>;
 }
 
 /** Resolve recommended copy with shallow per-group overrides for future approval/locales. */
@@ -503,5 +522,6 @@ export function resolvePresentationCopy(
       ...overrides.storage,
       notices: { ...RECOMMENDED_PRESENTATION_COPY.storage.notices, ...overrides.storage?.notices },
     },
+    reset: { ...RECOMMENDED_PRESENTATION_COPY.reset, ...overrides.reset },
   };
 }

@@ -165,3 +165,34 @@ test("every generation state has approved copy to show", () => {
   assert.equal(RECOMMENDED_PRESENTATION_COPY.status.staleAction, "Regenerate");
   assert.match(RECOMMENDED_PRESENTATION_COPY.toolbar.disabledReason, /not available/i);
 });
+
+test("reset returns the controller to a clean idle state and drops the old result", () => {
+  const workers: FakeWorker[] = [];
+  const controller = new GenerationController(() => {
+    const worker = new FakeWorker();
+    workers.push(worker);
+    return worker;
+  }, 5_000);
+
+  const requestId = controller.start({}, "seed");
+  workers[0]!.emit(result(requestId, true, true));
+  assert.ok(controller.state.lastCompatibleResult, "a result is held before the reset");
+
+  controller.reset();
+  assert.equal(controller.state.status, "idle");
+  assert.equal(controller.state.lastCompatibleResult, null, "a reset must not keep the old layouts on screen");
+  assert.equal(controller.state.progress, null);
+  assert.equal(controller.state.startedAt, null);
+  assert.equal(controller.retry(), null, "there is nothing to retry after a reset");
+  controller.dispose();
+});
+
+test("reset copy exists and states that local data is removed, without claiming approval", () => {
+  const copy = RECOMMENDED_PRESENTATION_COPY;
+  assert.ok(copy.reset.title.length > 0);
+  assert.match(copy.reset.detail, /deletes the project saved in this browser/i);
+  assert.match(copy.reset.detail, /cannot be undone/i);
+  assert.ok(copy.actions.resetProject.length > 0);
+  assert.ok(copy.actions.resetConfirm.length > 0);
+  assert.ok(copy.actions.resetCancel.length > 0);
+});

@@ -87,6 +87,8 @@ let saveState: "saved" | "saving" | "failed" | "unavailable" = storageNotice ===
   : "saved";
 let lastSavedRevision = editor.revision;
 let saveTimer: ReturnType<typeof setTimeout> | null = null;
+/** Reset is destructive, so it waits for an explicit confirmation. */
+let resetPending = false;
 let selectedLayoutId: string | null = null;
 let generationRevision: number | null = null;
 let expandedRoomId: string | null = "kitchen";
@@ -239,6 +241,13 @@ function renderBriefPane(state: Readonly<GenerationState>): string {
   const storageMarkup = storageNotice === null
     ? ""
     : `<p class="storage-notice" role="status">${escapeText(copy.storage.notices[storageNotice])}</p>`;
+  const resetMarkup = resetPending
+    ? `<div class="reset-confirm" role="alertdialog" aria-label="${escapeAttribute(copy.reset.title)}">
+        <strong>${escapeText(copy.reset.title)}</strong>
+        <p>${escapeText(copy.reset.detail)}</p>
+        <div class="reset-actions"><button id="reset-confirm" class="danger-action" type="button">${escapeText(copy.actions.resetConfirm)}</button><button id="reset-cancel" type="button">${escapeText(copy.actions.resetCancel)}</button></div>
+      </div>`
+    : "";
   return `<aside class="brief-pane" aria-label="${escapeAttribute(copy.ui.briefTitle)}">
     <div class="brief-scroll">
       <div class="pane-title"><div><span class="eyebrow">${escapeText(copy.ui.briefEyebrow)}</span><h1>${escapeText(copy.ui.briefTitle)}</h1></div><span class="revision">${escapeText(copy.ui.versionPrefix)}${editor.revision + 1}</span></div>
@@ -272,7 +281,8 @@ function renderBriefPane(state: Readonly<GenerationState>): string {
     <div class="brief-footer">
       <div class="brief-status" aria-live="polite"><span class="status-dot ${editor.resultsStale ? "warning" : "ok"}" aria-hidden="true"></span><span class="brief-state">${escapeText(statusLabel(state))}</span><span data-live-status>${escapeText(statusDetail(state))}</span></div>
       <div class="editor-actions"><button id="generate" class="primary-action" type="button" ${generating ? "disabled" : ""}>${escapeText(copy.actions.generate)}</button><button id="cancel" type="button" ${generating ? "" : "disabled"}>${escapeText(copy.actions.cancel)}</button><button id="retry" type="button" ${state.status === "workerError" || state.status === "budgetExceeded" ? "" : "disabled"}>${escapeText(copy.actions.retry)}</button></div>
-      <div class="text-actions"><button id="discard-draft" class="text-action" type="button" ${editor.dirty ? "" : "disabled"}>${escapeText(copy.actions.discardDraft)}</button><button id="new-variations" class="text-action" type="button" ${generating ? "disabled" : ""}>${escapeText(copy.actions.newVariations)}</button></div>
+      ${resetMarkup}
+      <div class="text-actions"><button id="discard-draft" class="text-action" type="button" ${editor.dirty ? "" : "disabled"}>${escapeText(copy.actions.discardDraft)}</button><button id="new-variations" class="text-action" type="button" ${generating ? "disabled" : ""}>${escapeText(copy.actions.newVariations)}</button><button id="reset-project" class="text-action danger" type="button" ${generating ? "disabled" : ""}>${escapeText(copy.actions.resetProject)}</button></div>
     </div>
   </aside>`;
 }
@@ -723,6 +733,9 @@ function bindFormEvents(): void {
   app.querySelector<HTMLButtonElement>("#cancel")?.addEventListener("click", () => controller.cancel());
   app.querySelector<HTMLButtonElement>("#retry")?.addEventListener("click", retryGeneration);
   app.querySelector<HTMLButtonElement>("#new-variations")?.addEventListener("click", startVariations);
+  app.querySelector<HTMLButtonElement>("#reset-project")?.addEventListener("click", requestReset);
+  app.querySelector<HTMLButtonElement>("#reset-confirm")?.addEventListener("click", performReset);
+  app.querySelector<HTMLButtonElement>("#reset-cancel")?.addEventListener("click", cancelReset);
   app.querySelector<HTMLButtonElement>("#regenerate")?.addEventListener("click", startGeneration);
   app.querySelector<HTMLButtonElement>("#discard-draft")?.addEventListener("click", () => { editor = discardBriefDraft(editor); render(controller.state); });
 }
@@ -746,6 +759,46 @@ function startGeneration(): void {
 function startVariations(): void {
   updateBrief({ generationSeed: bumpVariationSeed(editor.draft.generationSeed) });
   startGeneration();
+}
+
+/**
+ * Reset the workspace (Milestone 6.4).
+ *
+ * Destructive, so it is a two-step flow: the toolbar control opens an explicit
+ * confirmation that states local data will be removed, and only the confirmed
+ * action deletes anything.  Only PlanLab-owned keys are removed — the store
+ * scopes deletion by its own prefix — and the in-memory workspace never depends
+ * on storage having succeeded.
+ */
+function requestReset(): void {
+  resetPending = true;
+  render(controller.state);
+}
+
+function cancelReset(): void {
+  resetPending = false;
+  render(controller.state);
+}
+
+function performReset(): void {
+  if (saveTimer !== null) {
+    clearTimeout(saveTimer);
+    saveTimer = null;
+  }
+  controller.reset();
+  projectStore?.clear();
+  editor = createBriefEditorState(CANONICAL_PROJECT);
+  committedProjects.clear();
+  committedProjects.set(editor.revision, editor.committedProject);
+  selectedLayoutId = null;
+  generationRevision = null;
+  focusedEvidenceRefs = [];
+  viewport = createViewportState();
+  viewportProjectKey = `${editor.committedProject.projectId}:${editor.committedProject.site.site.width}:${editor.committedProject.site.site.depth}`;
+  lastSavedRevision = editor.revision;
+  resetPending = false;
+  saveState = projectStore === null ? "unavailable" : "saved";
+  render(controller.state);
 }
 
 /**

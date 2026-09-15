@@ -190,6 +190,7 @@ async function main() {
   const chrome = findChrome(options.chrome);
   const port = 9000 + Math.floor(Math.random() * 900);
   const profile = mkdtempSync(resolve(tmpdir(), "planlab-capture-"));
+  let postResult;
   const child = spawn(chrome, [
     "--headless=new",
     `--remote-debugging-port=${port}`,
@@ -244,6 +245,7 @@ async function main() {
     if (options.post) {
       const post = await client.send("Runtime.evaluate", { expression: options.post, returnByValue: true });
       if (post.exceptionDetails) throw new Error(`--post script failed: ${post.exceptionDetails.text}`);
+      postResult = post.result.value;
       await delay(700);
     }
 
@@ -262,6 +264,7 @@ async function main() {
     mkdirSync(dirname(options.out), { recursive: true });
     writeFileSync(options.out, Buffer.from(screenshot.data, "base64"));
     const value = digest.result.value;
+    if (postResult !== undefined) value.postResult = postResult;
     if (options.json) {
       mkdirSync(dirname(options.json), { recursive: true });
       writeFileSync(options.json, `${JSON.stringify(value, null, 2)}\n`, "utf8");
