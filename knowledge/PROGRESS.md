@@ -8,12 +8,12 @@ tags: [progress, resume]
 ## Resume here
 
 - **Checkpoint date:** 2026-09-15.
-- **Current focus:** Milestone 4 is closed and pushed; **Milestone 5 is staged, not active**. The
-  user requested a DeepSeek-Flash takeover before clearing context. Resume from the bounded brief at
-  the top of `HANDOFF.md`: prepare and present the 5.0 decision package, but do not claim or
-  implement 5.1–5.4 until the user explicitly approves the product/UX/copy and Vite-vs-Next.js
-  decisions. The user has approved `knowledge/PlanLab-Mockup.png` as the required visual direction;
-  the implementation and screenshot-QA contract is in
+- **Current focus:** Milestone 5 frontend work is now active under explicit user direction. The user
+  authorized continuing in the existing Vite shell and selected `knowledge/PlanLab-Mockup.png` as
+  the required visual target. A first CSS-only foundation is implemented and verified; DeepSeek-
+  Flash should continue from the exact boundary at the top of `HANDOFF.md`. Final product copy is
+  still a human hard gate and must remain centralized and replaceable. The implementation and
+  screenshot-QA contract is in
   `knowledge/planlab/FRONTEND_MOCKUP_BRIEF.md`. Full Stage 3 record:
   `artifacts/planlab/milestone-3/gate-amendment-d1-d4.md`.
 - **What changed (D1).** Minimum area alone admitted unusable rooms: the brief declared no minimum
@@ -63,18 +63,20 @@ tags: [progress, resume]
      retroactively without evidence.
   6. **Frontend visual direction:** approved by the user on 2026-09-15. Recreate
      `knowledge/PlanLab-Mockup.png` closely; functional similarity to the current shell is not
-     enough. No frontend code changed in this preparation-only checkpoint.
+     enough. A verified CSS foundation now matches the reference's main proportions, white toolbar,
+     blue accent, planning grid and compact density; `HANDOFF.md` records the precise remaining
+     `main.ts` and visual-QA work for DeepSeek-Flash.
 - **Next step:** DeepSeek-Flash reads `AGENTS.md`, this file, `knowledge/BOARD.md`,
-  `DELEGATION-PLAN.md`, `HANDOFF.md`, and `knowledge/planlab/FRONTEND_MOCKUP_BRIEF.md`, then prepares
-  a concise 5.0 decision package for the user. Recommend retaining Vite/TS, propose final strategy
-  names, conceptual-use disclaimer, metric names, and infeasibility/budget language, and wait for
-  explicit approval. No 5.1–5.4 code or bucket claim is authorized before that approval.
+  `DELEGATION-PLAN.md`, `HANDOFF.md`, and `knowledge/planlab/FRONTEND_MOCKUP_BRIEF.md`, claims 5.1,
+  and continues the mockup-driven frontend without redoing the CSS foundation. Keep strategy names,
+  disclaimer, metric labels, and failure wording centralized and replaceable; present those final
+  copy choices to the user before freezing them.
 - **In-flight branches:** all work is on `main` (Milestone 0 baseline `8171058`, Stage 1
   `0e8589b`…`e1c6f38` plus typecheck infra `19916f1`, Stage 2 `9a24738`…`ded4d73`, Stage 3
   `6089c48`…`99e1904` plus the 3.5 review); `stage0-planlab-spike` is retained at the completed gate
   checkpoint `b8aba2a`.
-- **Deferred:** Milestone 5+ product implementation is blocked on the 5.0 hard gate; it is staged in
-  `DELEGATION-PLAN.md` and `knowledge/BOARD.md`. `INSTANCES_BY_PROJECT` in `rules.ts` caches
+- **Deferred:** final Milestone 5 product copy remains blocked on the 5.0 human hard gate.
+  `INSTANCES_BY_PROJECT` in `rules.ts` caches
   instances per project object identity — revisit when the project document becomes editable
   (Milestone 6).
 

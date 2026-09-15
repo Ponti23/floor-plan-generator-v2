@@ -124,11 +124,14 @@ and failure wording in one replaceable presentation-copy object until the user c
 
 ## Current-shell gaps Flash must explicitly close
 
-The existing `src/app/main.ts` and `src/app/styles.css` are a functional worker vertical slice, not
-a visual match. A faithful implementation must address all of these visible gaps:
+The starter CSS now establishes the reference proportions, white/blue visual language, canvas grid,
+compact density and option-card row. `src/app/main.ts` is still the original functional worker
+vertical slice, so a faithful continuation must address these visible gaps without discarding the
+verified CSS foundation:
 
-- replace the dark green header with the white reference toolbar and grouped controls;
-- match the 310 / flexible / 385 px desktop pane proportions and independent pane scrolling;
+- expand the white header into the reference toolbar with grouped semantic controls;
+- preserve the new 310 / flexible / 385 px desktop pane proportions and add independent pane
+  scrolling where needed;
 - replace the sparse Brief form with dense, aligned editor sections and unit-aware rows;
 - replace the grey canvas and basic SVG with the reference grid, site/envelope hierarchy, plan
   labels, line weights, viewport controls, orientation, legend, and scale;

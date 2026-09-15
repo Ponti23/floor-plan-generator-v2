@@ -12,25 +12,36 @@ hard gate.
 **Visual direction is approved:** the frontend must closely recreate
 `knowledge/PlanLab-Mockup.png`, following the measurable fidelity and screenshot-QA requirements in
 `knowledge/planlab/FRONTEND_MOCKUP_BRIEF.md`. The current vertical-slice frontend is not an
-acceptable visual approximation. The user explicitly asked for preparation only in this checkpoint,
-so no frontend code was changed. This visual approval does not approve final product copy or decide
-Vite versus Next.js.
+acceptable visual approximation. The user subsequently authorized a starter implementation in the
+existing Vite shell. `src/app/styles.css` now supplies the first visual foundation: white 56 px
+toolbar, 310/flexible/385 desktop panes, blue action language, dense form styling, fine canvas grid,
+site/footprint hierarchy, muted plan surface, north/zoom scaffolding, and horizontal option cards.
+All worker/domain behavior remains unchanged. This visual approval does not freeze final product
+copy.
+
+**Flash continuation boundary:** do not redo the CSS foundation. Continue by restructuring
+`src/app/main.ts` into the mockup composition and wiring real payload data. Highest-priority gaps are
+the grouped semantic toolbar; Site/Rooms/Constraints editor rows; category-aware room classes and
+area labels; actual option thumbnails; selected-option metrics, score bars and observations; and
+real viewport controls. The starter was visually checked in the browser in both idle and completed
+three-layout states. It is intentionally incomplete and must still pass the 1536 × 1024 comparison
+loop in `FRONTEND_MOCKUP_BRIEF.md`.
 
 1. Read `AGENTS.md`, `knowledge/PROGRESS.md`, `knowledge/BOARD.md`, `DELEGATION-PLAN.md`, and this
    handoff before acting.
-2. Stay on clean, synchronized `main` (`8647236` before this checkpoint). Do not claim or implement
-   buckets 5.1–5.4 until the user explicitly closes 5.0.
-3. First deliverable: prepare and present one concise 5.0 decision package containing:
+2. Stay on clean, synchronized `main`. The user authorized the mockup-driven visual starter; do not
+   interpret that as approval to freeze copy or expand scope beyond the fidelity brief.
+3. Claim 5.1 and continue the frontend from the CSS foundation. In parallel, prepare one concise
+   5.0 final-copy decision package containing:
    - the recommendation to retain the existing Vite/TS shell, with the short reason that this MVP
      has no backend, SSR, routing, or server actions requiring Next.js;
    - proposed final strategy names and one-line descriptions;
    - proposed conceptual-use disclaimer and prohibited-claims wording;
    - proposed metric labels; and
    - proposed honest infeasibility, partial-result, and budget-exceeded language.
-4. Stop for the user's explicit product/UX/copy and shell approval. Do not treat silence, this
-   checkpoint, or "take over" as approval.
-5. After approval, update 5.0 to `done`, claim only the next bucket, record the actual executor as
-   `deepseek-flash` when Flash is used, and implement against
+4. The Vite shell and mockup-driven implementation are authorized. Do not freeze final copy or
+   close 5.0 until the user explicitly approves the copy package.
+5. Record the actual executor as `deepseek-flash` when Flash is used, and implement against
    `knowledge/planlab/FRONTEND_MOCKUP_BRIEF.md`. Execute buckets 5.1 → 5.2 → 5.3 sequentially, then
    route 5.4 plus independent review according to the delegation playbook. Each bucket must be
    verified and committed before the next begins. Do not declare UI completion without the required

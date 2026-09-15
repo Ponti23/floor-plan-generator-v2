@@ -81,12 +81,9 @@ Active design: [`planlab/README.md`](./planlab/README.md) · staged plan: [`../D
   diagnostics clean, Stage 0 `baselineMatch: true` after refreshing the
   input fingerprint, and browser smoke checks for generate/cancel/edit.
   Retry/worker-failure are unit-tested but not manually re-simulated.
-- Milestone 5 is staged but **not active** until 5.0 closes. The existing Vite/TS
-  shell is the recommended technical default for this client-only app; the
-  reference plan says Next.js, so that is still an architecture/product choice
-  for Sol/Astra. Strategy names, conceptual-use language, metric names, and
-  infeasibility copy are user product/UX/copy hard gates. No executor may claim or
-  implement 5.1–5.4 until the user approves 5.0. After approval, implementation may
-  keep approved copy in a replaceable presentation layer. The user approved
-  `knowledge/PlanLab-Mockup.png` as the visual direction on 2026-09-15; fidelity and
-  screenshot-QA requirements are in `knowledge/planlab/FRONTEND_MOCKUP_BRIEF.md`.
+- Milestone 5 frontend implementation is active by explicit user direction on 2026-09-15. Continue
+  in the existing Vite/TS shell and use `knowledge/PlanLab-Mockup.png` as the visual target; fidelity
+  and screenshot-QA requirements are in `knowledge/planlab/FRONTEND_MOCKUP_BRIEF.md`. Strategy
+  names, conceptual-use language, metric names, and infeasibility copy remain a user hard gate:
+  implementation may use centralized replaceable defaults, but no executor may freeze final copy or
+  close 5.0 without user approval.
