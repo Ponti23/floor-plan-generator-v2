@@ -38,7 +38,7 @@ Active design: [`planlab/README.md`](./planlab/README.md) · staged plan: [`../D
 | 5.4 | Generation states, stale-result affordances, keyboard/a11y | terra-max | orchestrator (`/root`) | done | `main` (`3a769e2`) |
 | 5.5 | Independent Milestone 5 review | terra-max | independent review agent (`/root/milestone5_review`); judged by orchestrator | done | `main` |
 | 5.6 | Stage 0 baseline provenance fix | terra-max | orchestrator (`/root`) | done | `main` |
-| 6.1 | Versioned local storage repository | luna-max | unassigned | todo | — |
+| 6.1 | Versioned local storage repository | luna-max | orchestrator (`/root`) | done | `main` |
 | 6.2 | Sequential migrations and recovery key | luna-max | unassigned | todo | — |
 | 6.3 | Debounced autosave, flush and save status | luna-max | unassigned | todo | — |
 | 6.4 | Reset flow and destructive confirmation (copy = hard gate) | luna-max | unassigned | todo | — |
@@ -138,6 +138,11 @@ Active design: [`planlab/README.md`](./planlab/README.md) · staged plan: [`../D
   - The review missed one defect that the orchestrator fixed at closure: option-card strategy names
     clipped mid-word ("Compact Efficien", "Balanc"). Fixed by narrowing the badge/score columns and
     clamping the name to two lines; re-verified by measuring per-card `scrollWidth` and by capture.
+- **Stage 6 is active.** Bucket 6.1 is done (`src/app/project-store.ts`, record:
+  `artifacts/planlab/milestone-6/6.1-local-storage-repository.md`): a `StoragePort`-backed store with
+  namespaced keys, an injectable store version, and typed read/write outcomes for empty, loaded,
+  corrupt, outdated, unsupported-version and unavailable storage. 9 new tests; 185 total. The store
+  is not yet wired into the workspace — that is 6.3 — and 6.2 still owns real migrations.
 - **Bucket 5.5 is the active bucket** (`todo`, owner `sol-max`). It needs an agent that did not
   author 5.3/5.4, a real 1536 × 1024 comparison against `knowledge/PlanLab-Mockup.png`, and Sol's
   judgment. Two housekeeping facts for whoever picks it up: the committed
