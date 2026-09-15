@@ -1,0 +1,47 @@
+{
+  "viewport": {
+    "width": 1000,
+    "height": 900
+  },
+  "toolbarHeight": 56,
+  "briefPane": {
+    "width": 0,
+    "height": 0,
+    "top": 0,
+    "left": 0
+  },
+  "canvas": {
+    "width": 1000,
+    "height": 844,
+    "top": 56,
+    "left": 0
+  },
+  "analysisPane": {
+    "width": 0,
+    "height": 0,
+    "top": 0,
+    "left": 0
+  },
+  "statusLabel": "Ready",
+  "statusDetail": "ReadyCommit a brief and generate when ready.",
+  "saveStatus": "Saved locally",
+  "projectName": "PlanLab canonical prototype",
+  "siteWidth": "20",
+  "siteDepth": "30",
+  "variationSeed": "canonical-0",
+  "storageNotice": null,
+  "optionCards": [],
+  "summaryHeading": null,
+  "summaryScore": null,
+  "metricRows": [],
+  "scoreRows": [],
+  "ruleSummary": null,
+  "ruleRows": [],
+  "observations": [],
+  "notice": "ⓘConceptual layout only — verify dimensions, regulations, and construction requirements before use.",
+  "svgPlan": "-6 -6 92 142",
+  "timings": {
+    "generateMs": null
+  },
+  "postResult": "{\"toggles\":[{\"pane\":\"analysis\",\"display\":\"flex\",\"pressed\":\"true\"},{\"pane\":\"brief\",\"display\":\"flex\",\"pressed\":\"true\"}],\"canvas\":[390,615,1000],\"briefPane\":\"none\"}"
+}

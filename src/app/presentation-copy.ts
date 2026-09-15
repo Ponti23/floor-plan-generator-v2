@@ -101,6 +101,9 @@ export interface PlanLabPresentationCopy {
     circulationLegend: string;
     entranceLabel: string;
     compareEyebrow: string;
+    /** Narrow-window pane toggles. */
+    briefPaneToggle: string;
+    analysisPaneToggle: string;
     optionsTitle: string;
     analysisTitle: string;
     analysisFallbackTitle: string;
@@ -341,6 +344,8 @@ export const RECOMMENDED_PRESENTATION_COPY: Readonly<PlanLabPresentationCopy> = 
     circulationLegend: "Circulation",
     entranceLabel: "ENTRANCE (SOUTH)",
     compareEyebrow: "Compare alternatives",
+    briefPaneToggle: "Brief",
+    analysisPaneToggle: "Analysis",
     optionsTitle: "Layout options",
     analysisTitle: "Analysis",
     analysisFallbackTitle: "Analysis",

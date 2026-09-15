@@ -122,6 +122,11 @@ let saveTimer: ReturnType<typeof setTimeout> | null = null;
 /** Reset is destructive, so it waits for an explicit confirmation. */
 let resetPending = false;
 let lastPersistedPayload: GenerationResultPayload | null = null;
+/**
+ * Narrow-window pane visibility.  Desktop keeps both panes; below the breakpoint
+ * the user can fold either one away so the plan keeps a usable width.
+ */
+const paneVisibility = { brief: true, analysis: true };
 let selectedLayoutId: string | null = null;
 let generationRevision: number | null = null;
 let expandedRoomId: string | null = "kitchen";
@@ -745,6 +750,44 @@ function renderSaveStatus(): void {
   indicator.appendChild(document.createTextNode(text));
 }
 
+/**
+ * Narrow-window pane toggles (Milestone 7.1).
+ *
+ * The controls are mounted from code rather than the toolbar template so the
+ * desktop composition in `PlanLab-Mockup.png` stays byte-identical, and CSS
+ * hides them above the breakpoint.  Folding a pane never hides the other one's
+ * content permanently: the plan keeps at least a usable width, and the toggle
+ * stays reachable in the toolbar.
+ */
+function mountPaneToggles(): void {
+  const host = app.querySelector<HTMLElement>(".toolbar-right");
+  const main = app.querySelector<HTMLElement>(".workspace");
+  if (!host || !main) return;
+  const panes = [
+    ["brief", copy.ui.briefPaneToggle, "brief-pane"],
+    ["analysis", copy.ui.analysisPaneToggle, "analysis"],
+  ] as const;
+  for (const [pane, label, paneClass] of panes) {
+    const anchor = app.querySelector<HTMLElement>(`.${paneClass}`);
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "toolbar-button pane-toggle";
+    button.dataset.paneToggle = pane;
+    button.setAttribute("aria-pressed", String(paneVisibility[pane]));
+    button.setAttribute("aria-controls", paneClass);
+    button.title = label;
+    button.textContent = label;
+    if (anchor) anchor.id = paneClass;
+    button.addEventListener("click", () => {
+      paneVisibility[pane] = !paneVisibility[pane];
+      render(controller.state);
+    });
+    host.prepend(button);
+  }
+  main.classList.toggle("brief-collapsed", !paneVisibility.brief);
+  main.classList.toggle("analysis-collapsed", !paneVisibility.analysis);
+}
+
 function roomWithField(index: number, field: keyof DraftRoom, value: string): void {
   updateBrief({
     program: editor.draft.program.map((room, roomIndex) => roomIndex === index ? { ...room, [field]: value } : room),
@@ -888,11 +931,15 @@ function startVariations(): void {
 function requestReset(): void {
   resetPending = true;
   render(controller.state);
+  // Move focus into the confirmation, and start on the safe choice: a keyboard
+  // user must not be able to confirm a destructive reset by pressing Enter twice.
+  app.querySelector<HTMLButtonElement>("#reset-cancel")?.focus();
 }
 
 function cancelReset(): void {
   resetPending = false;
   render(controller.state);
+  app.querySelector<HTMLButtonElement>("#reset-project")?.focus();
 }
 
 function performReset(): void {
@@ -995,6 +1042,7 @@ function render(state: Readonly<GenerationState>): void {
   app.innerHTML = `<header class="toolbar"><div class="brand"><span class="brand-mark" aria-hidden="true">${toolbarIcon("brand")}</span><strong>${escapeText(copy.productName)}</strong><span class="brand-subtitle">${escapeText(copy.subtitle)}</span></div><div class="toolbar-group toolbar-middle"><button type="button" class="toolbar-button" disabled title="${escapeAttribute(`${copy.toolbar.newProject} — ${copy.toolbar.disabledReason}`)}">${escapeText(copy.toolbar.newProject)}</button><span class="save-indicator"><span class="status-dot ok" aria-hidden="true"></span>${escapeText(copy.toolbar.saveStatus)}</span></div><div class="toolbar-group toolbar-right">${shellControl(copy.toolbar.grid, "grid")}${shellControl(copy.toolbar.measurements, "measurements")}${shellControl(copy.toolbar.settings, "settings")}</div></header><main class="workspace">${renderBriefPane(state)}${renderCanvas(state)}${renderAnalysis(state)}</main>`;
   bindFormEvents();
   bindViewportEvents();
+  mountPaneToggles();
   renderSaveStatus();
   restoreFocus(focus);
   syncProgressTicker(state);
