@@ -43,7 +43,7 @@ Active design: [`planlab/README.md`](./planlab/README.md) · staged plan: [`../D
 | 6.3 | Debounced autosave, flush and save status | luna-max | orchestrator (`/root`) | done | `main` |
 | 6.4 | Reset flow and destructive confirmation (copy = hard gate) | luna-max | orchestrator (`/root`) | done + copy `needs-human` | `main` |
 | 6.5 | Engine-version result invalidation | terra-max | orchestrator (`/root`) | done | `main` |
-| 6.6 | Independent Stage 6 review | terra-max | sol-max | todo | — |
+| 6.6 | Independent Stage 6 review | terra-max | independent review agent (`/root/stage6_review`); judged by orchestrator | done | `main` |
 | 7.1 | Responsive panel collapse and accessibility sweep | terra-max | unassigned | todo | — |
 | 7.2 | Production deployment config and support limitations | luna-max | orchestrator (`/root`) | done | `main` |
 | 7.3 | Rendering and performance profile | terra-max | orchestrator (`/root`) | done (quiet-machine Stage 0 re-measure still owed) | `main` |

@@ -215,21 +215,21 @@ test("every storage notice and save label has real copy", () => {
 
 test("migrations run one version at a time and only rewrite after every step succeeds", () => {
   const storage = new MemoryStorage();
-  const older = JSON.stringify({ storeVersion: 1, savedAt: "2026-01-01T00:00:00.000Z", project: { legacy: true } });
+  const older = JSON.stringify({ storeVersion: 1, savedAt: "2026-01-01T00:00:00.000Z", project: CANONICAL_PROJECT });
   storage.plant(`${PROJECT_STORE_PREFIX}project`, older);
 
   const store = createProjectStore(storage, {
     storeVersion: 3,
     migrations: [
-      { from: 1, to: 2, migrate: (document) => ({ ...document, project: { ...(document.project as object), step2: true } }) },
-      { from: 2, to: 3, migrate: (document) => ({ ...document, project: { ...(document.project as object), step3: true } }) },
+      { from: 1, to: 2, migrate: (document) => ({ ...document, project: document.project }) },
+      { from: 2, to: 3, migrate: (document) => ({ ...document, project: document.project }) },
     ],
   });
 
   assert.deepEqual(store.migrate(), { status: "migrated", fromVersion: 1, toVersion: 3 });
   const migrated = JSON.parse(storage.raw(store.key)!);
   assert.equal(migrated.storeVersion, 3);
-  assert.deepEqual(migrated.project, { legacy: true, step2: true, step3: true });
+  assert.deepEqual(migrated.project, CANONICAL_PROJECT);
   assert.equal(store.migrate().status, "notNeeded", "a second run has nothing to do");
 });
 
@@ -259,6 +259,15 @@ test("a missing or failing migration leaves the original document untouched", ()
   });
   assert.equal(empty.migrate().status, "failed");
   assert.equal(storage.raw(empty.key), original);
+
+  const invalid = createProjectStore(storage, {
+    storeVersion: 2,
+    migrations: [{ from: 1, to: 2, migrate: (document) => ({ ...document, project: { notAProject: true } }) }],
+  });
+  const invalidOutcome = invalid.migrate();
+  assert.equal(invalidOutcome.status, "failed");
+  assert.match(invalidOutcome.status === "failed" ? invalidOutcome.reason : "", /failed validation/i);
+  assert.equal(storage.raw(invalid.key), original);
 
   const newer = createProjectStore(storage, { storeVersion: 0 });
   const refused = newer.migrate();

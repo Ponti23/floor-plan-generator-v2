@@ -276,6 +276,14 @@ export function createProjectStore(
         version = step.to;
       }
 
+      // A migration is only successful if the resulting document would be
+      // loadable by this reader. Without this check a faulty registered step
+      // could write a value that the next boot classifies as corrupt.
+      const validated = parseDocument(JSON.stringify(document), supportedVersion);
+      if (validated.status !== "loaded") {
+        return { status: "failed", reason: `migrated project failed validation (${validated.status})` };
+      }
+
       try {
         storage.setItem(key, JSON.stringify(document));
       } catch (error) {

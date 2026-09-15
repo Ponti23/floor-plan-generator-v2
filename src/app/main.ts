@@ -6,6 +6,8 @@ import { METRIC_CATEGORIES } from "../domain/metrics.ts";
 import type { Layout } from "../domain/layout.ts";
 import type { NormalizedProject, RoomKind } from "../domain/model.ts";
 import type { GenerationResultPayload } from "../domain/resultPayload.ts";
+import { fingerprintNormalizedProject } from "../domain/serialization.ts";
+import { validateLayout } from "../domain/validation.ts";
 import {
   bumpVariationSeed,
   CARDINAL_SIDES,
@@ -29,7 +31,11 @@ import {
   type StorageNoticeKind,
   type StoragePort,
 } from "./project-store.ts";
-import { projectStoredResult, readStoredResult } from "./stored-result.ts";
+import {
+  projectStoredResult,
+  readStoredResult,
+  storedResultMatchesBrief,
+} from "./stored-result.ts";
 import {
   candidateEvidence,
   observationLabel,
@@ -75,7 +81,7 @@ const projectStore: ProjectStore | null = storagePort === null ? null : createPr
 const storedOutcome = projectStore === null
   ? ({ status: "unavailable", reason: "local storage is not reachable" } as const)
   : projectStore.read();
-const storageNotice: StorageNoticeKind | null = storageNoticeKind(storedOutcome);
+let storageNotice: StorageNoticeKind | null = storageNoticeKind(storedOutcome);
 if (storedOutcome.status === "corrupt" && projectStore !== null && storagePort !== null) {
   // Keep the unreadable copy rather than letting the next save overwrite it.
   preserveUnreadableDocument(storagePort, projectStore);
@@ -136,8 +142,54 @@ const controller = new GenerationController(
  * A result restored against a different brief would present old layouts as the
  * answer to the current one.
  */
+function storedResultProjectsCleanly(
+  payload: GenerationResultPayload,
+  project: NormalizedProject,
+): boolean {
+  try {
+    if (!payload || typeof payload.ok !== "boolean") return false;
+    if (!payload.selection || typeof payload.selection.complete !== "boolean") return false;
+    if (!Array.isArray(payload.selection.selected)) return false;
+    if (!Array.isArray(payload.layouts) || !Array.isArray(payload.candidates)) return false;
+    // Re-running the same read-only projections the first render will use is
+    // the cheapest honest smoke test for a stored payload whose top-level
+    // shape passed `readStoredResult` but whose layout/scorecard internals are
+    // still untrusted.
+    const firstId = payload.selection.selected[0]?.layoutId ?? null;
+    projectOptionCards(payload, firstId, project, copy);
+    selectedScorecard(payload, firstId);
+    for (const layout of payload.layouts) {
+      validateLayout(layout, project);
+      candidateEvidence(layout, project);
+    }
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 function restoreStoredResult(): void {
   if (storedOutcome.status !== "loaded" || storedResult.status !== "usable") return;
+  const storedProjectFingerprint = fingerprintNormalizedProject(editor.committedProject);
+  if (!storedResultMatchesBrief(storedResult.document, storedProjectFingerprint)) {
+    // A stored result from an earlier brief must not be presented as the
+    // answer to the brief that was just loaded. Discard it silently; this is
+    // a safety discard, not a build-version mismatch notice.
+    try {
+      storagePort?.removeItem(RESULT_STORE_KEY);
+    } catch {
+      // Harmless if it cannot be removed; it will still not be restored.
+    }
+    return;
+  }
+  if (!storedResultProjectsCleanly(storedResult.document.payload, editor.committedProject)) {
+    try {
+      storagePort?.removeItem(RESULT_STORE_KEY);
+    } catch {
+      // As above: a corrupt result is discarded, never loaded.
+    }
+    return;
+  }
   controller.restore(storedResult.document.payload);
   generationRevision = editor.revision;
   editor = markBriefResultCurrent(editor, editor.revision);
@@ -847,6 +899,9 @@ function performReset(): void {
   viewportProjectKey = `${editor.committedProject.projectId}:${editor.committedProject.site.site.width}:${editor.committedProject.site.site.depth}`;
   lastSavedRevision = editor.revision;
   resetPending = false;
+  storageNotice = null;
+  resultsOutdated = false;
+  lastPersistedPayload = null;
   saveState = projectStore === null ? "unavailable" : "saved";
   render(controller.state);
 }
@@ -881,6 +936,9 @@ function syncProgressTicker(state: Readonly<GenerationState>): void {
 
 function retryGeneration(): void {
   if (!commitEditorDraft()) return;
+  // Retry is also a generation path: the result belongs to this brief and
+  // must not be persisted ahead of the brief it depends on.
+  flushSave(true);
   generationRevision = editor.revision;
   focusedEvidenceRefs = [];
   // Retry the latest committed snapshot. The controller still supplies the
@@ -938,12 +996,17 @@ function persistResultIfCurrent(state: Readonly<GenerationState>): void {
   if (storagePort === null || payload === null || payload === lastPersistedPayload) return;
   if (state.status === "generating" || state.requestId !== null) return;
   if (editor.resultRevision === null || editor.resultRevision !== editor.revision) return;
-  lastPersistedPayload = payload;
   resultsOutdated = false;
   try {
-    storagePort.setItem(RESULT_STORE_KEY, JSON.stringify(projectStoredResult(payload)));
+    storagePort.setItem(
+      RESULT_STORE_KEY,
+      JSON.stringify(projectStoredResult(payload, fingerprintNormalizedProject(editor.committedProject))),
+    );
+    lastPersistedPayload = payload;
   } catch {
-    // A full store must not break the workspace; the brief is still saved.
+    // A full store must not break the workspace; the brief is still saved. By
+    // leaving `lastPersistedPayload` unchanged the next render retries this
+    // write instead of silently marking a failed result as persisted.
   }
 }
 

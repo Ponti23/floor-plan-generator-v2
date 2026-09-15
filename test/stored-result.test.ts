@@ -7,6 +7,7 @@ import {
   CURRENT_RESULT_VERSIONS,
   projectStoredResult,
   readStoredResult,
+  storedResultMatchesBrief,
   versionsMatch,
 } from "../src/app/stored-result.ts";
 
@@ -19,13 +20,15 @@ import {
 const BUDGET = { maxCandidatesPerTopology: 2, maxTotalCandidates: 6 } as const;
 const result = generateLayouts(CANONICAL_NORMALIZED_PROJECT, { seed: "stored-result-tests", budget: BUDGET });
 const payload = projectGenerationResult(result);
+const BRIEF_FINGERPRINT = "test-brief-fingerprint";
 
 test("the stored projection keeps the selected layouts and drops the pool", () => {
-  const stored = projectStoredResult(payload, "2026-09-15T00:00:00.000Z");
+  const stored = projectStoredResult(payload, BRIEF_FINGERPRINT, "2026-09-15T00:00:00.000Z");
   const selectedIds = payload.selection.selected.map((item) => item.layoutId);
 
   assert.equal(stored.storeVersion, 1);
   assert.equal(stored.savedAt, "2026-09-15T00:00:00.000Z");
+  assert.equal(stored.briefFingerprint, BRIEF_FINGERPRINT);
   assert.deepEqual(stored.payload.layouts.map((layout) => layout.id).sort(), [...selectedIds].sort());
   assert.deepEqual(stored.payload.candidates.map((candidate) => candidate.layoutId).sort(), [...selectedIds].sort());
   assert.equal(stored.payload.diagnostics.length, 0);
@@ -61,20 +64,32 @@ test("versions are read from the payload and compared field by field", () => {
 });
 
 test("a usable stored result is returned intact", () => {
-  const stored = projectStoredResult(payload);
+  const stored = projectStoredResult(payload, BRIEF_FINGERPRINT);
   const outcome = readStoredResult(JSON.stringify(stored));
   assert.equal(outcome.status, "usable");
   if (outcome.status !== "usable") return;
   assert.deepEqual(outcome.document.payload.layouts.map((layout) => layout.id), stored.payload.layouts.map((layout) => layout.id));
+  assert.equal(storedResultMatchesBrief(outcome.document, BRIEF_FINGERPRINT), true);
+  assert.equal(storedResultMatchesBrief(outcome.document, "another-brief"), false);
 });
 
 test("a result from a different build is reported as outdated, never restored", () => {
-  const stored = projectStoredResult(payload);
+  const stored = projectStoredResult(payload, BRIEF_FINGERPRINT);
   const older = { ...stored, versions: { ...stored.versions, engineVersion: "planlab-generator-0.3" } };
   const outcome = readStoredResult(JSON.stringify(older));
   assert.equal(outcome.status, "outdated");
   if (outcome.status !== "outdated") return;
   assert.equal(outcome.stored.engineVersion, "planlab-generator-0.3");
+
+  // A real payload-shape bump is a build change too, and must be reported as
+  // outdated rather than as an unreadable document.
+  const bumpedPayload = {
+    ...stored,
+    versions: { ...stored.versions, payloadVersion: "planlab-generation-result-payload-2" },
+    payload: { ...stored.payload, payloadVersion: "planlab-generation-result-payload-2" },
+  };
+  const bumped = readStoredResult(JSON.stringify(bumpedPayload));
+  assert.equal(bumped.status, "outdated");
 
   // A document with no version block at all is judged by the payload it carries.
   const { versions: _dropped, ...withoutVersions } = stored;
@@ -86,5 +101,32 @@ test("missing, unparseable and foreign documents are classified without throwing
   assert.equal(readStoredResult("{nope").status, "corrupt");
   assert.equal(readStoredResult("[]").status, "corrupt");
   assert.equal(readStoredResult(JSON.stringify({ storeVersion: 99 })).status, "corrupt");
-  assert.equal(readStoredResult(JSON.stringify({ storeVersion: 1, payload: {} })).status, "corrupt");
+  assert.equal(readStoredResult(JSON.stringify({
+    storeVersion: 1,
+    briefFingerprint: BRIEF_FINGERPRINT,
+    payload: {},
+  })).status, "corrupt");
+});
+
+test("a result without a brief fingerprint is never restored", () => {
+  const stored = projectStoredResult(payload, BRIEF_FINGERPRINT);
+  const { briefFingerprint: _dropped, ...withoutFingerprint } = stored;
+  const outcome = readStoredResult(JSON.stringify(withoutFingerprint));
+  assert.equal(outcome.status, "corrupt");
+});
+
+test("a malformed payload with matching versions is classified without throwing", () => {
+  const stored = projectStoredResult(payload, BRIEF_FINGERPRINT);
+  const malformed = {
+    storeVersion: 1,
+    briefFingerprint: BRIEF_FINGERPRINT,
+    versions: stored.versions,
+    payload: {
+      payloadVersion: CURRENT_RESULT_VERSIONS.payloadVersion,
+      layouts: [],
+      candidates: [],
+    },
+  };
+  const outcome = readStoredResult(JSON.stringify(malformed));
+  assert.equal(outcome.status, "corrupt");
 });

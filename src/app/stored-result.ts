@@ -38,6 +38,12 @@ export interface ResultBuildVersions {
 export interface StoredResultDocument {
   storeVersion: number;
   savedAt: string;
+  /**
+   * Fingerprint of the authored brief this result was generated from.
+   * Without it a reload cannot tell whether a stored result belongs to the
+   * brief that was also loaded.
+   */
+  briefFingerprint: string;
   versions: ResultBuildVersions;
   payload: GenerationResultPayload;
 }
@@ -82,12 +88,14 @@ export function versionsMatch(
 
 export function projectStoredResult(
   payload: GenerationResultPayload,
+  briefFingerprint: string,
   savedAt = new Date().toISOString(),
 ): StoredResultDocument {
   const selectedIds = new Set(payload.selection.selected.map((item) => item.layoutId));
   return {
     storeVersion: STORED_RESULT_VERSION,
     savedAt,
+    briefFingerprint,
     versions: buildVersionsFromPayload(payload),
     payload: {
       payloadVersion: payload.payloadVersion,
@@ -99,6 +107,37 @@ export function projectStoredResult(
       candidates: payload.candidates.filter((candidate) => selectedIds.has(candidate.layoutId)),
     },
   };
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return value !== null && typeof value === "object" && !Array.isArray(value);
+}
+
+/**
+ * Structural validation for a stored result payload.
+ *
+ * A stored value is untrusted input for the same reason a worker message is.
+ * The workspace immediately dereferences `payload.ok`, `payload.selection`,
+ * `payload.layouts` and `payload.candidates`, so this must be at least
+ * structurally sound before `controller.restore()` is allowed to project it.
+ */
+function isStoredResultPayload(value: unknown): value is GenerationResultPayload {
+  if (!isRecord(value)) return false;
+  if (value.payloadVersion !== CURRENT_RESULT_VERSIONS.payloadVersion) return false;
+  if (typeof value.ok !== "boolean") return false;
+  if (!isRecord(value.selection)) return false;
+  if (typeof value.selection.complete !== "boolean") return false;
+  if (!Array.isArray(value.selection.selected)) return false;
+  if (!value.selection.selected.every((item) =>
+    isRecord(item) && typeof item.strategy === "string" && typeof item.layoutId === "string",
+  )) {
+    return false;
+  }
+  if (!Array.isArray(value.layouts)) return false;
+  if (!Array.isArray(value.candidates)) return false;
+  if (!Array.isArray(value.diagnostics)) return false;
+  if (!isRecord(value.metadata)) return false;
+  return true;
 }
 
 export type StoredResultReadOutcome =
@@ -127,19 +166,45 @@ export function readStoredResult(
   if (document.storeVersion !== STORED_RESULT_VERSION) {
     return { status: "corrupt", reason: "stored result has an unknown store version" };
   }
-  const payload = document.payload as GenerationResultPayload | undefined;
-  if (!payload || typeof payload !== "object" || !Array.isArray(payload.layouts) || !Array.isArray(payload.candidates)) {
+  const payload = document.payload;
+  const hasPayloadRecord = isRecord(payload);
+  if (document.versions === undefined && (!hasPayloadRecord || typeof (payload as Record<string, unknown>).payloadVersion !== "string")) {
     return { status: "corrupt", reason: "stored result has no usable payload" };
   }
-  const versions = document.versions ?? buildVersionsFromPayload(payload);
+  if (document.versions !== undefined && !isRecord(document.versions)) {
+    return { status: "corrupt", reason: "stored result has no usable version block" };
+  }
+  const versions = document.versions ?? (hasPayloadRecord
+    ? buildVersionsFromPayload(payload as GenerationResultPayload)
+    : {});
+
+  // Version skew is classified before the full payload shape is trusted. A
+  // real payload-version bump is a build change and must surface the stale
+  // result notice, not a generic corrupt notice.
   if (!versionsMatch(versions, current)) return { status: "outdated", stored: versions };
+
+  if (!isStoredResultPayload(payload)) {
+    return { status: "corrupt", reason: "stored result has no usable payload" };
+  }
+  if (typeof document.briefFingerprint !== "string" || document.briefFingerprint.length === 0) {
+    return { status: "corrupt", reason: "stored result has no brief fingerprint" };
+  }
   return {
     status: "usable",
     document: {
       storeVersion: STORED_RESULT_VERSION,
       savedAt: typeof document.savedAt === "string" ? document.savedAt : new Date(0).toISOString(),
-      versions,
+      briefFingerprint: document.briefFingerprint,
+      versions: versions as ResultBuildVersions,
       payload,
     },
   };
+}
+
+/** True only when the stored result belongs to the supplied brief fingerprint. */
+export function storedResultMatchesBrief(
+  document: StoredResultDocument,
+  briefFingerprint: string,
+): boolean {
+  return document.briefFingerprint === briefFingerprint;
 }
