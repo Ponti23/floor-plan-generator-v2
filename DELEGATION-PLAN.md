@@ -195,31 +195,31 @@ the reset-confirmation wording and the save-failure wording (see 6.4).
 Spec: [`UI_ARCHITECTURE.md`](./knowledge/planlab/UI_ARCHITECTURE.md) "Persistence experience",
 [`TESTING_STRATEGY.md`](./knowledge/planlab/TESTING_STRATEGY.md).
 
-- [ ] **6.1 Versioned local storage repository.** A `ProjectStore` adapter over `localStorage` behind
+- [x] **6.1 Versioned local storage repository.** `1eb5f58`; record `artifacts/planlab/milestone-6/6.1-local-storage-repository.md`. A `ProjectStore` adapter over `localStorage` behind
   an interface: namespaced keys (`planlab:v1:*`), a stored schema/engine version, runtime parse and
   validation of whatever is read, and an injectable storage port so tests never touch a real browser
   store. Acceptance: a round-tripped project is byte-identical after canonical normalization; a
   missing key, a corrupt payload, and an unknown future schema version each return a typed outcome
   rather than throwing. — `luna-max`
-- [ ] **6.2 Sequential migrations and recovery key.** Migrate older stored documents forward one
+- [x] **6.2 Sequential migrations and recovery key.** `c163df9`; mechanism + recovery keys, no v2 to migrate yet — record `artifacts/planlab/milestone-6/6.2-migrations.md`. Migrate older stored documents forward one
   version at a time; when a document cannot be migrated, retain the original under a separate
   recovery key instead of deleting it, and surface that fact in the UI. Acceptance: an old fixture
   migrates to current; a corrupt fixture is preserved under the recovery key and the app still starts.
   — `luna-max`
-- [ ] **6.3 Debounced autosave, flush and save status.** Commit-triggered debounce, immediate flush on
+- [x] **6.3 Debounced autosave, flush and save status.** `b3d47bc`; record `artifacts/planlab/milestone-6/6.3-autosave-restore.md`. Commit-triggered debounce, immediate flush on
   Generate and on page hide, and a save-status projection (`Saved locally` / `Saving` / `Local save
   failed`) that never claims success after a failed write. Acceptance: simulating a storage failure
   leaves the in-memory project intact and shows the failure state; a successful write clears it.
   — `luna-max`
-- [ ] **6.4 Reset flow and destructive confirmation.** Reset removes only PlanLab-owned keys (proved
+- [x] **6.4 Reset flow and destructive confirmation.** `76299f6`; copy still `needs-human` — record `artifacts/planlab/milestone-6/6.4-reset-flow.md`. Reset removes only PlanLab-owned keys (proved
   by a test that plants a foreign key), requires an explicit confirmation, and states that local data
   will be removed. **Copy is a user hard gate**: ship replaceable defaults and record the pending
   approval rather than freezing wording. — `luna-max`
-- [ ] **6.5 Engine-version result invalidation.** A stored result whose engine/scoring version no
+- [x] **6.5 Engine-version result invalidation.** `c163df9`; record `artifacts/planlab/milestone-6/6.5-result-persistence.md`. A stored result whose engine/scoring version no
   longer matches the running build must be marked stale rather than shown as current. Acceptance: a
   stored payload written under an older version surfaces the stale affordance and is regenerated on
   demand. — `terra-max`
-- [ ] **6.6 Independent Stage 6 review.** Adversarial pass over storage, migration, failure and reset
+- [x] **6.6 Independent Stage 6 review.** `cd20ff3` (seven fixes) plus `d4da15a`; record `artifacts/planlab/milestone-6/6.6-independent-review.md`. Adversarial pass over storage, migration, failure and reset
   paths: injected corrupt documents, denied storage, version skew, and a refresh/restore browser run.
   Record under `artifacts/planlab/milestone-6/`. — `terra-max` (independent; Sol judges)
 
@@ -229,14 +229,14 @@ Goal (from `IMPLEMENTATION_PLAN.md` Milestone 7): make the validated MVP respons
 **Not active.** Engineering items (7.1–7.3) can be staged without a user decision; 7.4 is a hard
 gate owned by the user.
 
-- [ ] **7.1 Responsive panel collapse and accessibility sweep.** Panel collapse below the desktop
+- [x] **7.1 Responsive panel collapse and accessibility sweep.** `7866045`; record `artifacts/planlab/milestone-7/7.1-responsive-accessibility.md`. Panel collapse below the desktop
   breakpoint without shrinking the plan into a sliver; contrast, focus order, and non-colour status
   re-checked across every state. — `terra-max`
-- [ ] **7.2 Production deployment configuration and support limitations.** Reproducible Vite
+- [x] **7.2 Production deployment configuration and support limitations.** `7f9e37f`; record `artifacts/planlab/milestone-7/7.2-deployment.md`. Reproducible Vite
   production build, static-host configuration (Vercel preset: build `npm run build`, output `dist`),
   a README that states the conceptual-use limitation, and a production worker-path smoke test.
   — `luna-max`
-- [ ] **7.3 Rendering and performance profile with recorded budgets.** Measure the real workspace
+- [x] **7.3 Rendering and performance profile with recorded budgets.** `7f9e37f`, re-measured `626dd3e`; record `artifacts/planlab/milestone-7/7.3-performance-profile.md`. Measure the real workspace
   (generation, first paint, SVG projection, thumbnail rendering) and either meet the recorded target
   or revise it explicitly with evidence. Must re-measure the Stage 0 timing gate on a quiet machine
   because its margin is thin. — `terra-max`

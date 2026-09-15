@@ -60,16 +60,20 @@ default while requiring it to stay settable (D2/D3), and asked for the engineeri
 to be done rather than returned as questions (D4). All of it is implemented, verified and green
 (145 tests, full regression gate PASS at median 1,750 ms). Record:
 [`artifacts/planlab/milestone-3/gate-amendment-d1-d4.md`](artifacts/planlab/milestone-3/gate-amendment-d1-d4.md).
-**Milestone 4 is closed; Milestone 5 is complete pending Sol's judgment. Buckets 5.0–5.4 are
-complete. The 5.0 copy
-and shell gate closed on 2026-09-15 with all five decisions approved
-(`artifacts/planlab/milestone-5/5.0-copy-decision-package.md`), so copy is final and no executor needs
-to re-ask. Bucket 5.5 is **PASS WITH OPEN FINDINGS** and ready for Sol to judge; record:
-`artifacts/planlab/milestone-5/5.5-independent-review.md`. 5.3's record is
-`artifacts/planlab/milestone-5/5.3-result-selector.md`, 5.4's is
-`artifacts/planlab/milestone-5/5.4-generation-states.md`; the screenshot harness is
-`scripts/capture-ui.mjs`. To run the app locally: `npm run dev` then open
-http://localhost:5173.**
+**Milestones 5 and 6 are closed, and Stage 7's 7.1–7.3 are complete. Only 7.4 (release approval,
+the user's hard gate) remains.** Milestone 5 closed after the 5.0 copy/shell gate was answered
+(`artifacts/planlab/milestone-5/5.0-copy-decision-package.md`) and after an independent 5.5 review
+judged PASS by the orchestrator (`5.5-independent-review.md`). Stage 6 closed after an independent
+6.6 review that found and fixed seven defects (`artifacts/planlab/milestone-6/6.6-independent-review.md`),
+itself closed out by `d4da15a`. Per-bucket records live in `artifacts/planlab/milestone-{5,6,7}/`; the
+screenshot and DOM-digest harness is `scripts/capture-ui.mjs`.
+
+**Two decisions are waiting on the user, and nothing else is:** whether to push local `main`
+(everything since `baa9a54` is unpushed), and whether to approve the 6.4 reset-confirmation wording,
+which ships as a replaceable default and is marked `needs-human` on the board.
+
+To run the app locally: `npm run dev`, then open **http://localhost:5173**; `npm run preview` serves
+the production build on 4173.**
 
 ## D5 remote checkpoint — approved
 

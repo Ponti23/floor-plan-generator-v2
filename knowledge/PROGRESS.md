@@ -8,12 +8,18 @@ tags: [progress, resume]
 ## Resume here
 
 - **Checkpoint date:** 2026-09-15.
-- **Current focus:** **Milestone 5 is complete and closed.** Buckets 5.0–5.4 are implemented, 5.5 is an
-  independent review that the orchestrator judged PASS, and 5.6 fixed the Stage 0 baseline provenance
-  defect found during verification. **Stage 6 (local persistence and recovery) is staged in
-  `DELEGATION-PLAN.md` and `knowledge/BOARD.md` and is the next active stage.** It has no user
-  decision blocking the engineering work; only 6.4's reset-confirmation wording is a copy hard gate and
-  must ship as a replaceable default with the approval still pending.
+- **Current focus:** **Milestones 5, 6 and the engineering half of 7 are complete.** Milestone 5 closed
+  after an independent review; Stage 6 (local persistence and recovery) finished with its own
+  independent review; Stage 7's 7.1 (responsive/accessibility), 7.2 (deployment config + README
+  limitations) and 7.3 (performance profile, including a quiet-machine Stage 0 re-measure) are done.
+  **The only unfinished bucket is 7.4 — release approval, which is the user's hard gate** — plus the
+  two pending user decisions below (push, and the 6.4 reset-confirmation wording).
+- **What Stage 6/7 changed for the user.** The brief and the last generation survive a refresh; the
+  workspace says `Saved locally` / `Saving…` / `Local save failed`; a corrupt or foreign saved
+  document is preserved and explained rather than silently replaced; Reset project asks first, then
+  removes only PlanLab-owned keys; stored layouts are discarded (with a notice) when a different build
+  produced them. Below 1180 px, two toolbar toggles fold the brief or analysis pane so the plan keeps
+  a usable width, and the tertiary text colour moved from a failing 4.02:1 to 5.26:1.
 - **What closed this session (Milestone 5).**
   - **5.0 copy and shell gate — closed by the user on 2026-09-15**: keep Vite/TS (static build
     verified Vercel-deployable: `npm run build` → `dist/`, no server runtime), the three strategy
@@ -52,13 +58,13 @@ tags: [progress, resume]
      at the cost of one bulk renormalisation commit.
   5. **`INSTANCES_BY_PROJECT`** in `rules.ts` caches instances per project object identity — revisit
      when the project document becomes editable under Stage 6.
-- **Next step (Stage 6, partially done):** 6.1 (store), 6.3 (autosave/restore/save status) and 6.4
-  (confirmed reset) are complete — records under `artifacts/planlab/milestone-6/`. Remaining: 6.2
-  (migrations — nothing to migrate until a store v2 exists; the recovery-key half is done), 6.5
-  (engine-version result invalidation — blocked because results are not persisted), and 6.6
-  (independent Stage 6 review by an agent that did not author it). The app now restores the stored
-  brief on load, autosaves on committed revisions, flushes on Generate and page hide, and shows
-  `Saved locally` / `Saving…` / `Local save failed` / `Local saving unavailable`.
+- **Next step:** nothing engineering-shaped is left in the staged plan. **7.4 (release approval) is the
+  user's gate**, and it wants an architect acceptance session across several briefs rather than the
+  canonical fixture alone. Everything else is staged, executed, reviewed, verified and recorded:
+  Milestone 5 (5.0–5.6), Stage 6 (6.1–6.6) and Stage 7 (7.1–7.3), with per-bucket records under
+  `artifacts/planlab/milestone-{5,6,7}/`. If the user wants more, the highest-value next work is a
+  second real brief in the fixtures (only the canonical brief has ever been exercised end to end) and
+  a deploy the Vercel headers can actually be checked against.
 - **Two decisions are waiting on the user:**
   1. **Push.** `main` is unpushed since `baa9a54`; everything after it (Milestones 5 and the Stage 6
      work) is local. Pushing is the user's call.
