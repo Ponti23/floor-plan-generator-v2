@@ -35,6 +35,13 @@ export interface SvgProjectionOptions {
  * them inside the viewBox instead of clipping at the canvas edge.
  */
 const ROOT_MARGIN_UNITS = 6;
+/**
+ * Extra room below the site rectangle.  The site-dimension row and the scale
+ * bar are drawn under the site, and the canvas reserves a further band under
+ * the plan for the entrance label, so the drawing must not run to the viewBox
+ * edge.
+ */
+const ROOT_BOTTOM_MARGIN_UNITS = 16;
 const LAYER_ORDER = [
   "grid",
   "site",
@@ -50,6 +57,22 @@ export type SvgLayerName = typeof LAYER_ORDER[number];
 
 export function svgLayerOrder(): readonly SvgLayerName[] {
   return LAYER_ORDER;
+}
+
+/**
+ * The plan viewBox in grid units: one source of truth shared by the projection
+ * that renders the SVG and by the viewport maths that maps pointer positions
+ * back into it.  A second, hand-written copy of these margins is how zoom
+ * anchors and pan deltas silently drift from what the user sees.
+ */
+export function planViewBox(project: NormalizedProject): GridRect {
+  const site = project.site.site;
+  return {
+    x: -ROOT_MARGIN_UNITS,
+    y: -ROOT_MARGIN_UNITS,
+    width: site.width + ROOT_MARGIN_UNITS * 2,
+    depth: site.depth + ROOT_MARGIN_UNITS + ROOT_BOTTOM_MARGIN_UNITS,
+  };
 }
 
 function escapeText(value: string): string {
@@ -208,16 +231,39 @@ function dimensionsMarkup(
   </g>`;
 }
 
+function scaleBarMarkup(project: NormalizedProject, copy: PlanLabPresentationCopy["ui"]): string {
+  const site = project.site.site;
+  // A bar scale, not a bare line: alternating filled segments with numbered
+  // ticks, ending in the total length.  The number of segments stays fixed so
+  // the bar reads as a scale at any site size.
+  const segments = 3;
+  const barUnits = Math.min(24, Math.max(12, Math.floor(site.width / 3)));
+  const segment = barUnits / segments;
+  const x0 = Math.max(1, site.width - barUnits - 3);
+  const y = site.depth + 2.4;
+  const height = 1.1;
+  const metresPerSegment = segment * GRID_UNIT_METRES;
+  const blocks = Array.from({ length: segments }, (_, index) => {
+    const x = x0 + index * segment;
+    const shade = index % 2 === 0 ? "scale-bar-dark" : "scale-bar-light";
+    return `<rect class="${shade}" x="${formatNumber(x)}" y="${formatNumber(y)}" width="${formatNumber(segment)}" height="${formatNumber(height)}"/>`;
+  }).join("");
+  const ticks = Array.from({ length: segments }, (_, index) => {
+    const x = x0 + index * segment;
+    const value = Number((index * metresPerSegment).toFixed(2));
+    return `<line class="scale-tick" x1="${formatNumber(x)}" y1="${formatNumber(y - .55)}" x2="${formatNumber(x)}" y2="${formatNumber(y + height + .55)}"/><text class="scale-tick-label" x="${formatNumber(x)}" y="${formatNumber(y + height + 2.1)}">${escapeText(String(value))}</text>`;
+  }).join("");
+  const endX = x0 + barUnits;
+  const endLabel = `${formatLength(barUnits, copy).replace(/\.00/, "")}`;
+  return `${blocks}${ticks}<text class="scale-label" x="${formatNumber(endX + .8)}" y="${formatNumber(y + height + 2.1)}">${escapeText(endLabel)}</text>`;
+}
+
 function northScaleMarkup(project: NormalizedProject, copy: PlanLabPresentationCopy["ui"]): string {
   const site = project.site.site;
-  const scaleLength = Math.min(20, Math.max(4, Math.floor(site.width / 4)));
-  const scaleX = Math.max(1, site.width - scaleLength - 3);
-  const scaleY = site.depth + 2.4;
   return `<g class="north-scale" aria-hidden="true">
     <text class="north" x="${formatNumber(site.width - 2)}" y="2">${escapeText(copy.northSymbol)}</text>
     <path class="north-arrow" d="M ${formatNumber(site.width - 2)} 2.8 L ${formatNumber(site.width - 2)} 5.5"/>
-    <path class="scale-bar" d="M ${formatNumber(scaleX)} ${formatNumber(scaleY)} H ${formatNumber(scaleX + scaleLength)} M ${formatNumber(scaleX)} ${formatNumber(scaleY - .7)} V ${formatNumber(scaleY + .7)} M ${formatNumber(scaleX + scaleLength)} ${formatNumber(scaleY - .7)} V ${formatNumber(scaleY + .7)}"/>
-    <text class="scale-label" x="${formatNumber(scaleX + scaleLength)}" y="${formatNumber(scaleY + 2)}">${escapeText(formatLength(scaleLength, copy))}</text>
+    ${scaleBarMarkup(project, copy)}
   </g>`;
 }
 
@@ -238,12 +284,7 @@ export function projectPlanSvg(options: SvgProjectionOptions): string {
   } = options;
   const site = project.site.site;
   const envelope = project.site.envelope;
-  const root = {
-    x: -ROOT_MARGIN_UNITS,
-    y: -ROOT_MARGIN_UNITS,
-    width: site.width + ROOT_MARGIN_UNITS * 2,
-    depth: site.depth + ROOT_MARGIN_UNITS * 2,
-  } satisfies GridRect;
+  const root = planViewBox(project);
   const roomById = new Map(project.rooms.map((room) => [room.id, room]));
   const spaces = layout?.spaces ?? [];
   const evidence = projectEvidenceGeometry(layout, focusedEvidenceRefs);
@@ -261,7 +302,7 @@ export function projectPlanSvg(options: SvgProjectionOptions): string {
     // Rooms carry their area on a second line.  Circulation and entry runs are
     // often a single grid unit wide, where a second line would collide with the
     // neighbouring room labels, so they keep the name only.
-    const area = room ? `<tspan x="${formatNumber(centreX)}" dy="2.6">${escapeText(formatArea(space.rect.width * space.rect.depth, copy))}</tspan>` : "";
+    const area = room ? `<tspan x="${formatNumber(centreX)}" dy="2.2">${escapeText(formatArea(space.rect.width * space.rect.depth, copy))}</tspan>` : "";
     const baseline = room ? centreY - 1 : centreY;
     return `<text class="space-label" data-space-label="${escapeAttribute(space.instanceId)}" x="${formatNumber(centreX)}" y="${formatNumber(baseline)}">${escapeText(label)}${area}</text>`;
   }).join("");
@@ -280,7 +321,7 @@ export function projectPlanSvg(options: SvgProjectionOptions): string {
     "north-scale": `<g class="svg-layer north-scale-layer" data-layer="north-scale">${northScaleMarkup(project, copy)}</g>`,
   };
   return `<svg class="plan-svg${staleClass}" role="img" aria-label="${escapeAttribute(stale ? copy.stalePlanAria : copy.generatedPlanAria)}" viewBox="${formatNumber(root.x)} ${formatNumber(root.y)} ${formatNumber(root.width)} ${formatNumber(root.depth)}" preserveAspectRatio="xMidYMid meet" data-root-width="${formatNumber(root.width)}" data-root-depth="${formatNumber(root.depth)}">
-    <defs><pattern id="${escapeAttribute(gridId)}" width="4" height="4" patternUnits="userSpaceOnUse"><path d="M 4 0 L 0 0 0 4"/></pattern><marker id="dimension-tick" markerWidth="2" markerHeight="2" refX="1" refY="1" orient="auto"><path d="M 0 0 L 2 2"/></marker></defs>
+    <defs><pattern id="${escapeAttribute(gridId)}" width="2" height="2" patternUnits="userSpaceOnUse"><path d="M 2 0 L 0 0 0 2"/></pattern><marker id="dimension-arrow" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto-start-reverse" markerUnits="strokeWidth"><path d="M 0 0 L 6 3 L 0 6 z"/></marker></defs>
     <g class="viewport-transform" data-viewport-transform="true" transform="${escapeAttribute(viewportTransformAttribute(transform))}">${LAYER_ORDER.map((layer) => layers[layer]).join("")}</g>
   </svg>`;
 }

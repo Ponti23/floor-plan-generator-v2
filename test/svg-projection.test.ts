@@ -5,6 +5,7 @@ import type { Layout } from "../src/domain/layout.ts";
 import { tryNormalizeProject } from "../src/domain/normalization.ts";
 import { resolvePresentationCopy } from "../src/app/presentation-copy.ts";
 import {
+  planViewBox,
   projectEvidenceGeometry,
   projectPlanSvg,
   projectPortalLine,
@@ -50,13 +51,28 @@ test("SVG projection emits deterministic layers under one viewport transform", (
     svgLayerOrder(),
   );
   assert.equal((first.match(/data-viewport-transform/g) ?? []).length, 1);
-  // The root is the site plus a 6-unit margin on every side.  The margin has to
-  // cover the scale bar and the site-dimension label, which are drawn below the
-  // site rectangle; a 4-unit margin clipped them at the canvas edge.
-  assert.match(first, /viewBox="-6 -6 92 132"/);
+  // The root is the site plus a 6-unit margin on the sides and top, plus a
+  // deeper bottom band.  The band has to cover the scale bar and the
+  // site-dimension row, which are drawn below the site rectangle, and still
+  // leave room for the entrance label under the plan; a 4-unit margin clipped
+  // them at the canvas edge.
+  assert.match(first, /viewBox="-6 -6 92 142"/);
   assert.match(first, /data-root-width="92"/);
+  assert.match(first, /data-root-depth="142"/);
   assert.match(first, /data-space-id="bedroom-1"/);
   assert.match(first, /data-portal-id="portal-entry"/);
+});
+
+test("the rendered root and the viewport root are the same rectangle", () => {
+  // Pointer-to-viewBox mapping, wheel zoom anchors and Fit all resolve against
+  // this rectangle.  A second hand-written copy of the margins in the app is
+  // how zoom anchors drift from the plan the user can see.
+  const root = planViewBox(normalized.value);
+  const svg = projectPlanSvg({ project: normalized.value, layout, copy });
+  assert.match(svg, new RegExp(`viewBox="${root.x} ${root.y} ${root.width} ${root.depth}"`));
+  assert.match(svg, new RegExp(`data-root-width="${root.width}"`));
+  assert.match(svg, new RegExp(`data-root-depth="${root.depth}"`));
+  assert.deepEqual(root, { x: -6, y: -6, width: 92, depth: 142 });
 });
 
 test("evidence projection resolves only authoritative room, footprint, circulation and portal geometry", () => {

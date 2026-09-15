@@ -8,7 +8,8 @@ tags: [progress, resume]
 ## Resume here
 
 - **Checkpoint date:** 2026-09-15.
-- **Current focus:** Milestone 5 frontend work is now active under explicit user direction. The
+- **Current focus:** Milestone 5 frontend work is complete; the **5.5 independent review is PASS
+  WITH OPEN FINDINGS** and is ready for Sol to judge. The
   **5.0 copy and shell hard gate closed on 2026-09-15**: the user answered all five decisions
   separately and approved each one (keep Vite/TS, the three strategy names, five score-breakdown
   rows, real-value-only metric rows, and the disclaimer/prohibited-claims/failure wording). Record:
@@ -16,7 +17,7 @@ tags: [progress, resume]
   The user
   authorized continuing in the existing Vite shell and selected `knowledge/PlanLab-Mockup.png` as
   the required visual target. A first CSS-only foundation is implemented and verified; DeepSeek-
-  Flash should continue from the exact boundary at the top of `HANDOFF.md`. Final product copy is
+  Final product copy is
   still a human hard gate and must remain centralized and replaceable. The implementation and
   screenshot-QA contract is in
   `knowledge/planlab/FRONTEND_MOCKUP_BRIEF.md`. Full Stage 3 record:
@@ -67,22 +68,16 @@ tags: [progress, resume]
      `Ponti23` identity and completed buckets do not record Flash as owner. Record the actual
      executor in `knowledge/BOARD.md` for every future claimed bucket; do not rewrite provenance
      retroactively without evidence.
-  6. **Frontend visual direction:** approved by the user on 2026-09-15. Recreate
-     `knowledge/PlanLab-Mockup.png` closely; functional similarity to the current shell is not
-     enough. A verified CSS foundation now matches the reference's main proportions, white toolbar,
-     blue accent, planning grid and compact density; `HANDOFF.md` records the precise remaining
-     `main.ts` and visual-QA work for DeepSeek-Flash.
-- **Next step:** buckets 5.1–5.4 are complete (`c63a1d2`, `96ba89f`, 5.3 and 5.4 as of this
-  checkpoint). 5.4 delivered all eight generation states, the stale-results banner with a working
-  Regenerate action, elapsed/watchdog progress, disabled out-of-scope shell controls and the
-  deterministic "new variations" seed bump — record:
-  `artifacts/planlab/milestone-5/5.4-generation-states.md`.
-  5.3 delivered real option thumbnails, the selected-option summary (six real-value-only metric rows),
-  whole-number category bars, PASS/WARNING/FAIL rule checks and honest empty/infeasible states —
-  record: `artifacts/planlab/milestone-5/5.3-result-selector.md`; evidence: 169 tests, clean
-  typecheck/build/diagnostics, and 1536 × 1024 browser captures with DOM digests under
-  `artifacts/planlab/milestone-5/`. Next is 5.4 (generation states, stale-result affordances,
-  keyboard/a11y), then 5.5 (independent review incl. the mockup comparison).
+  6. **Milestone 5 independent review is complete.** Bucket 5.5 is **PASS WITH OPEN FINDINGS**;
+     record: `artifacts/planlab/milestone-5/5.5-independent-review.md`. The review fixed pointer/
+     zoom anchor drift, Unicode toolbar/viewport glyph fallback, option-card geometry mismatch,
+     expand-button accessible names, missing `aria-pressed`, missing landmark roles, and
+     locale-sensitive metric formatting. Stage 6 is staged but remains inactive until Sol judges
+     5.5 closed.
+- **Next step:** Sol judges `artifacts/planlab/milestone-5/5.5-independent-review.md`, then closes
+  Milestone 5 or dispatches the recorded residual visual-review independence caveat. Stages 6–7
+  are already written into `DELEGATION-PLAN.md` and `knowledge/BOARD.md` but are not active until
+  Milestone 5 is closed.
 - **Baseline provenance fixed (bucket 5.6).** `benchmarkInputManifest()` now hashes LF-normalised
   content, so the fingerprint describes the source instead of the checkout. The re-record is proven
   drift-free: every canonical per-seed hash, impossible fixture, historical baseline, budget and seed
@@ -98,15 +93,16 @@ tags: [progress, resume]
   instances per project object identity — revisit when the project document becomes editable
   (Milestone 6).
 
-**Evidence this session:** takeover audit reproduced `npm test` **145 passing**;
+**Evidence this session:** takeover audit reproduced `npm test` **176 passing**;
 `npm run typecheck` 0 errors; `npm run build` clean; `npm run diagnostics:canonical -- --check`
 clean at fingerprint `sha256:8efe5b5e…`; `npm run benchmark:stage0:check`
-**`baselineMatch: true`** with every gate line PASS at median **1,973.5 ms** / p95
-**2,070.5 ms**; `npm run benchmark:worker` median **188.8 ms**. The earlier quiet reference was
+**`baselineMatch: true`** with every gate line PASS at median **1,918.6 ms** / p95
+**2,208.6 ms**; `npm run benchmark:worker` median **188.8 ms**. The earlier quiet reference was
 1,709.8 ms / 1,779.6 ms and 174.1 ms respectively. Browser smoke remains:
 generate reaches `complete` with three options and an SVG plan; cancel returns to `idle` and keeps
 the last compatible result; committing a site edit (`18000 × 26000 mm`) regenerates a changed
-viewBox (`86x126` → `78x110`) and layout set.
+viewBox (`86x126` → `78x110`) and layout set. The 5.5 review adds idle, complete and stale captures
+at 1536 × 1024 under `artifacts/planlab/milestone-5/`.
 
 **Process note:** the 3.5 review was performed by the orchestrator because no separate agent was
 available in the session, so it leans on differential evidence (frozen prior commit in a scratch

@@ -36,7 +36,7 @@ Active design: [`planlab/README.md`](./planlab/README.md) · staged plan: [`../D
 | 5.2 | SVG projection, layers, pan/zoom/fit, evidence highlight | luna-max | luna-max | done | `main` (`96ba89f`) |
 | 5.3 | Result selector and analysis projection | luna-max | orchestrator (`/root`) | done | `main` (`09a9662`) |
 | 5.4 | Generation states, stale-result affordances, keyboard/a11y | terra-max | orchestrator (`/root`) | done | `main` (`3a769e2`) |
-| 5.5 | Independent Milestone 5 review | terra-max | sol-max | todo | `main` |
+| 5.5 | Independent Milestone 5 review | terra-max | sol-max | done | `main` |
 | 5.6 | Stage 0 baseline provenance fix | terra-max | orchestrator (`/root`) | done | `main` |
 | 6.1 | Versioned local storage repository | luna-max | unassigned | todo | — |
 | 6.2 | Sequential migrations and recovery key | luna-max | unassigned | todo | — |

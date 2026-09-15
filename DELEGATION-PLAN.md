@@ -178,7 +178,7 @@ direction plus screenshot acceptance contract in
   `invalidBrief`, `generating`, `complete`, `partial`, `infeasible`, `budgetExceeded`, and
   `workerError`; make stale results obvious; provide labels, visible focus, keyboard order, and
   non-colour status indicators. — `terra-max` (`3a769e2`; actual executor: orchestrator `/root`)
-- [ ] **5.5 Independent Milestone 5 review.** Review the editor/projection stack for state ownership
+- [x] **5.5 Independent Milestone 5 review.** Review the editor/projection stack for state ownership
   leaks, stale-result handling, copy hard-gate compliance, SVG accessibility, keyboard behaviour, and
   false-precision presentation. Fix only Milestone 5 defects and record evidence under
   `artifacts/planlab/milestone-5/`. Include a 1536 × 1024 side-by-side comparison against

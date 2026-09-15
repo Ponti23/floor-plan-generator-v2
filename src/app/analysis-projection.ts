@@ -197,10 +197,7 @@ function projectRuleChecks(evaluations: readonly RuleEvaluation[]): RuleCheckPro
 }
 
 function formatNumber(value: number, digits: number): string {
-  return value.toLocaleString(undefined, {
-    minimumFractionDigits: digits,
-    maximumFractionDigits: digits,
-  });
+  return value.toFixed(digits);
 }
 
 /**

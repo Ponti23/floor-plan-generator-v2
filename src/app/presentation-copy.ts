@@ -58,6 +58,8 @@ export interface PlanLabPresentationCopy {
     roomPassThrough: string;
     roomNameAria: string;
     roomQuantityAriaSuffix: string;
+    roomExpandAria: string;
+    roomCollapseAria: string;
     relationshipEmpty: string;
     chooseRoom: string;
     relationshipKindLabels: Record<string, string>;
@@ -260,6 +262,8 @@ export const RECOMMENDED_PRESENTATION_COPY: Readonly<PlanLabPresentationCopy> = 
     roomPassThrough: "May be pass-through",
     roomNameAria: "Room name",
     roomQuantityAriaSuffix: " quantity",
+    roomExpandAria: "Expand",
+    roomCollapseAria: "Collapse",
     relationshipEmpty: "No relationship preferences in this brief.",
     chooseRoom: "Choose room…",
     relationshipKindLabels: {

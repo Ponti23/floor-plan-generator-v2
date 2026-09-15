@@ -31,7 +31,7 @@ import {
   type CandidateEvidence,
   type RuleCheckRow,
 } from "./analysis-projection.ts";
-import { projectEvidenceGeometry, projectPlanSvg } from "./svg-projection.ts";
+import { planViewBox, projectEvidenceGeometry, projectPlanSvg } from "./svg-projection.ts";
 import {
   createViewportState,
   fitViewport,
@@ -177,7 +177,7 @@ function renderRoom(room: DraftRoom, index: number): string {
       <label class="check-row"><input type="checkbox" data-room-index="${index}" data-room-trait="exteriorPreference" ${room.traits.exteriorPreference !== "none" ? "checked" : ""}>${escapeText(copy.ui.roomExteriorPreference)}</label>
       <label class="check-row"><input type="checkbox" data-room-index="${index}" data-room-trait="mayBePassThrough" ${room.traits.mayBePassThrough ? "checked" : ""}>${escapeText(copy.ui.roomPassThrough)}</label>
     </div>` : "";
-  return `<li class="room-item ${open ? "expanded" : ""}"><div class="room-summary"><span class="room-swatch ${roomKindClass(room.kind)}" aria-hidden="true"></span><input class="room-label" data-room-index="${index}" data-room-field="label" value="${escapeAttribute(room.label)}" aria-label="${escapeAttribute(copy.ui.roomNameAria)}"><input class="quantity-input" data-room-index="${index}" data-room-field="quantity" inputmode="numeric" value="${escapeAttribute(room.quantity)}" aria-label="${escapeAttribute(`${room.label}${copy.ui.roomQuantityAriaSuffix}`)}"><span class="room-area">${escapeText(summary)} ${escapeText(copy.ui.units.squareMetre)}</span><button class="expand-room" type="button" data-expand-room="${escapeAttribute(room.id)}" aria-expanded="${open}">${open ? "⌃" : "⌄"}</button></div>${advanced}</li>`;
+  return `<li class="room-item ${open ? "expanded" : ""}"><div class="room-summary"><span class="room-swatch ${roomKindClass(room.kind)}" aria-hidden="true"></span><input class="room-label" data-room-index="${index}" data-room-field="label" value="${escapeAttribute(room.label)}" aria-label="${escapeAttribute(copy.ui.roomNameAria)}"><input class="quantity-input" data-room-index="${index}" data-room-field="quantity" inputmode="numeric" value="${escapeAttribute(room.quantity)}" aria-label="${escapeAttribute(`${room.label}${copy.ui.roomQuantityAriaSuffix}`)}"><span class="room-area">${escapeText(summary)} ${escapeText(copy.ui.units.squareMetre)}</span><button class="expand-room" type="button" data-expand-room="${escapeAttribute(room.id)}" aria-expanded="${open}" aria-label="${escapeAttribute(`${open ? copy.ui.roomCollapseAria : copy.ui.roomExpandAria} ${room.label}`)}">${open ? "⌃" : "⌄"}</button></div>${advanced}</li>`;
 }
 
 function renderRelationships(): string {
@@ -248,9 +248,7 @@ function syncViewportProject(project: NormalizedProject): void {
 }
 
 function rootViewBox(project: NormalizedProject): { x: number; y: number; width: number; depth: number } {
-  const margin = 4;
-  const site = project.site.site;
-  return { x: -margin, y: -margin, width: site.width + margin * 2, depth: site.depth + margin * 2 };
+  return planViewBox(project);
 }
 
 function rootCentre(project: NormalizedProject): { x: number; y: number } {
@@ -361,12 +359,17 @@ function renderCanvas(state: Readonly<GenerationState>): string {
   const selected = selectedResult(state);
   syncViewportProject(selected.project);
   const progress = state.status === "generating" ? progressReadout(state) : copy.ui.canvasReady;
+  // The pointer tools are inline SVG rather than glyph characters: the arrow
+  // and hand emoji render inconsistently across platforms and font fallbacks,
+  // and the mockup shows drawn tool icons.
+  const selectIcon = `<svg class="tool-icon" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M3 1.6l9.4 6.2-4 .6-1.9 3.6z"/></svg>`;
+  const panIcon = `<svg class="tool-icon" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M5.6 13.4c-1.1 0-1.8-.7-1.8-1.8V7.4a.65.65 0 0 1 1.3 0v1.2h.5V4.4a.65.65 0 0 1 1.3 0v4.2h.5V3.7a.65.65 0 0 1 1.3 0v4.9h.5V5a.65.65 0 0 1 1.3 0v5.4c0 1.9-1.1 3-3 3z"/></svg>`;
   return `<section class="canvas" aria-label="${escapeAttribute(copy.ui.viewportAria)}">
-    <div class="viewport-tools" aria-label="${escapeAttribute(copy.ui.viewportToolsAria)}"><button type="button" aria-label="${escapeAttribute(copy.ui.selectTool)}" data-viewport-action="select" class="${viewport.mode === "select" ? "active" : ""}">↖</button><button type="button" aria-label="${escapeAttribute(copy.ui.panTool)}" data-viewport-action="pan" class="${viewport.mode === "pan" ? "active" : ""}">✋</button><span class="tool-divider"></span><button type="button" aria-label="${escapeAttribute(copy.ui.zoomOut)}" data-viewport-action="zoom-out">−</button><span class="zoom-value" data-zoom-value>${Math.round(viewport.transform.scale * 100)}%</span><button type="button" aria-label="${escapeAttribute(copy.ui.zoomIn)}" data-viewport-action="zoom-in">+</button><button type="button" aria-label="${escapeAttribute(copy.ui.fitPlan)}" data-viewport-action="fit">${escapeText(copy.ui.fitPlan)}</button></div>
-    <div class="north-indicator" aria-label="${escapeAttribute(copy.ui.northOrientation)}">${escapeText(copy.ui.northSymbol)}<span>▲</span></div>
+    <div class="viewport-tools" role="group" aria-label="${escapeAttribute(copy.ui.viewportToolsAria)}"><button type="button" aria-label="${escapeAttribute(copy.ui.selectTool)}" aria-pressed="${viewport.mode === "select"}" data-viewport-action="select" class="${viewport.mode === "select" ? "active" : ""}">${selectIcon}</button><button type="button" aria-label="${escapeAttribute(copy.ui.panTool)}" aria-pressed="${viewport.mode === "pan"}" data-viewport-action="pan" class="${viewport.mode === "pan" ? "active" : ""}">${panIcon}</button><span class="tool-divider"></span><button type="button" aria-label="${escapeAttribute(copy.ui.zoomOut)}" data-viewport-action="zoom-out">−</button><span class="zoom-value" data-zoom-value>${Math.round(viewport.transform.scale * 100)}%</span><button type="button" aria-label="${escapeAttribute(copy.ui.zoomIn)}" data-viewport-action="zoom-in">+</button><button type="button" class="fit-action" aria-label="${escapeAttribute(copy.ui.fitPlan)}" data-viewport-action="fit">${escapeText(copy.ui.fitPlan)}</button></div>
+    <div class="north-indicator" role="img" aria-label="${escapeAttribute(copy.ui.northOrientation)}">${escapeText(copy.ui.northSymbol)}<span>▲</span></div>
     ${projectPlanSvg({ layout: selected.layout, project: selected.project, stale: editor.resultsStale, focusedEvidenceRefs, transform: viewport.transform, copy: copy.ui })}
     <div class="canvas-status" data-live-canvas aria-live="polite">${escapeText(progress)}</div>
-    <div class="legend" aria-label="${escapeAttribute(copy.ui.legendAria)}"><span><i class="legend-line site-line"></i>${escapeText(copy.ui.propertyBoundary)}</span><span><i class="legend-line footprint-line"></i>${escapeText(copy.ui.buildingFootprint)}</span><span><i class="legend-swatch room-line"></i>${escapeText(copy.ui.roomLegend)}</span><span><i class="legend-swatch circulation-line"></i>${escapeText(copy.ui.circulationLegend)}</span></div>
+    <div class="legend" role="group" aria-label="${escapeAttribute(copy.ui.legendAria)}"><span><i class="legend-line site-line"></i>${escapeText(copy.ui.propertyBoundary)}</span><span><i class="legend-line footprint-line"></i>${escapeText(copy.ui.buildingFootprint)}</span><span><i class="legend-swatch room-line"></i>${escapeText(copy.ui.roomLegend)}</span><span><i class="legend-swatch circulation-line"></i>${escapeText(copy.ui.circulationLegend)}</span></div>
     <div class="entrance-label">${escapeText(copy.ui.entranceLabel)}</div>
   </section>`;
 }
@@ -393,9 +396,9 @@ function renderOptions(selected: ReturnType<typeof selectedResult>, state: Reado
   if (!selected.result) return `<p class="empty-state">${escapeText(optionRowEmptyMessage(state))}</p>`;
   return projectOptionCards(selected.result, selectedLayoutId, selected.project, copy).map((card) => {
     if (!card.layoutId) {
-      return `<div class="option-card empty"><span class="option-badge">${escapeText(card.slot)}</span><span class="option-name">${escapeText(card.strategyLabel)}</span><span class="option-empty-reason">${escapeText(card.emptyReason ?? copy.analysis.optionUnavailable)}</span></div>`;
+      return `<div class="option-card empty"><span class="option-head"><span class="option-badge">${escapeText(card.slot)}</span><span class="option-name">${escapeText(card.strategyLabel)}</span></span><span class="option-empty-reason">${escapeText(card.emptyReason ?? copy.analysis.optionUnavailable)}</span></div>`;
     }
-    return `<button class="option-card ${card.selected ? "selected" : ""}" type="button" data-layout="${escapeAttribute(card.layoutId)}" aria-pressed="${card.selected}"><span class="option-badge">${escapeText(card.slot)}</span><span class="option-name">${escapeText(card.strategyLabel)}</span><strong>${card.score ?? "—"}</strong>${card.thumbnail}</button>`;
+    return `<button class="option-card ${card.selected ? "selected" : ""}" type="button" data-layout="${escapeAttribute(card.layoutId)}" aria-pressed="${card.selected}"><span class="option-head"><span class="option-badge">${escapeText(card.slot)}</span><span class="option-name">${escapeText(card.strategyLabel)}</span></span><strong class="option-score">${card.score ?? "—"}</strong>${card.thumbnail}</button>`;
   }).join("");
 }
 
@@ -687,11 +690,23 @@ function render(state: Readonly<GenerationState>): void {
   }
   const focus = preserveFocus();
   selectedResult(state);
+  // Toolbar glyphs are inline SVG.  Unicode symbol fallbacks (a ruler, a
+  // command mark) render as a blank or a hyphen on machines without the
+  // expected font, which turned a labelled control into a broken one.
+  const toolbarIcon = (name: "brand" | "grid" | "measurements" | "settings"): string => {
+    const body: Record<typeof name, string> = {
+      brand: `<rect class="brand-plate" x="2" y="2" width="16" height="16" rx="3"/><path d="M6.5 6.5h7v7h-7z"/><path d="M6.5 10h7M10 6.5v7"/>`,
+      grid: `<rect x="2" y="2" width="5" height="5"/><rect x="9" y="2" width="5" height="5"/><rect x="2" y="9" width="5" height="5"/><rect x="9" y="9" width="5" height="5"/>`,
+      measurements: `<path d="M2.2 10.6l8.4-8.4 3.6 3.6-8.4 8.4z"/><path d="M5 7.8l1.3 1.3M7 5.8l1.3 1.3M9 3.8l1.3 1.3"/>`,
+      settings: `<circle cx="8" cy="8" r="2.3"/><path d="M8 1.6v2.1M8 12.3v2.1M1.6 8h2.1M12.3 8h2.1M3.6 3.6l1.5 1.5M10.9 10.9l1.5 1.5M12.4 3.6l-1.5 1.5M5.1 10.9l-1.5 1.5"/>`,
+    };
+    return `<svg class="toolbar-icon toolbar-icon-${name}" viewBox="0 0 16 16" aria-hidden="true" focusable="false">${body[name]}</svg>`;
+  };
   // Out-of-scope toolbar actions are present as visibly disabled shell controls
   // rather than as buttons that look live and do nothing.
-  const shellControl = (label: string, icon: string): string =>
-    `<button type="button" class="toolbar-button" disabled title="${escapeAttribute(`${label} — ${copy.toolbar.disabledReason}`)}">${escapeText(icon)} ${escapeText(label)}</button>`;
-  app.innerHTML = `<header class="toolbar"><div class="brand"><span class="brand-mark" aria-hidden="true">⌘</span><strong>${escapeText(copy.productName)}</strong><span class="brand-subtitle">${escapeText(copy.subtitle)}</span></div><div class="toolbar-group toolbar-middle"><button type="button" class="toolbar-button" disabled title="${escapeAttribute(`${copy.toolbar.newProject} — ${copy.toolbar.disabledReason}`)}">${escapeText(copy.toolbar.newProject)}</button><span class="save-indicator"><span class="status-dot ok" aria-hidden="true"></span>${escapeText(copy.toolbar.saveStatus)}</span></div><div class="toolbar-group toolbar-right">${shellControl(copy.toolbar.grid, "▦")}${shellControl(copy.toolbar.measurements, "⌁")}${shellControl(copy.toolbar.settings, "⚙")}</div></header><main class="workspace">${renderBriefPane(state)}${renderCanvas(state)}${renderAnalysis(state)}</main>`;
+  const shellControl = (label: string, icon: "grid" | "measurements" | "settings"): string =>
+    `<button type="button" class="toolbar-button" disabled title="${escapeAttribute(`${label} — ${copy.toolbar.disabledReason}`)}">${toolbarIcon(icon)}<span>${escapeText(label)}</span></button>`;
+  app.innerHTML = `<header class="toolbar"><div class="brand"><span class="brand-mark" aria-hidden="true">${toolbarIcon("brand")}</span><strong>${escapeText(copy.productName)}</strong><span class="brand-subtitle">${escapeText(copy.subtitle)}</span></div><div class="toolbar-group toolbar-middle"><button type="button" class="toolbar-button" disabled title="${escapeAttribute(`${copy.toolbar.newProject} — ${copy.toolbar.disabledReason}`)}">${escapeText(copy.toolbar.newProject)}</button><span class="save-indicator"><span class="status-dot ok" aria-hidden="true"></span>${escapeText(copy.toolbar.saveStatus)}</span></div><div class="toolbar-group toolbar-right">${shellControl(copy.toolbar.grid, "grid")}${shellControl(copy.toolbar.measurements, "measurements")}${shellControl(copy.toolbar.settings, "settings")}</div></header><main class="workspace">${renderBriefPane(state)}${renderCanvas(state)}${renderAnalysis(state)}</main>`;
   bindFormEvents();
   bindViewportEvents();
   restoreFocus(focus);
