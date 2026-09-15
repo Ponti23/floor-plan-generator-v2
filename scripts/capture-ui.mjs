@@ -22,6 +22,7 @@
  *   --post <js>       run JavaScript after generation settles, before capture
  *   --immediate       capture while the run is still in flight instead of waiting
  *   --reload          reload the page (same profile, so storage persists) before capturing
+ *   --post-reload <js> run JavaScript after the reload, before capturing
  *   --json <path>     also write the DOM digest as JSON
  */
 import { execFile, spawn } from "node:child_process";
@@ -43,6 +44,7 @@ function parseArgs(argv) {
     post: null,
     immediate: false,
     reload: false,
+    postReload: null,
     json: null,
     chrome: null,
   };
@@ -59,6 +61,7 @@ function parseArgs(argv) {
     else if (arg === "--post") options.post = next;
     else if (arg === "--immediate") options.immediate = true;
     else if (arg === "--reload") options.reload = true;
+    else if (arg === "--post-reload") options.postReload = next;
     else if (arg === "--no-generate") options.generate = false;
   }
   return options;
@@ -191,6 +194,7 @@ async function main() {
   const port = 9000 + Math.floor(Math.random() * 900);
   const profile = mkdtempSync(resolve(tmpdir(), "planlab-capture-"));
   let postResult;
+  let postReloadResult;
   /** Wall-clock timings measured by this harness, reported in the digest. */
   const timings = { generateMs: null };
   const child = spawn(chrome, [
@@ -262,6 +266,13 @@ async function main() {
       await delay(700);
     }
 
+    if (options.postReload) {
+      const after = await client.send("Runtime.evaluate", { expression: options.postReload, returnByValue: true });
+      if (after.exceptionDetails) throw new Error(`--post-reload script failed: ${after.exceptionDetails.text}`);
+      postReloadResult = after.result.value;
+      await delay(400);
+    }
+
     const digest = await client.send("Runtime.evaluate", {
       expression: DOM_DIGEST,
       returnByValue: true,
@@ -272,6 +283,7 @@ async function main() {
     const value = digest.result.value;
     value.timings = timings;
     if (postResult !== undefined) value.postResult = postResult;
+    if (postReloadResult !== undefined) value.postReloadResult = postReloadResult;
     if (options.json) {
       mkdirSync(dirname(options.json), { recursive: true });
       writeFileSync(options.json, `${JSON.stringify(value, null, 2)}\n`, "utf8");

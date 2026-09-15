@@ -727,9 +727,22 @@ function renderSaveStatus(): void {
   indicator.dataset.state = saveState;
   const dot = indicator.querySelector<HTMLElement>(".status-dot");
   if (dot) dot.classList.toggle("warning", saveState === "failed");
-  const label = indicator.querySelector<HTMLElement>("[data-save-status]") ??
-    indicator.querySelectorAll<HTMLElement>("span")[1] ?? null;
-  if (label) label.textContent = saveStatusText();
+  const text = saveStatusText();
+  const label = indicator.querySelector<HTMLElement>("[data-save-status]");
+  if (label) {
+    label.textContent = text;
+    return;
+  }
+  // The toolbar template renders this label as a bare text node beside the
+  // status dot, so the node itself is the thing to rewrite. (Writing "the
+  // second span" here silently did nothing: there is no second span.)
+  for (const node of Array.from(indicator.childNodes)) {
+    if (node.nodeType === Node.TEXT_NODE) {
+      node.textContent = text;
+      return;
+    }
+  }
+  indicator.appendChild(document.createTextNode(text));
 }
 
 function roomWithField(index: number, field: keyof DraftRoom, value: string): void {
@@ -888,7 +901,10 @@ function performReset(): void {
     saveTimer = null;
   }
   controller.reset();
+  // Consume what the store actually removed. A reset that could not delete every
+  // key it owns must not report success.
   projectStore?.clear();
+  const remainingOwnedKeys = projectStore?.ownedKeys() ?? [];
   editor = createBriefEditorState(CANONICAL_PROJECT);
   committedProjects.clear();
   committedProjects.set(editor.revision, editor.committedProject);
@@ -899,10 +915,10 @@ function performReset(): void {
   viewportProjectKey = `${editor.committedProject.projectId}:${editor.committedProject.site.site.width}:${editor.committedProject.site.site.depth}`;
   lastSavedRevision = editor.revision;
   resetPending = false;
-  storageNotice = null;
+  storageNotice = remainingOwnedKeys.length > 0 ? "resetIncomplete" : null;
   resultsOutdated = false;
   lastPersistedPayload = null;
-  saveState = projectStore === null ? "unavailable" : "saved";
+  saveState = projectStore === null ? "unavailable" : remainingOwnedKeys.length > 0 ? "failed" : "saved";
   render(controller.state);
 }
 

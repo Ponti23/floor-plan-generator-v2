@@ -1,0 +1,48 @@
+{
+  "viewport": {
+    "width": 1536,
+    "height": 1024
+  },
+  "toolbarHeight": 56,
+  "briefPane": {
+    "width": 310,
+    "height": 968,
+    "top": 56,
+    "left": 0
+  },
+  "canvas": {
+    "width": 841,
+    "height": 968,
+    "top": 56,
+    "left": 310
+  },
+  "analysisPane": {
+    "width": 385,
+    "height": 968,
+    "top": 56,
+    "left": 1151
+  },
+  "statusLabel": "Ready",
+  "statusDetail": "ReadyCommit a brief and generate when ready.",
+  "saveStatus": "Saved locally",
+  "projectName": "PlanLab canonical prototype",
+  "siteWidth": "20",
+  "siteDepth": "30",
+  "variationSeed": "canonical-0",
+  "storageNotice": null,
+  "optionCards": [],
+  "summaryHeading": null,
+  "summaryScore": null,
+  "metricRows": [],
+  "scoreRows": [],
+  "ruleSummary": null,
+  "ruleRows": [],
+  "observations": [],
+  "notice": "ⓘConceptual layout only — verify dimensions, regulations, and construction requirements before use.",
+  "svgPlan": "-6 -6 92 142",
+  "timings": {
+    "generateMs": null
+  },
+  "postResult": "planted",
+  "postReloadResult": "{\"noticeBefore\":\"The saved project could not be read, so the default brief was loaded. The unreadable copy was kept in local storage.\",\"noticeAfter\":null,\"keysAfter\":[],\"saveStatus\":\"Saved locally\"}"
+}

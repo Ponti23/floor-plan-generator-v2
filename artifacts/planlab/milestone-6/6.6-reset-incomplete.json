@@ -1,0 +1,47 @@
+{
+  "viewport": {
+    "width": 1536,
+    "height": 1024
+  },
+  "toolbarHeight": 56,
+  "briefPane": {
+    "width": 310,
+    "height": 968,
+    "top": 56,
+    "left": 0
+  },
+  "canvas": {
+    "width": 841,
+    "height": 968,
+    "top": 56,
+    "left": 310
+  },
+  "analysisPane": {
+    "width": 385,
+    "height": 968,
+    "top": 56,
+    "left": 1151
+  },
+  "statusLabel": "Ready",
+  "statusDetail": "ReadyCommit a brief and generate when ready.",
+  "saveStatus": "Local save failed",
+  "projectName": "PlanLab canonical prototype",
+  "siteWidth": "20",
+  "siteDepth": "30",
+  "variationSeed": "canonical-0",
+  "storageNotice": "Some saved data could not be removed from this browser. The workspace was reset, but a stored copy may still be present.",
+  "optionCards": [],
+  "summaryHeading": null,
+  "summaryScore": null,
+  "metricRows": [],
+  "scoreRows": [],
+  "ruleSummary": null,
+  "ruleRows": [],
+  "observations": [],
+  "notice": "ⓘConceptual layout only — verify dimensions, regulations, and construction requirements before use.",
+  "svgPlan": "-6 -6 92 142",
+  "timings": {
+    "generateMs": null
+  },
+  "postResult": "{\"state\":\"failed\",\"label\":\"Local save failed\",\"keys\":[\"planlab:v1:junk\"]}"
+}

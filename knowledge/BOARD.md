@@ -143,6 +143,13 @@ Active design: [`planlab/README.md`](./planlab/README.md) · staged plan: [`../D
   namespaced keys, an injectable store version, and typed read/write outcomes for empty, loaded,
   corrupt, outdated, unsupported-version and unavailable storage. 9 new tests; 185 total. The store
   is not yet wired into the workspace — that is 6.3 — and 6.2 still owns real migrations.
+- **Stage 6 is COMPLETE** (6.1 store, 6.2 migration seam, 6.3 autosave/restore/save status, 6.4
+  confirmed reset, 6.5 stored results with version invalidation, shipped at `1eb5f58`, `b3d47bc`,
+  `76299f6`, `c163df9`). The 6.6 independent review (`cd20ff3`, `/root/stage6_review`) found and fixed
+  seven defects — most importantly that a stored result was not linked to the brief it belonged to —
+  and the orchestrator closed its one open finding plus a defect neither review had seen: the
+  save-status label was a bare text node, so it never updated. Records:
+  `artifacts/planlab/milestone-6/6.1…6.6-*.md`. 199 tests.
 - **Bucket 5.5 is the active bucket** (`todo`, owner `sol-max`). It needs an agent that did not
   author 5.3/5.4, a real 1536 × 1024 comparison against `knowledge/PlanLab-Mockup.png`, and Sol's
   judgment. Two housekeeping facts for whoever picks it up: the committed

@@ -66,7 +66,13 @@ export type ProjectWriteOutcome =
  *
  * `null` means "nothing worth saying": an empty store is the normal first run.
  */
-export type StorageNoticeKind = "recovered" | "newerVersion" | "olderVersion" | "unavailable";
+export type StorageNoticeKind =
+  | "recovered"
+  | "newerVersion"
+  | "olderVersion"
+  | "unavailable"
+  /** A reset that could not remove everything it owns. */
+  | "resetIncomplete";
 
 export function storageNoticeKind(outcome: ProjectReadOutcome): StorageNoticeKind | null {
   switch (outcome.status) {

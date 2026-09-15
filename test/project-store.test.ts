@@ -205,7 +205,7 @@ test("every storage notice and save label has real copy", () => {
   for (const label of [storage.savedLabel, storage.savingLabel, storage.failedLabel, storage.unavailableLabel]) {
     assert.ok(typeof label === "string" && label.length > 0);
   }
-  for (const kind of ["recovered", "newerVersion", "olderVersion", "unavailable"] as const) {
+  for (const kind of ["recovered", "newerVersion", "olderVersion", "resultsOutdated", "resetIncomplete", "unavailable"] as const) {
     assert.ok(storage.notices[kind].length > 0, `${kind} notice is written`);
   }
   // The failure copy must not claim the data was saved.
