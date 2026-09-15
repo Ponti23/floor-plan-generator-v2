@@ -45,8 +45,8 @@ Active design: [`planlab/README.md`](./planlab/README.md) · staged plan: [`../D
 | 6.5 | Engine-version result invalidation | terra-max | orchestrator (`/root`) | done | `main` |
 | 6.6 | Independent Stage 6 review | terra-max | sol-max | todo | — |
 | 7.1 | Responsive panel collapse and accessibility sweep | terra-max | unassigned | todo | — |
-| 7.2 | Production deployment config and support limitations | luna-max | unassigned | todo | — |
-| 7.3 | Rendering and performance profile | terra-max | unassigned | todo | — |
+| 7.2 | Production deployment config and support limitations | luna-max | orchestrator (`/root`) | done | `main` |
+| 7.3 | Rendering and performance profile | terra-max | orchestrator (`/root`) | done (quiet-machine Stage 0 re-measure still owed) | `main` |
 | 7.4 | Release approval **(HARD GATE)** | astra-plan | user | todo | — |
 
 ## Handoff rules

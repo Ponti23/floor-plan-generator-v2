@@ -7,6 +7,7 @@
     "typecheck": "tsc -p tsconfig.json",
     "dev": "vite",
     "build": "vite build",
+    "preview": "vite preview",
     "benchmark:worker": "node scripts/benchmark-worker.mjs",
     "benchmark:stage0": "node scripts/benchmark-stage0.mjs",
     "benchmark:stage0:check": "node scripts/benchmark-stage0.mjs --check",

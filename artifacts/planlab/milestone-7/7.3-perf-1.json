@@ -1,0 +1,90 @@
+{
+  "viewport": {
+    "width": 1536,
+    "height": 1024
+  },
+  "toolbarHeight": 56,
+  "briefPane": {
+    "width": 310,
+    "height": 968,
+    "top": 56,
+    "left": 0
+  },
+  "canvas": {
+    "width": 841,
+    "height": 968,
+    "top": 56,
+    "left": 310
+  },
+  "analysisPane": {
+    "width": 385,
+    "height": 968,
+    "top": 56,
+    "left": 1151
+  },
+  "statusLabel": "Complete",
+  "statusDetail": "CompleteThree compatible layout options ready.",
+  "saveStatus": "Saved locally",
+  "projectName": "PlanLab canonical prototype",
+  "siteWidth": "20",
+  "siteDepth": "30",
+  "variationSeed": "canonical-0",
+  "storageNotice": null,
+  "optionCards": [
+    {
+      "slot": "A",
+      "name": "Compact Efficiency",
+      "score": "81",
+      "emptyReason": null,
+      "selected": true,
+      "rooms": 10
+    },
+    {
+      "slot": "B",
+      "name": "Best Flow",
+      "score": "79",
+      "emptyReason": null,
+      "selected": false,
+      "rooms": 12
+    },
+    {
+      "slot": "C",
+      "name": "Balanced",
+      "score": "83",
+      "emptyReason": null,
+      "selected": false,
+      "rooms": 10
+    }
+  ],
+  "summaryHeading": "Option — Compact Efficiency",
+  "summaryScore": "81/100",
+  "metricRows": [
+    "Usable area126.0 m²",
+    "Footprint area180.0 m²",
+    "Efficiency87.5 %",
+    "Circulation length18.00 m",
+    "Target GFA180.0 m²",
+    "Unallocated interior0.0 %"
+  ],
+  "scoreRows": [
+    "Space utilization87",
+    "Flow78",
+    "Adjacency55",
+    "Room proportions99",
+    "Services & site83"
+  ],
+  "ruleSummary": "PASS33 checks passed",
+  "ruleRows": [],
+  "observations": [
+    "✓Target footprint (strong)",
+    "✓Unallocated interior (strong)",
+    "✓Preferred area (strong)",
+    "✓Circulation ratio (strong)"
+  ],
+  "notice": "ⓘConceptual layout only — verify dimensions, regulations, and construction requirements before use.",
+  "svgPlan": "-6 -6 92 142",
+  "timings": {
+    "generateMs": 1857
+  },
+  "postResult": "{\"dcl\":295,\"load\":351,\"paints\":[\"first-paint:542\",\"first-contentful-paint:542\"]}"
+}

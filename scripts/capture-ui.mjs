@@ -191,6 +191,8 @@ async function main() {
   const port = 9000 + Math.floor(Math.random() * 900);
   const profile = mkdtempSync(resolve(tmpdir(), "planlab-capture-"));
   let postResult;
+  /** Wall-clock timings measured by this harness, reported in the digest. */
+  const timings = { generateMs: null };
   const child = spawn(chrome, [
     "--headless=new",
     `--remote-debugging-port=${port}`,
@@ -226,6 +228,7 @@ async function main() {
     }
 
     if (options.generate) {
+      const generateStartedAt = Date.now();
       await client.send("Runtime.evaluate", {
         expression: "document.querySelector('#generate')?.click()",
         awaitPromise: false,
@@ -237,7 +240,10 @@ async function main() {
           returnByValue: true,
         });
         const value = probe.result.value;
-        if (value && value.cards > 0 && !/Generating|Preparing/i.test(value.status)) break;
+        if (value && value.cards > 0 && !/Generating|Preparing/i.test(value.status)) {
+          timings.generateMs = Date.now() - generateStartedAt;
+          break;
+        }
         await delay(options.immediate ? 250 : 250);
       }
     }
@@ -264,6 +270,7 @@ async function main() {
     mkdirSync(dirname(options.out), { recursive: true });
     writeFileSync(options.out, Buffer.from(screenshot.data, "base64"));
     const value = digest.result.value;
+    value.timings = timings;
     if (postResult !== undefined) value.postResult = postResult;
     if (options.json) {
       mkdirSync(dirname(options.json), { recursive: true });
