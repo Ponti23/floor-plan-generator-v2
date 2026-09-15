@@ -19,6 +19,17 @@ import {
   type DraftRoom,
 } from "./editor-state.ts";
 import { resolvePresentationCopy } from "./presentation-copy.ts";
+import {
+  candidateEvidence,
+  observationLabel,
+  observationExplanations,
+  projectCategoryRows,
+  projectMetricRows,
+  projectOptionCards,
+  selectedScorecard,
+  type CandidateEvidence,
+  type RuleCheckRow,
+} from "./analysis-projection.ts";
 import { projectEvidenceGeometry, projectPlanSvg } from "./svg-projection.ts";
 import {
   createViewportState,
@@ -175,7 +186,7 @@ function renderBriefPane(state: Readonly<GenerationState>): string {
         <div class="form-row"><label for="project-name">${escapeText(copy.ui.projectName)}</label><input id="project-name" data-draft="name" value="${escapeAttribute(editor.draft.name)}"></div>
         <div class="form-row"><label for="site-width">${escapeText(copy.ui.width)}</label><input id="site-width" data-draft="site.widthM" inputmode="decimal" value="${escapeAttribute(editor.draft.site.widthM)}"><span class="unit">${escapeText(copy.ui.units.metre)}</span></div>
         <div class="form-row"><label for="site-depth">${escapeText(copy.ui.depth)}</label><input id="site-depth" data-draft="site.depthM" inputmode="decimal" value="${escapeAttribute(editor.draft.site.depthM)}"><span class="unit">${escapeText(copy.ui.units.metre)}</span></div>
-        <div class="form-row"><label for="front-side">${escapeText(copy.ui.frontEntrance)}</label><select id="front-side" disabled aria-label="${escapeAttribute(copy.ui.frontSide)}"><option selected>${escapeText(copy.ui.frontSide)}</option></select></div>
+        <div class="form-row wide-select"><label for="front-side">${escapeText(copy.ui.frontEntrance)}</label><select id="front-side" disabled aria-label="${escapeAttribute(copy.ui.frontSide)}"><option selected>${escapeText(copy.ui.frontSide)}</option></select></div>
         <div class="readout-row"><span>${escapeText(copy.ui.planningGrid)}</span><strong>${GRID_MM} ${escapeText(copy.ui.scaleUnit)}</strong></div>
         <div class="form-row"><label for="generation-seed">${escapeText(copy.ui.variationSeed)}</label><input id="generation-seed" data-draft="generationSeed" value="${escapeAttribute(editor.draft.generationSeed)}"></div>
       </section>
@@ -198,7 +209,7 @@ function renderBriefPane(state: Readonly<GenerationState>): string {
       ${issueMarkup}
     </div>
     <div class="brief-footer">
-      <div class="brief-status" aria-live="polite"><span class="status-dot ${editor.resultsStale ? "warning" : "ok"}" aria-hidden="true"></span><span>${escapeText(statusDetail(state))}</span></div>
+      <div class="brief-status" aria-live="polite"><span class="status-dot ${editor.resultsStale ? "warning" : "ok"}" aria-hidden="true"></span><span class="brief-state">${escapeText(statusLabel(state))}</span><span>${escapeText(statusDetail(state))}</span></div>
       <div class="editor-actions"><button id="generate" class="primary-action" type="button">${escapeText(copy.actions.generate)}</button><button id="cancel" type="button" ${state.status === "generating" ? "" : "disabled"}>${escapeText(copy.actions.cancel)}</button><button id="retry" type="button" ${state.status === "workerError" || state.status === "budgetExceeded" ? "" : "disabled"}>${escapeText(copy.actions.retry)}</button></div>
       <button id="discard-draft" class="text-action" type="button" ${editor.dirty ? "" : "disabled"}>${escapeText(copy.actions.discardDraft)}</button>
     </div>
@@ -345,41 +356,101 @@ function renderCanvas(state: Readonly<GenerationState>): string {
   </section>`;
 }
 
-function resultCards(result: GenerationResultPayload | null): string {
-  if (!result) return `<p class="empty-state">${escapeText(copy.status.noResult)}</p>`;
-  return result.selection.selected.map((item, index) => {
-    const candidate = result.candidates.find((entry) => entry.layoutId === item.layoutId);
-    const score = candidate?.scores.find((entry) => entry.profileId === item.strategy);
-    const layout = result.layouts.find((entry) => entry.id === item.layoutId);
-    const label = copy.strategyNames[item.strategy] ?? score?.label ?? item.strategy;
-    const selected = item.layoutId === selectedLayoutId;
-    const thumbnail = layout ? `<svg class="option-thumbnail" viewBox="0 0 ${layout.footprint.width} ${layout.footprint.depth}" role="img" aria-label="${escapeAttribute(`${label} thumbnail`)}"><rect class="thumbnail-footprint" x="0" y="0" width="${layout.footprint.width}" height="${layout.footprint.depth}"/>${layout.spaces.map((space) => `<rect class="thumbnail-space ${space.role}" x="${space.rect.x - layout.footprint.x}" y="${space.rect.y - layout.footprint.y}" width="${space.rect.width}" height="${space.rect.depth}"/>`).join("")}</svg>` : "";
-    return `<button class="option-card ${selected ? "selected" : ""}" type="button" data-layout="${escapeAttribute(item.layoutId)}" aria-pressed="${selected}"><span class="option-badge">${String.fromCharCode(65 + index)}</span><span class="option-name">${escapeText(label)}</span><strong>${score?.overallScore ?? "—"}</strong>${thumbnail}</button>`;
+/**
+ * The empty/partial state of the option row.
+ *
+ * An infeasible or budget-limited run must say what actually happened instead
+ * of reusing the "nothing has been generated yet" prompt, and an infeasible run
+ * never keeps a previous brief's cards on screen as if they answered it.
+ */
+function optionRowEmptyMessage(state: Readonly<GenerationState>): string {
+  if (state.status === "infeasible") return copy.status.infeasible;
+  if (state.status === "budgetExceeded") return copy.status.budgetExceeded;
+  if (state.status === "workerError") return state.error ?? copy.status.workerError;
+  if (state.status === "partial" && state.lastCompatibleResult) return copy.status.partial;
+  return state.lastCompatibleResult ? copy.status.partial : copy.status.noResult;
+}
+
+function renderOptions(selected: ReturnType<typeof selectedResult>, state: Readonly<GenerationState>): string {
+  if (!selected.result) return `<p class="empty-state">${escapeText(optionRowEmptyMessage(state))}</p>`;
+  return projectOptionCards(selected.result, selectedLayoutId, selected.project, copy).map((card) => {
+    if (!card.layoutId) {
+      return `<div class="option-card empty"><span class="option-badge">${escapeText(card.slot)}</span><span class="option-name">${escapeText(card.strategyLabel)}</span><span class="option-empty-reason">${escapeText(card.emptyReason ?? copy.analysis.optionUnavailable)}</span></div>`;
+    }
+    return `<button class="option-card ${card.selected ? "selected" : ""}" type="button" data-layout="${escapeAttribute(card.layoutId)}" aria-pressed="${card.selected}"><span class="option-badge">${escapeText(card.slot)}</span><span class="option-name">${escapeText(card.strategyLabel)}</span><strong>${card.score ?? "—"}</strong>${card.thumbnail}</button>`;
   }).join("");
 }
 
-function renderAnalysis(state: Readonly<GenerationState>): string {
-  const selected = selectedResult(state);
-  const candidate = selected.result?.candidates.find((entry) => entry.layoutId === selectedLayoutId);
-  const balanced = candidate?.scores.find((score) => score.profileId === "balanced") ?? candidate?.scores[0];
-  const metrics = balanced?.categoryScores
-    ? METRIC_CATEGORIES.map((category) => `<div class="metric-row"><span>${escapeText(copy.metricLabels[category])}</span><strong>${Math.round(balanced.categoryScores[category] ?? 0)}</strong></div>`).join("")
-    : `<p class="empty-state">${escapeText(copy.status.noResult)}</p>`;
-  const observations = balanced?.explanations.slice(0, 4).map((explanation) => {
+function renderRuleChecks(evidence: CandidateEvidence | null, layout: Layout | undefined): string {
+  if (!evidence) return "";
+  const { failures, warnings, passedCount, notApplicableCount } = evidence.rules;
+  const summaryParts = [`${passedCount} ${escapeText(copy.analysis.rulePassSummary)}`];
+  if (notApplicableCount > 0) summaryParts.push(`${notApplicableCount} ${escapeText(copy.analysis.ruleNotApplicableSummary)}`);
+  const summaryClass = failures.length > 0 ? "fail" : warnings.length > 0 ? "warning" : "pass";
+  const summaryStatus = failures.length > 0
+    ? copy.analysis.ruleStatusLabels.fail
+    : warnings.length > 0 ? copy.analysis.ruleStatusLabels.warning : copy.analysis.ruleStatusLabels.pass;
+  const rows = [...failures, ...warnings].map((row: RuleCheckRow) => {
+    const status = copy.analysis.ruleStatusLabels[row.status];
+    const refs = row.evidenceRefs;
+    const hasGeometry = refs.length > 0 && (() => {
+      const evidenceGeometry = projectEvidenceGeometry(layout, refs);
+      return evidenceGeometry.rects.length > 0;
+    })();
+    const text = `<span class="rule-label">${escapeText(row.label)}</span><span class="rule-status ${row.status}">${escapeText(status)}</span>`;
+    return hasGeometry
+      ? `<li class="rule-row ${row.status}"><button type="button" class="rule-button" data-evidence-refs="${escapeAttribute(refs.join("|"))}" aria-pressed="${focusedEvidenceRefs.join("|") === refs.join("|")}">${text}</button></li>`
+      : `<li class="rule-row ${row.status}"><span class="rule-button static">${text}</span></li>`;
+  }).join("");
+  return `<h3>${escapeText(copy.analysis.ruleChecksTitle)}</h3><ul class="rule-checks"><li class="rule-summary ${summaryClass}"><span class="rule-status ${summaryClass}">${escapeText(summaryStatus)}</span><span>${summaryParts.join(" · ")}</span></li>${rows}</ul>`;
+}
+
+function renderObservations(
+  selected: ReturnType<typeof selectedResult>,
+  explanations: GenerationResultPayload["candidates"][number]["scores"][number]["explanations"],
+): string {
+  const observations = explanations.slice(0, 4).map((explanation) => {
     const refs = explanation.evidenceRefs.filter((reference) => reference.length > 0);
     const hasGeometry = refs.length > 0 && (() => {
       const evidence = projectEvidenceGeometry(selected.layout, refs);
       return evidence.rects.length > 0 || evidence.portals.length > 0;
     })();
     const focused = hasGeometry && focusedEvidenceRefs.join("|") === refs.join("|");
-    const icon = `<span class="observation-icon">${explanation.impact >= 0 ? "✓" : "!"}</span>`;
-    const text = `<span>${escapeText(explanation.key.replaceAll(".", " "))}</span>`;
+    const label = observationLabel(explanation.key, copy);
+    const icon = `<span class="observation-icon ${explanation.impact < 0 ? "weak" : "strong"}" aria-hidden="true">${explanation.impact >= 0 ? "✓" : "!"}</span>`;
+    const text = `<span class="observation-text">${escapeText(label)}</span>`;
     const content = hasGeometry
-      ? `<button type="button" class="observation-button" data-evidence-refs="${escapeAttribute(refs.join("|"))}" aria-pressed="${focused}" aria-label="${escapeAttribute(`Focus ${explanation.key.replaceAll(".", " ")}`)}">${icon}${text}</button>`
+      ? `<button type="button" class="observation-button" data-evidence-refs="${escapeAttribute(refs.join("|"))}" aria-pressed="${focused}" aria-label="${escapeAttribute(`Focus ${label}`)}">${icon}${text}</button>`
       : `<span class="observation-static">${icon}${text}</span>`;
     return `<li class="observation-item ${focused ? "focused" : ""}">${content}</li>`;
   }).join("") ?? "";
-  return `<aside class="analysis" aria-label="${escapeAttribute(`${copy.ui.optionsTitle} and ${copy.ui.analysisTitle}`)}"><div class="analysis-scroll"><div class="pane-title"><div><span class="eyebrow">${escapeText(copy.ui.compareEyebrow)}</span><h1>${escapeText(copy.ui.optionsTitle)}</h1></div><span class="count">${selected.result?.selection.selected.length ?? 0}/3</span></div><div class="options">${resultCards(selected.result)}</div><div class="analysis-heading"><h2>${balanced ? `${escapeText(copy.ui.optionPrefix)} ${escapeText(copy.strategyNames[balanced.profileId] ?? balanced.label)}` : escapeText(copy.ui.analysisFallbackTitle)}</h2>${balanced ? `<strong>${balanced.overallScore}<small>/100</small></strong>` : ""}</div><div class="metrics">${metrics}</div><h3>${escapeText(copy.ui.scoreBreakdown)}</h3><div class="score-bars">${balanced ? METRIC_CATEGORIES.map((category) => `<div class="score-bar-row"><span>${escapeText(copy.metricLabels[category])}</span><span class="bar"><i style="width:${Math.max(0, Math.min(100, balanced.categoryScores[category] ?? 0))}%"></i></span><strong>${Math.round(balanced.categoryScores[category] ?? 0)}</strong></div>`).join("") : ""}</div><h3>${escapeText(copy.ui.observations)}</h3><ul class="observations">${observations || `<li class="empty-state">${escapeText(copy.ui.noEvidence)}</li>`}</ul></div><div class="conceptual-notice"><span aria-hidden="true">ⓘ</span><span>${escapeText(copy.status.conceptualUseNotice)}</span></div></aside>`;
+  return `<h3>${escapeText(copy.ui.observations)}</h3><ul class="observations">${observations || `<li class="empty-state">${escapeText(copy.ui.noEvidence)}</li>`}</ul>`;
+}
+
+function renderAnalysis(state: Readonly<GenerationState>): string {
+  const selected = selectedResult(state);
+  const evidence = selected.layout ? candidateEvidence(selected.layout, selected.project) : null;
+  const scorecard = selectedScorecard(selected.result, selectedLayoutId);
+  const heading = scorecard
+    ? `${escapeText(copy.ui.optionPrefix)} — ${escapeText(copy.strategyNames[scorecard.strategy] ?? scorecard.label)}`
+    : escapeText(copy.ui.analysisFallbackTitle);
+  const score = scorecard && Number.isFinite(scorecard.overallScore) ? Math.round(scorecard.overallScore) : null;
+  const hasOptions = (selected.result?.selection.selected.length ?? 0) > 0;
+  const metricRows = evidence
+    ? projectMetricRows(evidence.facts, copy).map((row) => `<div class="metric-row"><span title="${escapeAttribute(row.definition)}">${escapeText(row.label)}</span><strong>${escapeText(row.value ?? "—")}</strong></div>`).join("")
+    : "";
+  const categoryRows = projectCategoryRows(scorecard, METRIC_CATEGORIES, copy);
+  const bars = categoryRows.map((row) => `<div class="score-bar-row"><span>${escapeText(row.label)}</span><span class="bar"><i style="width:${Math.max(0, Math.min(100, row.score))}%"></i></span><strong>${row.score}</strong></div>`).join("");
+  // With no result to describe, the panel states the outcome once instead of
+  // printing empty metric, score, rule and observation sections.
+  const body = hasOptions
+    ? `<div class="analysis-heading"><h2>${heading}</h2>${score === null ? "" : `<strong>${score}<small>/100</small></strong>`}</div>
+      <div class="metrics">${metricRows || `<p class="empty-state">${escapeText(copy.ui.noEvidence)}</p>`}</div>
+      <h3>${escapeText(copy.ui.scoreBreakdown)}</h3><div class="score-bars">${bars}</div>
+      ${renderRuleChecks(evidence, selected.layout)}
+      ${renderObservations(selected, observationExplanations(scorecard))}`
+    : `<p class="empty-state">${escapeText(optionRowEmptyMessage(state))}</p>`;
+  return `<aside class="analysis" aria-label="${escapeAttribute(`${copy.ui.optionsTitle} and ${copy.ui.analysisTitle}`)}"><div class="analysis-scroll"><div class="pane-title"><div><span class="eyebrow">${escapeText(copy.ui.compareEyebrow)}</span><h1>${escapeText(copy.ui.optionsTitle)}</h1></div><span class="count">${selected.result?.selection.selected.length ?? 0}/3</span></div><div class="options">${renderOptions(selected, state)}</div>${body}</div><div class="conceptual-notice"><span aria-hidden="true">ⓘ</span><span>${escapeText(copy.status.conceptualUseNotice)}</span></div></aside>`;
 }
 
 function preserveFocus(): { id: string | null; start: number | null; end: number | null } {
@@ -549,7 +620,7 @@ function render(state: Readonly<GenerationState>): void {
   }
   const focus = preserveFocus();
   selectedResult(state);
-  app.innerHTML = `<header class="toolbar"><div class="brand"><span class="brand-mark" aria-hidden="true">⌘</span><strong>${escapeText(copy.productName)}</strong><span class="brand-subtitle">${escapeText(copy.subtitle)}</span></div><div class="toolbar-group toolbar-middle"><button type="button" class="toolbar-button">${escapeText(copy.toolbar.newProject)}</button><span class="save-indicator"><span class="status-dot ok" aria-hidden="true"></span>${escapeText(copy.toolbar.saveStatus)}</span></div><div class="toolbar-group toolbar-right"><button type="button" class="toolbar-button">▦ ${escapeText(copy.toolbar.grid)}</button><button type="button" class="toolbar-button">⌁ ${escapeText(copy.toolbar.measurements)}</button><button type="button" class="toolbar-button" aria-label="${escapeAttribute(copy.toolbar.settings)}">⚙ ${escapeText(copy.toolbar.settings)}</button><span class="toolbar-status" data-status="${escapeAttribute(statusLabel(state))}">${escapeText(statusLabel(state))}</span></div></header><main class="workspace">${renderBriefPane(state)}${renderCanvas(state)}${renderAnalysis(state)}</main>`;
+  app.innerHTML = `<header class="toolbar"><div class="brand"><span class="brand-mark" aria-hidden="true">⌘</span><strong>${escapeText(copy.productName)}</strong><span class="brand-subtitle">${escapeText(copy.subtitle)}</span></div><div class="toolbar-group toolbar-middle"><button type="button" class="toolbar-button">${escapeText(copy.toolbar.newProject)}</button><span class="save-indicator"><span class="status-dot ok" aria-hidden="true"></span>${escapeText(copy.toolbar.saveStatus)}</span></div><div class="toolbar-group toolbar-right"><button type="button" class="toolbar-button">▦ ${escapeText(copy.toolbar.grid)}</button><button type="button" class="toolbar-button">⌁ ${escapeText(copy.toolbar.measurements)}</button><button type="button" class="toolbar-button" aria-label="${escapeAttribute(copy.toolbar.settings)}">⚙ ${escapeText(copy.toolbar.settings)}</button></div></header><main class="workspace">${renderBriefPane(state)}${renderCanvas(state)}${renderAnalysis(state)}</main>`;
   bindFormEvents();
   bindViewportEvents();
   restoreFocus(focus);

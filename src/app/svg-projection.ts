@@ -29,7 +29,12 @@ export interface SvgProjectionOptions {
   copy: PlanLabPresentationCopy["ui"];
 }
 
-const ROOT_MARGIN_UNITS = 4;
+/**
+ * Root margin in grid units.  The scale bar and the site-dimension label are
+ * drawn below the site rectangle, so the margin must be large enough to keep
+ * them inside the viewBox instead of clipping at the canvas edge.
+ */
+const ROOT_MARGIN_UNITS = 6;
 const LAYER_ORDER = [
   "grid",
   "site",
@@ -207,7 +212,7 @@ function northScaleMarkup(project: NormalizedProject, copy: PlanLabPresentationC
   const site = project.site.site;
   const scaleLength = Math.min(20, Math.max(4, Math.floor(site.width / 4)));
   const scaleX = Math.max(1, site.width - scaleLength - 3);
-  const scaleY = site.depth + 2.7;
+  const scaleY = site.depth + 2.4;
   return `<g class="north-scale" aria-hidden="true">
     <text class="north" x="${formatNumber(site.width - 2)}" y="2">${escapeText(copy.northSymbol)}</text>
     <path class="north-arrow" d="M ${formatNumber(site.width - 2)} 2.8 L ${formatNumber(site.width - 2)} 5.5"/>
@@ -250,10 +255,15 @@ export function projectPlanSvg(options: SvgProjectionOptions): string {
   }).join("");
   const labelMarkup = spaces.map((space) => {
     const room = roomById.get(space.instanceId);
-    const label = room?.displayName ?? (space.role === "circulation" ? copy.circulationLegend : space.role === "entry" ? copy.entranceLabel : space.instanceId);
+    const label = room?.displayName ?? (space.role === "circulation" ? copy.circulationLegend : space.role === "entry" ? copy.entrySpaceLabel : space.instanceId);
     const centreX = space.rect.x + space.rect.width / 2;
     const centreY = space.rect.y + space.rect.depth / 2;
-    return `<text class="space-label" data-space-label="${escapeAttribute(space.instanceId)}" x="${formatNumber(centreX)}" y="${formatNumber(centreY - 1)}">${escapeText(label)}<tspan x="${formatNumber(centreX)}" dy="2.6">${escapeText(formatArea(space.rect.width * space.rect.depth, copy))}</tspan></text>`;
+    // Rooms carry their area on a second line.  Circulation and entry runs are
+    // often a single grid unit wide, where a second line would collide with the
+    // neighbouring room labels, so they keep the name only.
+    const area = room ? `<tspan x="${formatNumber(centreX)}" dy="2.6">${escapeText(formatArea(space.rect.width * space.rect.depth, copy))}</tspan>` : "";
+    const baseline = room ? centreY - 1 : centreY;
+    return `<text class="space-label" data-space-label="${escapeAttribute(space.instanceId)}" x="${formatNumber(centreX)}" y="${formatNumber(baseline)}">${escapeText(label)}${area}</text>`;
   }).join("");
   const footprint = layout
     ? `<rect class="footprint" data-footprint="true" x="${formatNumber(layout.footprint.x)}" y="${formatNumber(layout.footprint.y)}" width="${formatNumber(layout.footprint.width)}" height="${formatNumber(layout.footprint.depth)}"/>`

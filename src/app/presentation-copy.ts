@@ -82,6 +82,8 @@ export interface PlanLabPresentationCopy {
     viewportToolsAria: string;
     legendAria: string;
     northSymbol: string;
+    /** Short in-plan label for the entry space; the orientation banner uses `entranceLabel`. */
+    entrySpaceLabel: string;
     zoomValue: string;
     scaleUnit: string;
     canvasReady: string;
@@ -108,6 +110,51 @@ export interface PlanLabPresentationCopy {
   };
   strategyNames: Record<string, string>;
   metricLabels: Record<MetricCategory, string>;
+  /**
+   * Milestone 5.3 panel language. These are structural labels and derivation
+   * notes, not marketing claims; they stay here so a copy pass never touches
+   * the rendering functions.
+   */
+  analysis: {
+    thumbnailAria: string;
+    optionUnavailable: string;
+    optionUnavailableLabel: string;
+    ruleChecksTitle: string;
+    rulePassSummary: string;
+    ruleNotApplicableSummary: string;
+    ruleViolationSummary: string;
+    ruleStatusLabels: {
+      pass: string;
+      warning: string;
+      fail: string;
+    };
+    rawMetricLabels: {
+      usableArea: string;
+      footprintArea: string;
+      efficiency: string;
+      circulationLength: string;
+      targetGfa: string;
+      unallocatedInterior: string;
+    };
+    rawMetricDefinitions: {
+      usableArea: string;
+      footprintArea: string;
+      efficiency: string;
+      circulationLength: string;
+      targetGfa: string;
+      unallocatedInterior: string;
+    };
+    observationQualifiers: {
+      strong: string;
+      weak: string;
+      notApplicable: string;
+    };
+    selectionReasons: {
+      NO_VALID_CANDIDATES: string;
+      INSUFFICIENT_CANDIDATES: string;
+      INSUFFICIENT_DIVERSITY: string;
+    };
+  };
   status: {
     invalidBriefLabel: string;
     staleLabel: string;
@@ -243,6 +290,7 @@ export const RECOMMENDED_PRESENTATION_COPY: Readonly<PlanLabPresentationCopy> = 
     viewportToolsAria: "Viewport controls",
     legendAria: "Plan legend",
     northSymbol: "N",
+    entrySpaceLabel: "Entry",
     zoomValue: "100%",
     scaleUnit: "mm",
     canvasReady: "Ready",
@@ -278,6 +326,46 @@ export const RECOMMENDED_PRESENTATION_COPY: Readonly<PlanLabPresentationCopy> = 
     relationships: "Adjacency",
     liveability: "Room proportions",
     servicesSite: "Services & site",
+  },
+  analysis: {
+    thumbnailAria: "Layout thumbnail",
+    optionUnavailable: "No further distinct layout was available for this brief.",
+    optionUnavailableLabel: "Not available",
+    ruleChecksTitle: "Rule checks",
+    rulePassSummary: "checks passed",
+    ruleNotApplicableSummary: "not applicable to this layout",
+    ruleViolationSummary: "checks need attention",
+    ruleStatusLabels: {
+      pass: "PASS",
+      warning: "WARNING",
+      fail: "FAIL",
+    },
+    rawMetricLabels: {
+      usableArea: "Usable area",
+      footprintArea: "Footprint area",
+      efficiency: "Efficiency",
+      circulationLength: "Circulation length",
+      targetGfa: "Target GFA",
+      unallocatedInterior: "Unallocated interior",
+    },
+    rawMetricDefinitions: {
+      usableArea: "Sum of the placed room areas.",
+      footprintArea: "Building footprint area, including the garage.",
+      efficiency: "Usable area divided by the non-garage footprint.",
+      circulationLength: "Sum of each circulation run's longer dimension.",
+      targetGfa: "Target gross floor area declared by the committed brief.",
+      unallocatedInterior: "Footprint area not covered by a placed space.",
+    },
+    observationQualifiers: {
+      strong: "strong",
+      weak: "weak",
+      notApplicable: "not applicable",
+    },
+    selectionReasons: {
+      NO_VALID_CANDIDATES: "No hard-valid layout was found for this brief.",
+      INSUFFICIENT_CANDIDATES: "Not enough hard-valid layouts were found to fill three slots.",
+      INSUFFICIENT_DIVERSITY: "The remaining layouts were not different enough to show as a separate option.",
+    },
   },
   status: {
     invalidBriefLabel: "Invalid brief",
@@ -323,6 +411,16 @@ export interface PresentationCopyOverrides {
   };
   strategyNames?: Record<string, string>;
   metricLabels?: Partial<Record<MetricCategory, string>>;
+  analysis?: Omit<
+    Partial<PlanLabPresentationCopy["analysis"]>,
+    "ruleStatusLabels" | "rawMetricLabels" | "rawMetricDefinitions" | "observationQualifiers" | "selectionReasons"
+  > & {
+    ruleStatusLabels?: Partial<PlanLabPresentationCopy["analysis"]["ruleStatusLabels"]>;
+    rawMetricLabels?: Partial<PlanLabPresentationCopy["analysis"]["rawMetricLabels"]>;
+    rawMetricDefinitions?: Partial<PlanLabPresentationCopy["analysis"]["rawMetricDefinitions"]>;
+    observationQualifiers?: Partial<PlanLabPresentationCopy["analysis"]["observationQualifiers"]>;
+    selectionReasons?: Partial<PlanLabPresentationCopy["analysis"]["selectionReasons"]>;
+  };
   status?: Partial<PlanLabPresentationCopy["status"]>;
 }
 
@@ -348,6 +446,15 @@ export function resolvePresentationCopy(
     },
     strategyNames: { ...RECOMMENDED_PRESENTATION_COPY.strategyNames, ...overrides.strategyNames },
     metricLabels: { ...RECOMMENDED_PRESENTATION_COPY.metricLabels, ...overrides.metricLabels },
+    analysis: {
+      ...RECOMMENDED_PRESENTATION_COPY.analysis,
+      ...overrides.analysis,
+      ruleStatusLabels: { ...RECOMMENDED_PRESENTATION_COPY.analysis.ruleStatusLabels, ...overrides.analysis?.ruleStatusLabels },
+      rawMetricLabels: { ...RECOMMENDED_PRESENTATION_COPY.analysis.rawMetricLabels, ...overrides.analysis?.rawMetricLabels },
+      rawMetricDefinitions: { ...RECOMMENDED_PRESENTATION_COPY.analysis.rawMetricDefinitions, ...overrides.analysis?.rawMetricDefinitions },
+      observationQualifiers: { ...RECOMMENDED_PRESENTATION_COPY.analysis.observationQualifiers, ...overrides.analysis?.observationQualifiers },
+      selectionReasons: { ...RECOMMENDED_PRESENTATION_COPY.analysis.selectionReasons, ...overrides.analysis?.selectionReasons },
+    },
     status: { ...RECOMMENDED_PRESENTATION_COPY.status, ...overrides.status },
   };
 }

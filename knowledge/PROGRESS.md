@@ -72,10 +72,17 @@ tags: [progress, resume]
      enough. A verified CSS foundation now matches the reference's main proportions, white toolbar,
      blue accent, planning grid and compact density; `HANDOFF.md` records the precise remaining
      `main.ts` and visual-QA work for DeepSeek-Flash.
-- **Next step:** buckets 5.1/5.2 are complete at `c63a1d2` / `96ba89f`; 5.2 reports 159 passing
-  tests, clean typecheck/build/diagnostics, and browser viewport/evidence smoke. 5.3 is claimed at
-  `fabf607` and implements real option thumbnails plus the result and analysis projection against
-  the now-approved copy, without redoing the editor/SVG foundations.
+- **Next step:** buckets 5.1–5.3 are complete (`c63a1d2`, `96ba89f`, 5.3 as of this checkpoint).
+  5.3 delivered real option thumbnails, the selected-option summary (six real-value-only metric rows),
+  whole-number category bars, PASS/WARNING/FAIL rule checks and honest empty/infeasible states —
+  record: `artifacts/planlab/milestone-5/5.3-result-selector.md`; evidence: 169 tests, clean
+  typecheck/build/diagnostics, and 1536 × 1024 browser captures with DOM digests under
+  `artifacts/planlab/milestone-5/`. Next is 5.4 (generation states, stale-result affordances,
+  keyboard/a11y), then 5.5 (independent review incl. the mockup comparison).
+- **New open finding:** `benchmark:stage0:check` passes every substantive gate line but reports
+  `baselineMatch: false` because the manifest hashes raw working-tree bytes and
+  `core.autocrlf=true` rewrites line endings; the recorded baseline fingerprint matches no committed
+  tree. Fix the manifest hashing (or pin `.gitattributes`) and re-record once.
 - **In-flight branches:** all work is on `main` (Milestone 0 baseline `8171058`, Stage 1
   `0e8589b`…`e1c6f38` plus typecheck infra `19916f1`, Stage 2 `9a24738`…`ded4d73`, Stage 3
   `6089c48`…`99e1904` plus the 3.5 review); `stage0-planlab-spike` is retained at the completed gate

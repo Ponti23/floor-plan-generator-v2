@@ -34,7 +34,7 @@ Active design: [`planlab/README.md`](./planlab/README.md) · staged plan: [`../D
 | 5.0 | Milestone 5 product copy + Vite/Next.js shell decision | astra-plan | user | done | `main` (approved 2026-09-15) |
 | 5.1 | Brief editor state and committed form | luna-max | luna-max | done | `main` (`c63a1d2`) |
 | 5.2 | SVG projection, layers, pan/zoom/fit, evidence highlight | luna-max | luna-max | done | `main` (`96ba89f`) |
-| 5.3 | Result selector and analysis projection | luna-max | deepseek-flash | in-progress | `main` |
+| 5.3 | Result selector and analysis projection | luna-max | orchestrator (`/root`) | done | `main` |
 | 5.4 | Generation states, stale-result affordances, keyboard/a11y | terra-max | unassigned | todo | `main` |
 | 5.5 | Independent Milestone 5 review | terra-max | sol-max | todo | `main` |
 
@@ -91,3 +91,15 @@ Active design: [`planlab/README.md`](./planlab/README.md) · staged plan: [`../D
   `artifacts/planlab/milestone-5/5.0-copy-decision-package.md`. Copy is still centralized in
   `src/app/presentation-copy.ts` and stays replaceable, but it is no longer pending approval — no
   executor needs to re-ask, and no executor may silently reword it.
+- **Bucket 5.3 is complete** (`main`, record:
+  `artifacts/planlab/milestone-5/5.3-result-selector.md`). Claimed as `deepseek-flash` at `fabf607`;
+  the actual executor was the orchestrator (`/root`), recorded here because Git cannot distinguish
+  them. Real thumbnails, selected-option summary with six real-value-only metric rows, whole-number
+  category bars, PASS/WARNING/FAIL rule checks from the authoritative evaluator, and honest
+  empty/infeasible states. 169 tests, typecheck/build/diagnostics clean, browser 1536 × 1024 evidence
+  captured with a DOM digest.
+- **Open finding (not 5.3's):** `benchmark:stage0:check` reports every substantive gate line PASS but
+  `baselineMatch: false`. The recorded baseline's `benchmarkInputFingerprint` matches no committed
+  tree, and the manifest hashes raw working-tree bytes, so `core.autocrlf` changes it. Needs a
+  normalised-content hash (or a `.gitattributes` pin) plus one baseline re-record. Do not paper over
+  it by re-recording without that fix.

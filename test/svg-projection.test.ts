@@ -50,7 +50,11 @@ test("SVG projection emits deterministic layers under one viewport transform", (
     svgLayerOrder(),
   );
   assert.equal((first.match(/data-viewport-transform/g) ?? []).length, 1);
-  assert.match(first, /viewBox="-4 -4 88 128"/);
+  // The root is the site plus a 6-unit margin on every side.  The margin has to
+  // cover the scale bar and the site-dimension label, which are drawn below the
+  // site rectangle; a 4-unit margin clipped them at the canvas edge.
+  assert.match(first, /viewBox="-6 -6 92 132"/);
+  assert.match(first, /data-root-width="92"/);
   assert.match(first, /data-space-id="bedroom-1"/);
   assert.match(first, /data-portal-id="portal-entry"/);
 });
@@ -95,4 +99,3 @@ test("focused evidence appears above labels without changing layout coordinates"
   assert.equal(projectPortalLine(layout, layout.portals[0])?.x1, 31);
   assert.equal(layout.spaces[0]?.rect.x, 10);
 });
-
