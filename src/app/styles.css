@@ -304,13 +304,13 @@ body { overflow: hidden; }
 .analysis-scroll { flex: 1; padding: 21px 17px 12px; }
 .analysis .pane-title h1 { text-transform: none; }
 .analysis .options { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
-.option-card { position: relative; display: grid; grid-template-columns: 19px minmax(0, 1fr) auto; grid-template-rows: auto minmax(0, 1fr); align-items: start; gap: 6px; height: 191px; padding: 9px; border: 1px solid #d8dfe5; border-radius: 6px; background: #fff; text-align: left; }
-.option-card.selected { border: 2px solid var(--blue); padding: 8px; }
-.option-head { display: flex; align-items: center; gap: 6px; min-width: 0; grid-column: 1 / 3; }
+.option-card { position: relative; display: grid; grid-template-columns: 16px minmax(0, 1fr) auto; grid-template-rows: auto minmax(0, 1fr); align-items: start; gap: 5px; height: 191px; padding: 7px; border: 1px solid #d8dfe5; border-radius: 6px; background: #fff; text-align: left; }
+.option-card.selected { border: 2px solid var(--blue); padding: 6px; }
+.option-head { display: flex; align-items: center; gap: 5px; min-width: 0; grid-column: 1 / 3; }
 .option-badge { display: grid; place-items: center; flex: 0 0 auto; width: 19px; height: 19px; border-radius: 50%; background: #e1e6eb; color: #273442; font-size: 10px; font-weight: 700; }
 .option-card.selected .option-badge { background: var(--blue); color: #fff; }
-.option-name { overflow: hidden; color: #17202b; font-size: 11px; font-weight: 600; line-height: 1.15; letter-spacing: -.01em; }
-.option-card .option-score { grid-column: 3; grid-row: 1; justify-self: end; align-self: start; color: #17202b; font-size: 21px; font-weight: 600; }
+.option-name { display: -webkit-box; overflow: hidden; flex: 1 1 auto; min-width: 0; color: #17202b; font-size: 9.5px; font-weight: 600; line-height: 1.15; letter-spacing: -.01em; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+.option-card .option-score { grid-column: 3; grid-row: 1; justify-self: end; align-self: start; color: #17202b; font-size: 15px; font-weight: 600; }
 .option-thumbnail { grid-column: 1 / -1; grid-row: 2; align-self: stretch; width: 100%; min-height: 0; max-height: 142px; }
 .thumbnail-footprint { fill: #fbfbfa; stroke: #2d3337; stroke-width: .9; vector-effect: non-scaling-stroke; }
 .thumbnail-space { fill: #d8ebf8; stroke: #4a5259; stroke-width: .8; vector-effect: non-scaling-stroke; }

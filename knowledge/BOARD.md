@@ -36,7 +36,7 @@ Active design: [`planlab/README.md`](./planlab/README.md) · staged plan: [`../D
 | 5.2 | SVG projection, layers, pan/zoom/fit, evidence highlight | luna-max | luna-max | done | `main` (`96ba89f`) |
 | 5.3 | Result selector and analysis projection | luna-max | orchestrator (`/root`) | done | `main` (`09a9662`) |
 | 5.4 | Generation states, stale-result affordances, keyboard/a11y | terra-max | orchestrator (`/root`) | done | `main` (`3a769e2`) |
-| 5.5 | Independent Milestone 5 review | terra-max | sol-max | done | `main` |
+| 5.5 | Independent Milestone 5 review | terra-max | independent review agent (`/root/milestone5_review`); judged by orchestrator | done | `main` |
 | 5.6 | Stage 0 baseline provenance fix | terra-max | orchestrator (`/root`) | done | `main` |
 | 6.1 | Versioned local storage repository | luna-max | unassigned | todo | — |
 | 6.2 | Sequential migrations and recovery key | luna-max | unassigned | todo | — |
@@ -125,6 +125,19 @@ Active design: [`planlab/README.md`](./planlab/README.md) · staged plan: [`../D
   instead of looking live. "New variations" implements the UI_ARCHITECTURE retry-vs-new-variations
   split with a deterministic seed bump. 175 tests, typecheck/build/diagnostics clean, four
   1536 × 1024 state captures with DOM digests.
+- **Bucket 5.5 is complete and judged PASS by the orchestrator.** The review was performed by an
+  independent agent (`/root/milestone5_review`), not by the author of 5.3/5.4; its artifact is
+  `artifacts/planlab/milestone-5/5.5-independent-review.md` and it ends with the orchestrator's
+  judgment section. Seven defects were found and fixed (shared `planViewBox`, inline SVG icons, card
+  geometry, expand-button accessible name, `aria-pressed` on the viewport toggles, landmark roles,
+  deterministic number formatting). **Milestone 5 is closed.**
+  - One integrity note worth keeping: the review tree briefly produced `5.5-review.png`/`.json` that
+    were byte-identical copies of `5.4-complete`. Its own child agent deleted them, and the evidence
+    that stands now has been hash-checked by the orchestrator against every 5.4 capture. Treat
+    unattributed screenshot pairs as suspect and hash them before citing.
+  - The review missed one defect that the orchestrator fixed at closure: option-card strategy names
+    clipped mid-word ("Compact Efficien", "Balanc"). Fixed by narrowing the badge/score columns and
+    clamping the name to two lines; re-verified by measuring per-card `scrollWidth` and by capture.
 - **Bucket 5.5 is the active bucket** (`todo`, owner `sol-max`). It needs an agent that did not
   author 5.3/5.4, a real 1536 × 1024 comparison against `knowledge/PlanLab-Mockup.png`, and Sol's
   judgment. Two housekeeping facts for whoever picks it up: the committed
