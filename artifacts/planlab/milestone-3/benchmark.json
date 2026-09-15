@@ -1,7 +1,7 @@
 {
   "reportVersion": "planlab-stage0-regression-0.1",
   "suiteVersion": "planlab-stage0-seed-suite-0.6",
-  "recordedAt": "2026-09-15T04:47:27.049Z",
+  "recordedAt": "2026-09-15T06:07:43.254Z",
   "engineVersion": "planlab-generator-0.4",
   "ruleVersion": "planlab-core-2",
   "determinismVersion": "planlab-generator-determinism-1",
@@ -13,18 +13,18 @@
     "footprintVariantLimit": 64
   },
   "environment": {
-    "gitHeadAtRun": "3a769e29925469ac33fcee7eb810f4b05c51ba76",
-    "workingTreeStatusAtRun": "M scripts/benchmark-stage0.mjs\n?? artifacts/planlab/milestone-5/5.5-review.json\n?? artifacts/planlab/milestone-5/5.5-review.png",
+    "gitHeadAtRun": "786604578bbd9460d0f6bcbc557d9b113ebaf8d0",
+    "workingTreeStatusAtRun": "M scripts/benchmark-stage0.mjs",
     "workingTreeCleanAtRun": false,
-    "benchmarkInputFingerprint": "b85af1b697103d951cf1d850b78661fc46b4e0b93f57ee2b6db76c149961711c",
+    "benchmarkInputFingerprint": "b6fe04cce78e4fc7f173111fe3cf770ad56d6a50ea4f163ea923d03f2da5561f",
     "benchmarkInputFiles": [
       {
         "path": "package.json",
-        "sha256": "adc06a7fda4524bba70b46f3374dcff6d25f6685838b4581910f3a0c6a926110"
+        "sha256": "e5a88dfa9eb8f637ea2c1f0fd110500eb49ab824b66128abacb5af63f2e89d92"
       },
       {
         "path": "scripts/benchmark-stage0.mjs",
-        "sha256": "c953a0e5496b4c48ef061835aaa881035e4a167702f0a227c413d53d33af2ab4"
+        "sha256": "e3c391377c58a21d7c7b0cc106890792fa5d6ef9e70b6e17bd517f9c1e5e5683"
       },
       {
         "path": "src/domain/calibration.ts",
@@ -176,10 +176,10 @@
     "boundedMode": null
   },
   "summary": {
-    "medianMs": 1807.011,
-    "p95Ms": 1841.526,
-    "minimumMs": 1710.951,
-    "maximumMs": 1863.231
+    "medianMs": 1854.369,
+    "p95Ms": 1958.243,
+    "minimumMs": 1803.764,
+    "maximumMs": 2120.645
   },
   "gate": {
     "threeValidLayoutsPerSeed": true,
@@ -199,18 +199,18 @@
   "canonical": [
     {
       "seed": "planlab-canonical-01",
-      "elapsedMs": 1831.632,
+      "elapsedMs": 1855.077,
       "timingSamplesMs": [
-        1863.231,
-        1831.632,
-        1802.402
+        1847.919,
+        1855.077,
+        1879.835
       ],
       "timingSamplesRawMs": [
-        1863.2311,
-        1831.6315000000004,
-        1802.4021999999995
+        1847.9187999999997,
+        1855.0769,
+        1879.8353000000006
       ],
-      "replayElapsedMs": 1817.714,
+      "replayElapsedMs": 1861.346,
       "deterministic": true,
       "outputHash": "9a5bf7e368ffacd4b2fcabe971e205826c56c1a192a03ff588007aa003f8b49c",
       "layoutHash": "0df06e8639bcd012ac898040c0955ae48080304885749827135aba278032ff30",
@@ -309,18 +309,18 @@
     },
     {
       "seed": "planlab-canonical-02",
-      "elapsedMs": 1763.565,
+      "elapsedMs": 1882.186,
       "timingSamplesMs": [
-        1710.951,
-        1763.565,
-        1775.897
+        1882.186,
+        1919.803,
+        1859.071
       ],
       "timingSamplesRawMs": [
-        1710.9506999999994,
-        1763.5650000000023,
-        1775.8970000000008
+        1882.1864000000005,
+        1919.8029999999999,
+        1859.0711999999985
       ],
-      "replayElapsedMs": 1785.542,
+      "replayElapsedMs": 1852.61,
       "deterministic": true,
       "outputHash": "d0fc97a52f7cebc249b1a4b62af2fd290872372488b3d86c4a4998bc77f6831f",
       "layoutHash": "aaecabc4e9b5e1305744eab13098a403774bc7e5cc53bb92d51eabc17566f13a",
@@ -419,18 +419,18 @@
     },
     {
       "seed": "planlab-canonical-03",
-      "elapsedMs": 1824.551,
+      "elapsedMs": 1857.88,
       "timingSamplesMs": [
-        1827.415,
-        1804.195,
-        1824.551
+        1887.96,
+        1857.88,
+        1805.974
       ],
       "timingSamplesRawMs": [
-        1827.4153000000006,
-        1804.1945000000014,
-        1824.551199999998
+        1887.9604,
+        1857.8796999999977,
+        1805.9736000000012
       ],
-      "replayElapsedMs": 1795.878,
+      "replayElapsedMs": 1833.041,
       "deterministic": true,
       "outputHash": "3a5661de9c6624c8f6583c9820fa4b7a2246e0d7fae6471ae326fa7e1b39907c",
       "layoutHash": "681913bed108a0e8749e52981b363374b2d16042c720f49be66f2bbcf7e6075e",
@@ -529,18 +529,18 @@
     },
     {
       "seed": "planlab-canonical-04",
-      "elapsedMs": 1806.958,
+      "elapsedMs": 1845.404,
       "timingSamplesMs": [
-        1830.693,
-        1806.958,
-        1802.52
+        1830.752,
+        1851.849,
+        1845.404
       ],
       "timingSamplesRawMs": [
-        1830.6926000000021,
-        1806.9576000000015,
-        1802.520199999999
+        1830.7523,
+        1851.8493000000017,
+        1845.4040000000023
       ],
-      "replayElapsedMs": 1829.973,
+      "replayElapsedMs": 1928.148,
       "deterministic": true,
       "outputHash": "33b66103b458c2e5aadc532c4f3df8376ee7f7d24fa9894cc79b4e97c3791d88",
       "layoutHash": "725ca3feefce67830fd5e4edfb96cf985e37ffa3cbf53e596a2c4e447aaec938",
@@ -639,18 +639,18 @@
     },
     {
       "seed": "planlab-canonical-05",
-      "elapsedMs": 1829.571,
+      "elapsedMs": 1870.407,
       "timingSamplesMs": [
-        1829.571,
-        1807.064,
-        1849.621
+        1870.407,
+        1895.036,
+        1853.661
       ],
       "timingSamplesRawMs": [
-        1829.5705000000016,
-        1807.064099999996,
-        1849.6210999999967
+        1870.4074000000037,
+        1895.0359000000026,
+        1853.6609000000026
       ],
-      "replayElapsedMs": 1810.635,
+      "replayElapsedMs": 1872.74,
       "deterministic": true,
       "outputHash": "3a7e55c8f3eefd931db5d030c4477b9bc104e12a753d5a30fc6d82d5b8ba4f5a",
       "layoutHash": "2a2bc566fa977bd5004a798fed6a738e7f6d500b423e2da13839ddb64c5eb169",
@@ -749,18 +749,18 @@
     },
     {
       "seed": "planlab-canonical-06",
-      "elapsedMs": 1788.424,
+      "elapsedMs": 1871.334,
       "timingSamplesMs": [
-        1817.173,
-        1788.424,
-        1758.528
+        1871.334,
+        1830.177,
+        1880.355
       ],
       "timingSamplesRawMs": [
-        1817.1730000000098,
-        1788.423999999999,
-        1758.5280000000057
+        1871.3342999999877,
+        1830.1768999999913,
+        1880.3553000000102
       ],
-      "replayElapsedMs": 1789.466,
+      "replayElapsedMs": 1796.155,
       "deterministic": true,
       "outputHash": "5c2d8b359e2101580e93ee0a055c612b72db514aba2035fb560489abf90e2b56",
       "layoutHash": "5db7e555aaa274c40621bc49f7c55cd0613ef903432f1db30108c2cc07fe39b9",
@@ -859,18 +859,18 @@
     },
     {
       "seed": "planlab-canonical-07",
-      "elapsedMs": 1804.792,
+      "elapsedMs": 1823.256,
       "timingSamplesMs": [
-        1773.945,
-        1804.792,
-        1825.733
+        1803.764,
+        1824.105,
+        1823.256
       ],
       "timingSamplesRawMs": [
-        1773.9447000000073,
-        1804.7920999999915,
-        1825.7330999999976
+        1803.7635999999911,
+        1824.104800000001,
+        1823.2556999999942
       ],
-      "replayElapsedMs": 1816.159,
+      "replayElapsedMs": 1827.326,
       "deterministic": true,
       "outputHash": "1dfcc3bafce93fefcc089c290e3363ae92e75b117d7a28f3f700bb68f3ef2a33",
       "layoutHash": "cc0e4725918bc0b30ff7a24676ebfe619b1c7fe79dee33bcea851f811088a29a",
@@ -969,18 +969,18 @@
     },
     {
       "seed": "planlab-canonical-08",
-      "elapsedMs": 1815.317,
+      "elapsedMs": 1809.364,
       "timingSamplesMs": [
-        1823.283,
-        1815.317,
-        1793.504
+        1843.496,
+        1806.233,
+        1809.364
       ],
       "timingSamplesRawMs": [
-        1823.2834000000003,
-        1815.3168000000005,
-        1793.5043000000005
+        1843.4958000000042,
+        1806.2329000000027,
+        1809.3638999999966
       ],
-      "replayElapsedMs": 1757.198,
+      "replayElapsedMs": 1816.15,
       "deterministic": true,
       "outputHash": "bf556ed2f0616685c593afc717de3c85e34892a2ce1f2351bef431924fcd9e2b",
       "layoutHash": "f3f9893a095d7a2521b3f967b4f04a1e1462548fd6e34bf0f80683a532e15367",
@@ -1079,18 +1079,18 @@
     },
     {
       "seed": "planlab-canonical-09",
-      "elapsedMs": 1809.488,
+      "elapsedMs": 1967.591,
       "timingSamplesMs": [
-        1818.605,
-        1763.964,
-        1809.488
+        2120.645,
+        1967.591,
+        1946.818
       ],
       "timingSamplesRawMs": [
-        1818.6046999999962,
-        1763.964399999997,
-        1809.488200000007
+        2120.645199999999,
+        1967.590599999996,
+        1946.8178999999946
       ],
-      "replayElapsedMs": 1794.103,
+      "replayElapsedMs": 1808.405,
       "deterministic": true,
       "outputHash": "cb6fadaf04466c21c2a251d964127822b3017a4266602a216775a3c6bfa8a89b",
       "layoutHash": "1ef35ea802bff3f2ff6b7e591532d136555b2012c4f29aaedd4f2deffa4322ca",
@@ -1189,18 +1189,18 @@
     },
     {
       "seed": "planlab-canonical-10",
-      "elapsedMs": 1751.957,
+      "elapsedMs": 1846.376,
       "timingSamplesMs": [
-        1751.957,
-        1743.862,
-        1821.693
+        1870.082,
+        1845.946,
+        1846.376
       ],
       "timingSamplesRawMs": [
-        1751.9569000000047,
-        1743.8619999999937,
-        1821.6929999999993
+        1870.0823999999993,
+        1845.9455000000016,
+        1846.375899999999
       ],
-      "replayElapsedMs": 1759.757,
+      "replayElapsedMs": 1857.936,
       "deterministic": true,
       "outputHash": "3b6ca303b17e0711825e47a57a0a021989bfab4f52b32c894943274d503cec49",
       "layoutHash": "0ae73be71fb6d57684b88cc8f20beae75c3ebebc99f21e34319741bc2379b0e3",
@@ -1302,7 +1302,7 @@
     {
       "fixture": "envelopeConsumesSite",
       "seed": "impossible-envelope",
-      "elapsedMs": 0.265,
+      "elapsedMs": 0.271,
       "ok": false,
       "candidateCount": 0,
       "selectedCount": 0,
@@ -1339,7 +1339,7 @@
     {
       "fixture": "roomCannotFitEnvelope",
       "seed": "impossible-room",
-      "elapsedMs": 0.069,
+      "elapsedMs": 0.082,
       "ok": false,
       "candidateCount": 0,
       "selectedCount": 0,
@@ -1376,7 +1376,7 @@
     {
       "fixture": "programExceedsInstanceLimit",
       "seed": "impossible-program-size",
-      "elapsedMs": 0.039,
+      "elapsedMs": 0.064,
       "ok": false,
       "candidateCount": 0,
       "selectedCount": 0,

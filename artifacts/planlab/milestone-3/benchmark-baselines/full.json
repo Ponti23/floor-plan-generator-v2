@@ -30,7 +30,7 @@
     "planlab-canonical-09",
     "planlab-canonical-10"
   ],
-  "benchmarkInputFingerprint": "b85af1b697103d951cf1d850b78661fc46b4e0b93f57ee2b6db76c149961711c",
+  "benchmarkInputFingerprint": "b6fe04cce78e4fc7f173111fe3cf770ad56d6a50ea4f163ea923d03f2da5561f",
   "historicalStage0Baseline": {
     "commit": "e1c6f38",
     "artifact": "artifacts/planlab/milestone-0/benchmark.json",

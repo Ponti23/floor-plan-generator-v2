@@ -126,6 +126,41 @@ function hashSourceFile(path) {
 }
 
 /**
+ * Hash only the parts of `package.json` that can change a result.
+ *
+ * Hashing the whole manifest made the fingerprint move whenever any npm script
+ * was added or renamed (see `artifacts/planlab/milestone-7/7.3-…`), which forced
+ * a baseline re-record for a change that cannot affect a single layout.
+ * Dependencies, engines, module type and the package manager can; script names
+ * cannot. Keys are sorted so the hash does not depend on file order.
+ */
+function hashPackageManifest(path) {
+  const relevant = [
+    "dependencies",
+    "devDependencies",
+    "optionalDependencies",
+    "peerDependencies",
+    "engines",
+    "type",
+    "packageManager",
+  ];
+  const parsed = JSON.parse(readFileSync(path, "utf8"));
+  const picked = {};
+  for (const key of relevant) {
+    if (parsed[key] !== undefined) picked[key] = sortDeep(parsed[key]);
+  }
+  return sha256(JSON.stringify(picked));
+}
+
+function sortDeep(value) {
+  if (Array.isArray(value)) return value.map(sortDeep);
+  if (value === null || typeof value !== "object") return value;
+  return Object.fromEntries(
+    Object.keys(value).sort().map((key) => [key, sortDeep(value[key])]),
+  );
+}
+
+/**
  * A Git HEAD alone is not sufficient provenance when a benchmark is run from
  * a worktree before its generated artifacts are committed. Hash every local
  * source input that can affect the Stage 0 result instead.
@@ -138,7 +173,7 @@ function benchmarkInputManifest() {
   ].sort((a, b) => a < b ? -1 : a > b ? 1 : 0)
     .map((path) => ({
       path: relative(REPO_ROOT, path).replaceAll("\\", "/"),
-      sha256: hashSourceFile(path),
+      sha256: path === resolve(REPO_ROOT, "package.json") ? hashPackageManifest(path) : hashSourceFile(path),
     }));
   return {
     files,
