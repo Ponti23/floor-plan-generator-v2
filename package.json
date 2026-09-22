@@ -16,7 +16,7 @@
     "contracts:export": "E:/Projects/floor-plan-model/.python/python.exe scripts/export-generation-contract.py",
     "contracts:check": "E:/Projects/floor-plan-model/.python/python.exe scripts/export-generation-contract.py --check",
     "test:service": "E:/Projects/floor-plan-model/.python/python.exe -m unittest discover -s services/generation/tests/unit -p test_*.py",
-    "test:integration": "node --test test/integration"
+    "test:integration": "node --test \"test/integration/**/*.test.ts\""
   },
   "devDependencies": {
     "@types/node": "^24.13.4",
