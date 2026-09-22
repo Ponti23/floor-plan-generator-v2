@@ -5,6 +5,16 @@ dist/
 .env
 .env.*
 
+# The documented example env for the local generation service is committed.
+!.env.generation.example
+
+# PlanLab generation service: local runtime overlay, durable data and logs.
+.runtime/
+.local/
+
+# Integration run evidence (screenshots, DBs, logs) is regenerated, not stored.
+artifacts/integration/e2e/
+
 # Logs and editor/OS noise.
 *.log
 Thumbs.db

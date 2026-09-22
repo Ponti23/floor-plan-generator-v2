@@ -1,0 +1,490 @@
+{
+  "recordedAt": "2026-09-22",
+  "plan": "ASTRA_IMPLEMENTATION_MASTER_PLAN.md S00",
+  "note": "Files that must not change during PlanLab integration. S02 may modify only geometry_engine_v1/ge_layout_model.py and ge_validator.py (ge_circulation.py only with a separately documented patch); originals are copied to artifacts/integration/engine-before/ before that edit. Datasets and training arrays are deliberately not enumerated here.",
+  "groups": {
+    "engineSources": [
+      {
+        "path": "E:/Projects/floor-plan-model/geometry_engine_v1/check_schemas.py",
+        "bytes": 3986,
+        "sha256": "79db5a5b098d188003c3321d3af141c083673156d33b66d7e6428f6ffa61d9af"
+      },
+      {
+        "path": "E:/Projects/floor-plan-model/geometry_engine_v1/compare_old_new.py",
+        "bytes": 16307,
+        "sha256": "f93fbaeae87889f5960c1842c4ca4c9d91a738323523853dfd0739b9f976a2fb"
+      },
+      {
+        "path": "E:/Projects/floor-plan-model/geometry_engine_v1/diag_access.py",
+        "bytes": 2305,
+        "sha256": "9da76ba6f9a7c2cc428df02bde423696e67d8a177fe5eb08e0b7e456224a8916"
+      },
+      {
+        "path": "E:/Projects/floor-plan-model/geometry_engine_v1/diag_bands.py",
+        "bytes": 2229,
+        "sha256": "6f431b7a6ef7fc294b93a6cd4ff55889ee8a7c0a2b77c6c8a6f51717b949b05e"
+      },
+      {
+        "path": "E:/Projects/floor-plan-model/geometry_engine_v1/diag_bands2.py",
+        "bytes": 2079,
+        "sha256": "689045740aa6233896dbc363d8552475f843b218f4eccc9b421ce17a8027a88a"
+      },
+      {
+        "path": "E:/Projects/floor-plan-model/geometry_engine_v1/diag_edges.py",
+        "bytes": 1709,
+        "sha256": "811b746509a6e454dce09d47a39531fa5b3f9f29be9680916cc2cdaad02eff81"
+      },
+      {
+        "path": "E:/Projects/floor-plan-model/geometry_engine_v1/diag_hard0.py",
+        "bytes": 2018,
+        "sha256": "448a33abd832bbeb0979d77c373c60e9465dad26a75eb15a85346d3c6abd7510"
+      },
+      {
+        "path": "E:/Projects/floor-plan-model/geometry_engine_v1/diag_leaveout.py",
+        "bytes": 2209,
+        "sha256": "eb76e7637489d8c0ffb33c7dd56743f1a76ab77c7b41aa0e0f10a8dcd06fa9ad"
+      },
+      {
+        "path": "E:/Projects/floor-plan-model/geometry_engine_v1/diag_min.py",
+        "bytes": 2394,
+        "sha256": "50036ab556ee7241342d9e563ed998c3efc039248eb66385662f1d8a216c458f"
+      },
+      {
+        "path": "E:/Projects/floor-plan-model/geometry_engine_v1/diag_positions.py",
+        "bytes": 1336,
+        "sha256": "d58e2d3a208b486564bfa67807a63eb99a51e8878d8af0a58816519cdaa7e603"
+      },
+      {
+        "path": "E:/Projects/floor-plan-model/geometry_engine_v1/diag_shape.py",
+        "bytes": 1874,
+        "sha256": "afb5229876ae1cf78c981f2782329e98b367824cb3c3ed160a751e33121140d4"
+      },
+      {
+        "path": "E:/Projects/floor-plan-model/geometry_engine_v1/ge_circulation.py",
+        "bytes": 15210,
+        "sha256": "e72993394810835e2a1d76feea23d7d410531f251e5da0707c26078c6e8c2790"
+      },
+      {
+        "path": "E:/Projects/floor-plan-model/geometry_engine_v1/ge_core.py",
+        "bytes": 14728,
+        "sha256": "a6bfa7f34bc159e2e9db1d92c9ff3bfb57999b54cbbee47b4b5d33e6114b42d4"
+      },
+      {
+        "path": "E:/Projects/floor-plan-model/geometry_engine_v1/ge_demos.py",
+        "bytes": 8213,
+        "sha256": "6b784f98e220a17e1dc2827b6006cbd163773e79ccca2dd4cab0556567554fc4"
+      },
+      {
+        "path": "E:/Projects/floor-plan-model/geometry_engine_v1/ge_engine.py",
+        "bytes": 22090,
+        "sha256": "51bf7340f833824e0ef1341c8c8c4bba35a57dcf55ae3d127e07be5dad111a39"
+      },
+      {
+        "path": "E:/Projects/floor-plan-model/geometry_engine_v1/ge_layout_model.py",
+        "bytes": 37707,
+        "sha256": "b652c7ffbe71b30bbaa74020ce8413c51c5bf58a6d11fc036b1b268f179f8a8e"
+      },
+      {
+        "path": "E:/Projects/floor-plan-model/geometry_engine_v1/ge_layout_model_grid_retired.py",
+        "bytes": 36382,
+        "sha256": "d58e8fd05ca758a5521a8bdb1ccc8c34d0338e536ff1da14a94837c0939fc119"
+      },
+      {
+        "path": "E:/Projects/floor-plan-model/geometry_engine_v1/ge_probe_direct.py",
+        "bytes": 1160,
+        "sha256": "09b8fa37212afa166c9a5a9429f8f2cfc087d9cd7899effd22d33dd0359abd0e"
+      },
+      {
+        "path": "E:/Projects/floor-plan-model/geometry_engine_v1/ge_relations.py",
+        "bytes": 13278,
+        "sha256": "28f384073e906dcd9adf4472c7af68ac32c54238ddee6be78409da1bd0020ee5"
+      },
+      {
+        "path": "E:/Projects/floor-plan-model/geometry_engine_v1/ge_render.py",
+        "bytes": 10310,
+        "sha256": "c12f3c0cb69178c5fdb9293b03a1132ae6793edcf33c3c11200abf03168b311e"
+      },
+      {
+        "path": "E:/Projects/floor-plan-model/geometry_engine_v1/ge_render_png.py",
+        "bytes": 7559,
+        "sha256": "7d4f5fddfa7e05d80fc373cd0df8d69d5dbcf34d7001dde67f9cb5741737faac"
+      },
+      {
+        "path": "E:/Projects/floor-plan-model/geometry_engine_v1/ge_scoring.py",
+        "bytes": 16106,
+        "sha256": "a26576f42aab6d38803fd2278b3381a2cf5c96c519c1997b56420209807f2d91"
+      },
+      {
+        "path": "E:/Projects/floor-plan-model/geometry_engine_v1/ge_topology_adapter.py",
+        "bytes": 10853,
+        "sha256": "e3db93c857b650c0e9e3005091b001c92b7b63c7755681357cfb376f7bf1a892"
+      },
+      {
+        "path": "E:/Projects/floor-plan-model/geometry_engine_v1/ge_validator.py",
+        "bytes": 13815,
+        "sha256": "b9cc31274dc1402dd243d1588716e25b696ee03560cab41d1bf8f83331bfc07c"
+      },
+      {
+        "path": "E:/Projects/floor-plan-model/geometry_engine_v1/ge_walls.py",
+        "bytes": 12404,
+        "sha256": "27523a516353c75bc51e54c91bd2120105a7d3689dae8e3c161fa906f19b7e11"
+      },
+      {
+        "path": "E:/Projects/floor-plan-model/geometry_engine_v1/make_handoff.py",
+        "bytes": 48191,
+        "sha256": "15a6b0d444cd0e13b79a6f952a8f807ec940ee373d0adf21826f9aa564075cc9"
+      },
+      {
+        "path": "E:/Projects/floor-plan-model/geometry_engine_v1/minimal_repro.py",
+        "bytes": 2654,
+        "sha256": "f79b099ee25e7fe109a882977db71e44fc984a00771995c9f5ef006d1bea31ac"
+      },
+      {
+        "path": "E:/Projects/floor-plan-model/geometry_engine_v1/probe_area2.py",
+        "bytes": 2382,
+        "sha256": "b6583b54084b7befbb9d3b2a087c85f18da9aaf681328387451f7531491baab6"
+      },
+      {
+        "path": "E:/Projects/floor-plan-model/geometry_engine_v1/run_demos.py",
+        "bytes": 7588,
+        "sha256": "f06e71b12424e52df63d3402ffbb354cfa2a510f11e3e46621a4a86a58dffe8f"
+      },
+      {
+        "path": "E:/Projects/floor-plan-model/geometry_engine_v1/site_sizing.py",
+        "bytes": 2607,
+        "sha256": "00642b672d4ac91244c0de7f74f1be004de5e23b112627b34edd1beb3189821b"
+      },
+      {
+        "path": "E:/Projects/floor-plan-model/geometry_engine_v1/smoke_layout.py",
+        "bytes": 4991,
+        "sha256": "e281def05c2d61bb1c61c66403154bea6a32647aa9e214d5ab4c6f277cdc4024"
+      },
+      {
+        "path": "E:/Projects/floor-plan-model/geometry_engine_v1/summarize_old_new.py",
+        "bytes": 3893,
+        "sha256": "3f53afc6538d0a6454c1ba395f061c793dd75da2c8f2f8d6a778fc4f3f4b628d"
+      },
+      {
+        "path": "E:/Projects/floor-plan-model/geometry_engine_v1/sweep_demo.py",
+        "bytes": 2103,
+        "sha256": "6239004a3e60111148ddb752ec1965a2309e13ef10510446716a462ebf825771"
+      },
+      {
+        "path": "E:/Projects/floor-plan-model/geometry_engine_v1/test_aspect.py",
+        "bytes": 2197,
+        "sha256": "e17623bd0ce9a15bd6f3b535c9a3a83a1c0a41d1a735fe95a2e68173b337ffbe"
+      }
+    ],
+    "engineConfig": [
+      {
+        "path": "E:/Projects/floor-plan-model/geometry_engine_v1/config/architectural_rules.json",
+        "bytes": 5369,
+        "sha256": "9258c7310c33b939ce7cf8989dd97282188086b7df3a916fe496d3b4719fac72"
+      },
+      {
+        "path": "E:/Projects/floor-plan-model/geometry_engine_v1/config/defaults.json",
+        "bytes": 3186,
+        "sha256": "e53f3b72e0bf72c930e88a6203a081983cb92cff8a2d25ac7e87ddbd4b350ac9"
+      },
+      {
+        "path": "E:/Projects/floor-plan-model/geometry_engine_v1/schemas/brief.schema.json",
+        "bytes": 4893,
+        "sha256": "e2ca81bff8fff5eebc2d054fe46270b3920bc5366331f6ebdd6c7e20311b219b"
+      },
+      {
+        "path": "E:/Projects/floor-plan-model/geometry_engine_v1/schemas/layout.schema.json",
+        "bytes": 6471,
+        "sha256": "c67f5543d50da6f9242815c1ad2d1c60ec773618c569589f1c35d0222cda0d62"
+      }
+    ],
+    "engineDemos": [
+      {
+        "path": "E:/Projects/floor-plan-model/geometry_engine_v1/demos/demo_A_brief.json",
+        "bytes": 1861,
+        "sha256": "76a5843c0fb39b0407f2c3bf0cff1d532a50928348c8678f6cb5cd4683a65ee5"
+      },
+      {
+        "path": "E:/Projects/floor-plan-model/geometry_engine_v1/demos/demo_B_brief.json",
+        "bytes": 2732,
+        "sha256": "92fb2e3e7712457fb8e4353ba28ccf31abcc74cdd169cd8115888acda2e80a22"
+      },
+      {
+        "path": "E:/Projects/floor-plan-model/geometry_engine_v1/demos/demo_C_brief.json",
+        "bytes": 3143,
+        "sha256": "b92ff96a364a6133ed66657a0bfc34e7cae716741127c112a1fe50c1bcb66c68"
+      },
+      {
+        "path": "E:/Projects/floor-plan-model/geometry_engine_v1/demos/demo_D_brief.json",
+        "bytes": 2581,
+        "sha256": "fcf657bacd57cbd0076ac1ecc5ca74b6cfffa13ddadf08413cccf3451efda531"
+      },
+      {
+        "path": "E:/Projects/floor-plan-model/geometry_engine_v1/demos/demo_E_brief.json",
+        "bytes": 2897,
+        "sha256": "3bdd5069fabfddbcaa4d3f8ff1a2e986bf4e23a84aebc6557167d85ab04e93d4"
+      },
+      {
+        "path": "E:/Projects/floor-plan-model/geometry_engine_v1/demos/demos.json",
+        "bytes": 3640,
+        "sha256": "ffd87f5b5f2171d5bd5cb56ec8d1b42c4ce03c82a26d1d71a8da5ef9d0cd2c9f"
+      }
+    ],
+    "modelCode": [
+      {
+        "path": "E:/Projects/floor-plan-model/topology_v1/model/candidates.py",
+        "bytes": 31714,
+        "sha256": "877cedaee5a44b865b5601ea5aec653363d135e2433d9f3fa4c23a1ae4134c20"
+      },
+      {
+        "path": "E:/Projects/floor-plan-model/topology_v1/model/common.py",
+        "bytes": 11438,
+        "sha256": "98567804874195b55f1aa21cf66018cdde07bf428db4a55b6c2cc18d139adb92"
+      },
+      {
+        "path": "E:/Projects/floor-plan-model/topology_v1/model/data.py",
+        "bytes": 17478,
+        "sha256": "cd045d4e8578b8bc3e6b9dfdabefce5267faff8daecb36661414a5209a82c4f9"
+      },
+      {
+        "path": "E:/Projects/floor-plan-model/topology_v1/model/eval.py",
+        "bytes": 17018,
+        "sha256": "8cd640194a04120aa34a4ab470b37cbdcfa188c90f15cd261c3d3d389e82ea24"
+      },
+      {
+        "path": "E:/Projects/floor-plan-model/topology_v1/model/metrics.py",
+        "bytes": 29985,
+        "sha256": "1805d442947e23683574e192c428859eb5deb558999e92bc1fdc28ead1325cf7"
+      },
+      {
+        "path": "E:/Projects/floor-plan-model/topology_v1/model/model.py",
+        "bytes": 8413,
+        "sha256": "e13e30abd8544c8b0d44cceec14333ddc7061b0a9887faf0cdac92c56b5ec27a"
+      },
+      {
+        "path": "E:/Projects/floor-plan-model/topology_v1/model/rules.py",
+        "bytes": 13885,
+        "sha256": "0686f909da1e530043d562370944588d2fe57d2d1e9b4c02e71f1a5e566310d4"
+      },
+      {
+        "path": "E:/Projects/floor-plan-model/topology_v1/model/train.py",
+        "bytes": 21792,
+        "sha256": "8f897459f9fd243ea3eeb88b6856190ca3c781a86efd122965689c4e8eb85bb9"
+      },
+      {
+        "path": "E:/Projects/floor-plan-model/topology_v1/scripts/build_clean_splits.py",
+        "bytes": 28891,
+        "sha256": "5ce0c81aa59a42e3945978558a1d77c11d1b1242123efdcc84b5a63f1af8ff34"
+      },
+      {
+        "path": "E:/Projects/floor-plan-model/topology_v1/scripts/build_f2_clusters.py",
+        "bytes": 6788,
+        "sha256": "06139135d69ce18c1349278f2ba0f7361caf00d5f23cc48b9be59a76e86921f1"
+      },
+      {
+        "path": "E:/Projects/floor-plan-model/topology_v1/scripts/build_record_index.py",
+        "bytes": 12603,
+        "sha256": "ff9e758846634703fa3d0fd843fc38ffcb69430b293cf4d074cf4deb5f8bf6ce"
+      },
+      {
+        "path": "E:/Projects/floor-plan-model/topology_v1/scripts/build_store.py",
+        "bytes": 11049,
+        "sha256": "7fd7577a7052bb157fb13f21b813aa43f995a8223e6331cfd229b176890407f2"
+      },
+      {
+        "path": "E:/Projects/floor-plan-model/topology_v1/scripts/corpus_recheck.py",
+        "bytes": 21395,
+        "sha256": "aefe3a2b5da3026ed8010a740d9e17d14cc2e66ba5d95b0492c0642fcbd166b4"
+      },
+      {
+        "path": "E:/Projects/floor-plan-model/topology_v1/scripts/cuda_torch.py",
+        "bytes": 9500,
+        "sha256": "a558b09f9f5025c04fe96d6d51ce380769c751c1ff3959d3037fe5808c8a9b46"
+      },
+      {
+        "path": "E:/Projects/floor-plan-model/topology_v1/scripts/make_handoff.py",
+        "bytes": 43769,
+        "sha256": "ceeab91c70ac18583f241cbd0d303541fd18cff5a2e05721082cdc271d530b5f"
+      },
+      {
+        "path": "E:/Projects/floor-plan-model/topology_v1/scripts/make_ortools_input.py",
+        "bytes": 7310,
+        "sha256": "b7964f8b0113adf44171d6cd66a936fca35bc8047f720914394e53af71a13268"
+      },
+      {
+        "path": "E:/Projects/floor-plan-model/topology_v1/scripts/ortools_relaxation_probe.py",
+        "bytes": 5112,
+        "sha256": "bc04db273c407c49c70472fabf2ac9745bc0c564dbda3b6b8ad10491667f58fb"
+      },
+      {
+        "path": "E:/Projects/floor-plan-model/topology_v1/scripts/patch_store_f2.py",
+        "bytes": 1972,
+        "sha256": "941f126be831a4a774e024cdfb17640bebd0b700cc6cf24304c3e313016566a9"
+      },
+      {
+        "path": "E:/Projects/floor-plan-model/topology_v1/scripts/pilot_gate.py",
+        "bytes": 4260,
+        "sha256": "c91b969290ce10728c4edc726b81ffc9bc0be877bbe8730ee21338b56131a2be"
+      },
+      {
+        "path": "E:/Projects/floor-plan-model/topology_v1/scripts/print_checkpoints.py",
+        "bytes": 8963,
+        "sha256": "263eec3e5b62de9e45e80876f3ca10668f64a85e45d5387338479f35f39d57e5"
+      },
+      {
+        "path": "E:/Projects/floor-plan-model/topology_v1/scripts/probe_indexes.py",
+        "bytes": 4200,
+        "sha256": "3b26cae044b1a8fe949cafaef6bd467bcf90b02e93aab52ff85916a76443036f"
+      },
+      {
+        "path": "E:/Projects/floor-plan-model/topology_v1/scripts/solve_top5_from_model.py",
+        "bytes": 9027,
+        "sha256": "c8a9da39e813a852fbd14564478291275993786293041901203d65120fbe74cb"
+      },
+      {
+        "path": "E:/Projects/floor-plan-model/topology_v1/scripts/summarize_evals.py",
+        "bytes": 3917,
+        "sha256": "2cb189c2cde1e9b6ae97855c69ef6234f11420c90fee663902ee33ebacccb8ec"
+      }
+    ],
+    "overnightCode": [
+      {
+        "path": "E:/Projects/floor-plan-model/overnight_topology_v0/model/baselines.py",
+        "bytes": 3551,
+        "sha256": "a49a26588a62163a08598b7869a39761e0c59ab06098604f36f76e2baabfbabc"
+      },
+      {
+        "path": "E:/Projects/floor-plan-model/overnight_topology_v0/model/candidates.py",
+        "bytes": 12148,
+        "sha256": "f5b86449998da99f4424f24ec6c4c12c011c2166b90fde1536c143f863abb80b"
+      },
+      {
+        "path": "E:/Projects/floor-plan-model/overnight_topology_v0/model/common.py",
+        "bytes": 4264,
+        "sha256": "4e61df363b7b679ae96c2c6afa0c9321f2e5a27a3143ab94e99779a68a593d49"
+      },
+      {
+        "path": "E:/Projects/floor-plan-model/overnight_topology_v0/model/data.py",
+        "bytes": 6752,
+        "sha256": "e5da565c21abcca66469129176eb89a34116c830656661cbf987907d9c896bca"
+      },
+      {
+        "path": "E:/Projects/floor-plan-model/overnight_topology_v0/model/eval.py",
+        "bytes": 12988,
+        "sha256": "6cd21a1fcd2793554cbe4a30da2a35795a3730b43ba478a0a035fe6c08cd2c46"
+      },
+      {
+        "path": "E:/Projects/floor-plan-model/overnight_topology_v0/model/eval_main.py",
+        "bytes": 5081,
+        "sha256": "a299226d2b49792adc6278956b35720e447da3a3011e4395c2c16cfa0e3af709"
+      },
+      {
+        "path": "E:/Projects/floor-plan-model/overnight_topology_v0/model/model.py",
+        "bytes": 6159,
+        "sha256": "cbe4c6179e0bb1b122910855d1b4006210320e929640a21fedfbf5a0444e977c"
+      },
+      {
+        "path": "E:/Projects/floor-plan-model/overnight_topology_v0/model/pilot_gate.py",
+        "bytes": 3842,
+        "sha256": "b24485fbb7aa501c4447282c8e4f0fb089398154df6c501cb1a95ce46b921475"
+      },
+      {
+        "path": "E:/Projects/floor-plan-model/overnight_topology_v0/model/train.py",
+        "bytes": 10957,
+        "sha256": "7dfdecae8583073613d519ea2dbbc56a7e3a3d75dc87f8cb74b9a3ce089a7d1b"
+      },
+      {
+        "path": "E:/Projects/floor-plan-model/overnight_topology_v0/scripts/_tmp_dupcheck.py",
+        "bytes": 557,
+        "sha256": "198bddaf6c6304abdcf1d9400b3598296ffe00d333073278a17e8ab023e07c29"
+      },
+      {
+        "path": "E:/Projects/floor-plan-model/overnight_topology_v0/scripts/compile_all.py",
+        "bytes": 685,
+        "sha256": "cc742ad86e798c724f13e277ee513d96a12f50a2cf63fee0390035d932a265dc"
+      },
+      {
+        "path": "E:/Projects/floor-plan-model/overnight_topology_v0/scripts/corpus_final_gate.py",
+        "bytes": 11690,
+        "sha256": "67eef292532f51f76c6c6422aa6f677de28c0cf6d2d169e657ac5314f4b31334"
+      },
+      {
+        "path": "E:/Projects/floor-plan-model/overnight_topology_v0/scripts/fix1_data_build.py",
+        "bytes": 17761,
+        "sha256": "0f5093bc56a24773fcd87a76ef65fd9f0bc285cc4f75a8293549c8506bf01853"
+      },
+      {
+        "path": "E:/Projects/floor-plan-model/overnight_topology_v0/scripts/fix2_taxonomy_v3.py",
+        "bytes": 10223,
+        "sha256": "0d1722ded31f8ecb145a629020cf79a1695650ea0396db9099dc6d2dcb5ac47f"
+      },
+      {
+        "path": "E:/Projects/floor-plan-model/overnight_topology_v0/scripts/fix3_topology_holdout.py",
+        "bytes": 17891,
+        "sha256": "84b7217ae4b919d66d155185af2581dae8ec3b83b1a281faab71b402e4e6e73b"
+      },
+      {
+        "path": "E:/Projects/floor-plan-model/overnight_topology_v0/scripts/logutil.py",
+        "bytes": 1806,
+        "sha256": "ba4c3d4fded7edd4e8087e244d571d361b9abd35a9c8b82ae20df7b681e22cbd"
+      },
+      {
+        "path": "E:/Projects/floor-plan-model/overnight_topology_v0/scripts/raw_recheck.py",
+        "bytes": 2109,
+        "sha256": "617adabdadbc3f95c5a188caa89c386c290489f0625a25fbe5363b8b255c06b7"
+      },
+      {
+        "path": "E:/Projects/floor-plan-model/overnight_topology_v0/scripts/raw_snapshot.py",
+        "bytes": 1402,
+        "sha256": "0958a82ae24d571949e7d6aee330ba5670939eb71256464983e476ae44770d64"
+      },
+      {
+        "path": "E:/Projects/floor-plan-model/overnight_topology_v0/scripts/summarize_evals.py",
+        "bytes": 3292,
+        "sha256": "0a5f148fed7978abeb7348db5e5325cd4e444e0d312b0fb79f14dc9576409855"
+      }
+    ],
+    "runtimeAssets": [
+      {
+        "path": "E:/Projects/floor-plan-model/topology_v1/checkpoints/full_v1a/best.pt",
+        "bytes": 2773671,
+        "sha256": "3ea6225e6c582e167cb9a2450eae5b068cc2189cae182cb015503e3d47e220d8"
+      },
+      {
+        "path": "E:/Projects/floor-plan-model/topology_v1/data/store/store_manifest.json",
+        "bytes": 2833,
+        "sha256": "f56a3eec5ade2bf694d834f0241da8b2a714fb3c696dfb10bce80637cdc7ce6c"
+      },
+      {
+        "path": "E:/Projects/floor-plan-model/overnight_topology_v0/data/data_manifest.json",
+        "bytes": 7606,
+        "sha256": "7b88ba0ea80684a9e0abfd9753c84d49440fe260f0c2c3f7a97c2d1f5b283647"
+      }
+    ]
+  },
+  "totals": {
+    "engineSources": {
+      "files": 34,
+      "missing": 0
+    },
+    "engineConfig": {
+      "files": 4,
+      "missing": 0
+    },
+    "engineDemos": {
+      "files": 6,
+      "missing": 0
+    },
+    "modelCode": {
+      "files": 23,
+      "missing": 0
+    },
+    "overnightCode": {
+      "files": 19,
+      "missing": 0
+    },
+    "runtimeAssets": {
+      "files": 3,
+      "missing": 0
+    }
+  }
+}

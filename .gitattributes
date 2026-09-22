@@ -1,0 +1,5 @@
+# Byte-exact originals of the engine sources S02 may modify live under
+# artifacts/integration/engine-before/. Mark them non-text so Git never
+# normalises their line endings: the recorded SHA-256 values must stay
+# reproducible on any checkout, on Windows or elsewhere.
+artifacts/integration/engine-before/** -text

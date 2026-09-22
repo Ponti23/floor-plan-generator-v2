@@ -40,6 +40,9 @@ const artifacts = [
 const checkOnly = process.argv.includes("--check");
 let drifted = false;
 
+/** Committed artifacts are LF; a Windows checkout can present them as CRLF. */
+const normaliseLineEndings = (text) => text.replaceAll("\r\n", "\n");
+
 for (const artifact of artifacts) {
   const relativePath = artifact.path.slice(REPO_ROOT.length + 1).replaceAll("\\", "/");
   if (checkOnly) {
@@ -51,7 +54,7 @@ for (const artifact of artifacts) {
       drifted = true;
       continue;
     }
-    if (existing !== artifact.text) {
+    if (normaliseLineEndings(existing) !== normaliseLineEndings(artifact.text)) {
       console.error(`stale artifact: ${relativePath} (run node scripts/inspect-canonical.mjs)`);
       drifted = true;
       continue;

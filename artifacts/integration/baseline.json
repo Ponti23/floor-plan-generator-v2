@@ -1,0 +1,141 @@
+{
+  "plan": "docs/integration/ASTRA_IMPLEMENTATION_MASTER_PLAN.md",
+  "stage": "S00",
+  "stageName": "Safety, baseline, and reproducible launch prerequisites",
+  "recordedAt": "2026-09-22",
+  "timezone": "Australia/Perth",
+  "workspace": {
+    "engineRoot": "E:/Projects/floor-plan-model",
+    "engineRootIsGitRepo": false,
+    "engineRootNote": "No Git history. Protected sources are hashed, not versioned, so S02 keeps originals under artifacts/integration/engine-before/.",
+    "frontendRoot": "E:/Projects/floorplan-generator",
+    "frontendBranch": "integration/planlab-engine-mvp",
+    "frontendBaseCommit": "765408b07b115401906a0713eada2aace2397e87",
+    "frontendStatusAtAudit": "clean"
+  },
+  "toolchain": {
+    "node": "24.21.0",
+    "npm": "11.19.0",
+    "vite": "7.3.6",
+    "typescript": "5.9.3"
+  },
+  "engineRuntime": {
+    "interpreter": "E:/Projects/floor-plan-model/.python/python.exe",
+    "python": "3.14.7",
+    "torch": "2.9.0+cu129",
+    "ortools": "9.15.6755",
+    "numpy": "2.5.3",
+    "sqlite": "3.50.4",
+    "protectedEnvironmentUntouched": true,
+    "preexistingNote": "pip reports ortools 9.15.6755 wants protobuf<6.34 while 7.36.2 is installed in the protected environment. This predates S00, was not changed by S00, and the engine schema check plus CP-SAT smoke both pass."
+  },
+  "serviceOverlay": {
+    "path": "E:/Projects/floorplan-generator/.runtime/generation/site-packages",
+    "lockFile": "services/generation/requirements.lock.txt",
+    "directRequirements": "services/generation/requirements.in",
+    "installed": {
+      "fastapi": "0.141.1",
+      "uvicorn": "0.53.0",
+      "pydantic": "2.13.5",
+      "pydantic-core": "2.46.5",
+      "httpx": "0.28.1",
+      "starlette": "1.6.0",
+      "anyio": "4.15.1",
+      "httpcore": "1.0.9",
+      "h11": "0.16.0",
+      "click": "8.5.0",
+      "idna": "3.20",
+      "certifi": "2026.7.22",
+      "annotated-doc": "0.0.5",
+      "annotated-types": "0.8.0",
+      "typing-extensions": "4.16.0",
+      "typing-inspection": "0.4.4"
+    },
+    "shadowingCheck": "torch, numpy, OR-Tools and sqlite3 still resolve to the protected interpreter; the overlay contains no protobuf and no engine packages.",
+    "wheelHashes": "Recorded per package in services/generation/requirements.lock.txt."
+  },
+  "assets": {
+    "checkpoint": "E:/Projects/floor-plan-model/topology_v1/checkpoints/full_v1a/best.pt",
+    "checkpointSha256": "3ea6225e6c582e167cb9a2450eae5b068cc2189cae182cb015503e3d47e220d8",
+    "checkpointBytes": 2773671,
+    "checkpointMatchesPlan": true,
+    "storeManifest": {
+      "path": "E:/Projects/floor-plan-model/topology_v1/data/store/store_manifest.json",
+      "sha256": "f56a3eec5ade2bf694d834f0241da8b2a714fb3c696dfb10bce80637cdc7ce6c"
+    },
+    "dataManifest": {
+      "path": "E:/Projects/floor-plan-model/overnight_topology_v0/data/data_manifest.json",
+      "sha256": "7b88ba0ea80684a9e0abfd9753c84d49440fe260f0c2c3f7a97c2d1f5b283647"
+    }
+  },
+  "protectedSources": {
+    "manifest": "artifacts/integration/protected-source-sha256.json",
+    "copiedOriginals": {
+      "directory": "artifacts/integration/engine-before/",
+      "files": {
+        "ge_layout_model.py": "b652c7ffbe71b30bbaa74020ce8413c51c5bf58a6d11fc036b1b268f179f8a8e",
+        "ge_validator.py": "b9cc31274dc1402dd243d1588716e25b696ee03560cab41d1bf8f83331bfc07c",
+        "ge_circulation.py": "e72993394810835e2a1d76feea23d7d410531f251e5da0707c26078c6e8c2790"
+      }
+    }
+  },
+  "commands": [
+    {
+      "command": "npm test",
+      "cwd": "E:/Projects/floorplan-generator",
+      "exitCode": 1,
+      "when": "before the CRLF fix",
+      "result": "tests 199, pass 198, fail 1"
+    },
+    {
+      "command": "npm test",
+      "cwd": "E:/Projects/floorplan-generator",
+      "exitCode": 0,
+      "when": "after the CRLF fix",
+      "result": "tests 199, pass 199, fail 0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": "E:/Projects/floorplan-generator",
+      "exitCode": 0,
+      "result": "tsc -p tsconfig.json, no diagnostics"
+    },
+    {
+      "command": "npm run build",
+      "cwd": "E:/Projects/floorplan-generator",
+      "exitCode": 0,
+      "result": "30 modules transformed, dist built in 1.23s"
+    },
+    {
+      "command": "E:/Projects/floor-plan-model/.python/python.exe geometry_engine_v1/check_schemas.py",
+      "cwd": "E:/Projects/floor-plan-model",
+      "exitCode": 0,
+      "result": "27/27 documents valid"
+    },
+    {
+      "command": "E:/Projects/floor-plan-model/.python/python.exe scripts/check-generation-runtime.py",
+      "cwd": "E:/Projects/floorplan-generator",
+      "exitCode": 0,
+      "result": "all 27 checks passed"
+    },
+    {
+      "command": "node scripts/inspect-canonical.mjs --check",
+      "cwd": "E:/Projects/floorplan-generator",
+      "exitCode": 0,
+      "result": "canonical inspection matches artifacts; fingerprint sha256:8efe5b5efdca0659dd1ae44e7e48672824e7fae49c97d341ea69adf287621a27"
+    }
+  ],
+  "cpuSmoke": {
+    "evidence": "artifacts/integration/runtime-check.json",
+    "detail": "Demo B topology on the real checkpoint with device=cpu: 5 candidates, first call (includes model load) 0.24s, second call on the same adapter 0.21s, 5 candidates. No dataset or training array was loaded."
+  },
+  "knownFailures": [
+    {
+      "test": "test/project-inspection.test.ts — 'inspection renderers are deterministic and match the committed artifacts'",
+      "cause": "The committed text fixtures are stored with LF, but core.autocrlf=true presents them as CRLF on a Windows checkout, so the byte comparison failed. Geometry, numbers and the fingerprint were identical.",
+      "fix": "Normalise \\r\\n to \\n on the fixture read paths only (test/project-inspection.test.ts and scripts/inspect-canonical.mjs). No snapshot text, number or hash changed.",
+      "status": "fixed in S00; 199/199 pass"
+    }
+  ],
+  "secretHandling": "No secret values were read or printed. .env.local was not opened; .env.generation.example documents names only."
+}

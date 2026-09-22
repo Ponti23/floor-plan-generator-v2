@@ -1,0 +1,17 @@
+# PlanLab generation service — direct runtime and test dependencies.
+#
+# Installed into the service-only overlay
+#   E:/Projects/floorplan-generator/.runtime/generation/site-packages
+# with the engine interpreter
+#   E:/Projects/floor-plan-model/.python/python.exe
+# via
+#   scripts/start-generation.ps1 -Setup
+#
+# torch, numpy and OR-Tools are NOT listed here: they belong to the protected
+# engine environment (M/.python/Lib/site-packages) and must never be replaced
+# by the overlay. Python standard library unittest is the test runner; pytest
+# is deliberately absent.
+fastapi
+uvicorn
+pydantic>=2.9
+httpx

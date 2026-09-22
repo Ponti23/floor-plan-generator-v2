@@ -31,8 +31,17 @@ import {
 const REPO_ROOT = fileURLToPath(new URL("..", import.meta.url));
 const DIAGNOSTIC_ROOT = resolve(REPO_ROOT, "artifacts", "planlab", "milestone-1", "diagnostics");
 
-const CANONICAL_FIXTURE = readFileSync(resolve(DIAGNOSTIC_ROOT, "canonical-fixture.txt"), "utf8");
-const DISCRETIZATION_FIXTURE = readFileSync(resolve(DIAGNOSTIC_ROOT, "discretization.txt"), "utf8");
+/**
+ * Committed text artifacts are stored with LF. A Windows checkout with
+ * `core.autocrlf=true` presents them as CRLF, so the comparison is normalised
+ * for line endings only; geometry, numbers and hashes stay byte-exact.
+ */
+function readFixtureText(path: string): string {
+  return readFileSync(path, "utf8").replaceAll("\r\n", "\n");
+}
+
+const CANONICAL_FIXTURE = readFixtureText(resolve(DIAGNOSTIC_ROOT, "canonical-fixture.txt"));
+const DISCRETIZATION_FIXTURE = readFixtureText(resolve(DIAGNOSTIC_ROOT, "discretization.txt"));
 
 interface SiteOverrides {
   widthMm?: number;

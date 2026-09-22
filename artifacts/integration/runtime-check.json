@@ -1,0 +1,173 @@
+{
+  "check": "planlab-generation-runtime",
+  "recordedAt": "2026-09-22T15:54:02Z",
+  "engineRoot": "E:\\Projects\\floor-plan-model",
+  "serviceRoot": "E:\\Projects\\floorplan-generator",
+  "overlay": "E:\\Projects\\floorplan-generator\\.runtime\\generation\\site-packages",
+  "pythonVersion": "3.14.7",
+  "passed": true,
+  "checks": [
+    {
+      "name": "engine-interpreter",
+      "passed": true,
+      "required": true,
+      "detail": "running E:\\Projects\\floor-plan-model\\.python\\python.exe; expected E:\\Projects\\floor-plan-model\\.python\\python.exe"
+    },
+    {
+      "name": "overlay-directory",
+      "passed": true,
+      "required": true,
+      "detail": "E:\\Projects\\floorplan-generator\\.runtime\\generation\\site-packages"
+    },
+    {
+      "name": "overlay-import:fastapi",
+      "passed": true,
+      "required": true,
+      "detail": "0.141.1 from E:\\Projects\\floorplan-generator\\.runtime\\generation\\site-packages\\fastapi\\__init__.py"
+    },
+    {
+      "name": "overlay-import:uvicorn",
+      "passed": true,
+      "required": true,
+      "detail": "0.53.0 from E:\\Projects\\floorplan-generator\\.runtime\\generation\\site-packages\\uvicorn\\__init__.py"
+    },
+    {
+      "name": "overlay-import:pydantic",
+      "passed": true,
+      "required": true,
+      "detail": "2.13.5 from E:\\Projects\\floorplan-generator\\.runtime\\generation\\site-packages\\pydantic\\__init__.py"
+    },
+    {
+      "name": "overlay-import:httpx",
+      "passed": true,
+      "required": true,
+      "detail": "0.28.1 from E:\\Projects\\floorplan-generator\\.runtime\\generation\\site-packages\\httpx\\__init__.py"
+    },
+    {
+      "name": "protected-import:torch",
+      "passed": true,
+      "required": true,
+      "detail": "2.9.0+cu129 from E:\\Projects\\floor-plan-model\\.python\\Lib\\site-packages\\torch\\__init__.py"
+    },
+    {
+      "name": "protected-import:numpy",
+      "passed": true,
+      "required": true,
+      "detail": "2.5.3 from E:\\Projects\\floor-plan-model\\.python\\Lib\\site-packages\\numpy\\__init__.py"
+    },
+    {
+      "name": "protected-import:ortools",
+      "passed": true,
+      "required": true,
+      "detail": "9.15.6755 from E:\\Projects\\floor-plan-model\\.python\\Lib\\site-packages\\ortools\\__init__.py"
+    },
+    {
+      "name": "protected-import:sqlite3",
+      "passed": true,
+      "required": true,
+      "detail": "3.50.4 from E:\\Projects\\floor-plan-model\\.python\\python314.zip\\sqlite3\\__init__.pyc"
+    },
+    {
+      "name": "checkpoint-hash",
+      "passed": true,
+      "required": true,
+      "detail": "E:\\Projects\\floor-plan-model\\topology_v1\\checkpoints\\full_v1a\\best.pt sha256=3ea6225e6c582e167cb9a2450eae5b068cc2189cae182cb015503e3d47e220d8"
+    },
+    {
+      "name": "checkpoint-bytes",
+      "passed": true,
+      "required": true,
+      "detail": "2773671 bytes"
+    },
+    {
+      "name": "manifest:store_manifest",
+      "passed": true,
+      "required": true,
+      "detail": "E:\\Projects\\floor-plan-model\\topology_v1\\data\\store\\store_manifest.json sha256=f56a3eec5ade2bf694d834f0241da8b2a714fb3c696dfb10bce80637cdc7ce6c"
+    },
+    {
+      "name": "manifest:data_manifest",
+      "passed": true,
+      "required": true,
+      "detail": "E:\\Projects\\floor-plan-model\\overnight_topology_v0\\data\\data_manifest.json sha256=7b88ba0ea80684a9e0abfd9753c84d49440fe260f0c2c3f7a97c2d1f5b283647"
+    },
+    {
+      "name": "engine-package",
+      "passed": true,
+      "required": true,
+      "detail": "E:\\Projects\\floor-plan-model\\geometry_engine_v1"
+    },
+    {
+      "name": "engine-import:ge_core",
+      "passed": true,
+      "required": true,
+      "detail": "E:\\Projects\\floor-plan-model\\geometry_engine_v1\\ge_core.py"
+    },
+    {
+      "name": "engine-import:ge_engine",
+      "passed": true,
+      "required": true,
+      "detail": "E:\\Projects\\floor-plan-model\\geometry_engine_v1\\ge_engine.py"
+    },
+    {
+      "name": "engine-import:ge_layout_model",
+      "passed": true,
+      "required": true,
+      "detail": "E:\\Projects\\floor-plan-model\\geometry_engine_v1\\ge_layout_model.py"
+    },
+    {
+      "name": "engine-import:ge_validator",
+      "passed": true,
+      "required": true,
+      "detail": "E:\\Projects\\floor-plan-model\\geometry_engine_v1\\ge_validator.py"
+    },
+    {
+      "name": "engine-import:ge_circulation",
+      "passed": true,
+      "required": true,
+      "detail": "E:\\Projects\\floor-plan-model\\geometry_engine_v1\\ge_circulation.py"
+    },
+    {
+      "name": "engine-import:ge_relations",
+      "passed": true,
+      "required": true,
+      "detail": "E:\\Projects\\floor-plan-model\\geometry_engine_v1\\ge_relations.py"
+    },
+    {
+      "name": "engine-import:ge_walls",
+      "passed": true,
+      "required": true,
+      "detail": "E:\\Projects\\floor-plan-model\\geometry_engine_v1\\ge_walls.py"
+    },
+    {
+      "name": "engine-import:ge_scoring",
+      "passed": true,
+      "required": true,
+      "detail": "E:\\Projects\\floor-plan-model\\geometry_engine_v1\\ge_scoring.py"
+    },
+    {
+      "name": "engine-import:site_sizing",
+      "passed": true,
+      "required": true,
+      "detail": "E:\\Projects\\floor-plan-model\\geometry_engine_v1\\site_sizing.py"
+    },
+    {
+      "name": "engine-import:ge_topology_adapter",
+      "passed": true,
+      "required": true,
+      "detail": "E:\\Projects\\floor-plan-model\\geometry_engine_v1\\ge_topology_adapter.py"
+    },
+    {
+      "name": "sqlite-wal",
+      "passed": true,
+      "required": true,
+      "detail": "sqlite 3.50.4, journal_mode=wal, json() round-trip rows=1"
+    },
+    {
+      "name": "topology-smoke",
+      "passed": true,
+      "required": true,
+      "detail": "demo B candidates=5, first call (includes model load) 0.24s, second call on the same adapter 0.21s with 5 candidate(s); device=cpu; setup 0.00s"
+    }
+  ]
+}
