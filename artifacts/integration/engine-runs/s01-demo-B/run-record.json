@@ -1,0 +1,24 @@
+{
+  "title": "S01 real engine run for the layout-B fixture",
+  "command": "<engine python> .tmp/make_layout_fixture.py  (warm TopologyAdapter(device='cpu'), candidates_from_brief(top_k=5) injected as brief topology_candidates, ge_engine.generate_floorplans(top_k=5, top_n=3, time_limit_s=15, render=False))",
+  "brief": "geometry_engine_v1/demos/demo_B_brief.json",
+  "briefSha256": "92fb2e3e7712457fb8e4353ba28ccf31abcc74cdd169cd8115888acda2e80a22",
+  "candidateCount": 5,
+  "layoutCount": 3,
+  "attempts": 5,
+  "totalSeconds": 75.46,
+  "gate": {
+    "any_layout": true,
+    "any_validated_layout": true,
+    "n_candidates_attempted": 5,
+    "n_layouts": 5,
+    "n_validated": 5
+  },
+  "runResultSha256": "5a9bf59bfb843fa73bfb81132323db316f097c38771f4a52f390db89b0b8ea18",
+  "layoutIds": [
+    "L_v1_rank5_stochastic_11_a1",
+    "L_v1_rank3_stochastic_12_a1",
+    "L_v1_rank2_stochastic_14_a1"
+  ],
+  "note": "Raw first layout is preserved beside this record so the DTO conversion can be re-checked. Historical engine timings are not service benchmarks."
+}

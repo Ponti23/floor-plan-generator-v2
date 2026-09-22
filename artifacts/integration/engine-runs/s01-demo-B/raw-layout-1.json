@@ -1,0 +1,2523 @@
+{
+  "schema_version": "geometry_engine_v1.layout/1",
+  "layout_id": "L_v1_rank5_stochastic_11_a1",
+  "brief_id": "demo_B_typical_3bed_2bath_garage_laundry",
+  "topology_candidate_id": "v1_rank5_stochastic_11",
+  "topology_candidate_rank": 5,
+  "topology_source": "brief_provided",
+  "attempt": 1,
+  "solver_status": "FEASIBLE",
+  "units": "millimetres (integer)",
+  "site": {
+    "width_mm": 14117,
+    "height_mm": 16062,
+    "front": "south"
+  },
+  "setbacks": {
+    "north_mm": 1500,
+    "east_mm": 1000,
+    "south_mm": 3000,
+    "west_mm": 1000
+  },
+  "walls_config": {
+    "external_mm": 230,
+    "internal_mm": 90
+  },
+  "buildable_envelope": {
+    "x_mm": 1230,
+    "y_mm": 3230,
+    "width_mm": 11657,
+    "height_mm": 11102,
+    "source": "buildable envelope outer line inset by external wall 230 mm on each side",
+    "external_wall_mm": 230
+  },
+  "envelope_outer": {
+    "x_mm": 1000,
+    "y_mm": 3000,
+    "width_mm": 12117,
+    "height_mm": 11562,
+    "source": "site minus setbacks A/B/C/D (buildable envelope outer line)"
+  },
+  "gfa": {
+    "gross_external_area_m2": 140.097,
+    "net_room_area_m2": 115.044,
+    "circulation_area_m2": 11.657,
+    "reporting": "GROSS external area for GFA, NET internal room rectangles for room areas"
+  },
+  "grid": {
+    "nc": 1,
+    "nr": 1,
+    "cell_w_mm": 11657,
+    "cell_h_mm": 11102,
+    "bx": [
+      0,
+      11657
+    ],
+    "by": [
+      0,
+      11102
+    ],
+    "envelope": {
+      "x_mm": 1230,
+      "y_mm": 3230,
+      "width_mm": 11657,
+      "height_mm": 11102,
+      "source": "buildable envelope outer line inset by external wall 230 mm on each side",
+      "external_wall_mm": 230
+    },
+    "note": "continuous integer-mm model; no grid"
+  },
+  "rooms": [
+    {
+      "id": "B1",
+      "type": "bedroom",
+      "room_class": "standard",
+      "present": true,
+      "x_mm": 1230,
+      "y_mm": 4230,
+      "width_mm": 3200,
+      "height_mm": 3565,
+      "area_mm2": 11408000,
+      "area_m2": 11.408,
+      "target_area_m2": 14.0,
+      "min_area_m2": 11.0,
+      "max_area_m2": 16.1,
+      "min_short_side_mm": 3200,
+      "max_aspect_ratio": 1.8,
+      "area_deviation_mm2": -2592000,
+      "required": true,
+      "zone_preference": "any",
+      "access_required": true,
+      "grid": {}
+    },
+    {
+      "id": "B2",
+      "type": "bedroom",
+      "room_class": "standard",
+      "present": true,
+      "x_mm": 5630,
+      "y_mm": 10795,
+      "width_mm": 3393,
+      "height_mm": 3537,
+      "area_mm2": 12001041,
+      "area_m2": 12.001,
+      "target_area_m2": 12.0,
+      "min_area_m2": 10.0,
+      "max_area_m2": 13.8,
+      "min_short_side_mm": 3000,
+      "max_aspect_ratio": 1.8,
+      "area_deviation_mm2": 1041,
+      "required": true,
+      "zone_preference": "any",
+      "access_required": true,
+      "grid": {}
+    },
+    {
+      "id": "B3",
+      "type": "bedroom",
+      "room_class": "standard",
+      "present": true,
+      "x_mm": 1230,
+      "y_mm": 7795,
+      "width_mm": 3200,
+      "height_mm": 3000,
+      "area_mm2": 9600000,
+      "area_m2": 9.6,
+      "target_area_m2": 11.0,
+      "min_area_m2": 9.0,
+      "max_area_m2": 12.65,
+      "min_short_side_mm": 3000,
+      "max_aspect_ratio": 1.8,
+      "area_deviation_mm2": -1400000,
+      "required": true,
+      "zone_preference": "any",
+      "access_required": true,
+      "grid": {}
+    },
+    {
+      "id": "BA1",
+      "type": "bathroom",
+      "room_class": "standard",
+      "present": true,
+      "x_mm": 8216,
+      "y_mm": 4230,
+      "width_mm": 3054,
+      "height_mm": 1955,
+      "area_mm2": 5970570,
+      "area_m2": 5.9706,
+      "target_area_m2": 6.0,
+      "min_area_m2": 4.5,
+      "max_area_m2": 6.9,
+      "min_short_side_mm": 1800,
+      "max_aspect_ratio": 2.2,
+      "area_deviation_mm2": -29430,
+      "required": true,
+      "zone_preference": "any",
+      "access_required": true,
+      "grid": {}
+    },
+    {
+      "id": "BA2",
+      "type": "bathroom",
+      "room_class": "standard",
+      "present": true,
+      "x_mm": 8216,
+      "y_mm": 6185,
+      "width_mm": 2875,
+      "height_mm": 1600,
+      "area_mm2": 4600000,
+      "area_m2": 4.6,
+      "target_area_m2": 4.0,
+      "min_area_m2": 3.0,
+      "max_area_m2": 4.6,
+      "min_short_side_mm": 1600,
+      "max_aspect_ratio": 2.2,
+      "area_deviation_mm2": 600000,
+      "required": true,
+      "zone_preference": "any",
+      "access_required": true,
+      "grid": {}
+    },
+    {
+      "id": "K1",
+      "type": "kitchen",
+      "room_class": "standard",
+      "present": true,
+      "x_mm": 1230,
+      "y_mm": 10795,
+      "width_mm": 4400,
+      "height_mm": 3537,
+      "area_mm2": 15562800,
+      "area_m2": 15.5628,
+      "target_area_m2": 14.0,
+      "min_area_m2": 10.0,
+      "max_area_m2": 16.1,
+      "min_short_side_mm": 2800,
+      "max_aspect_ratio": 2.0,
+      "area_deviation_mm2": 1562800,
+      "required": true,
+      "zone_preference": "any",
+      "access_required": true,
+      "grid": {}
+    },
+    {
+      "id": "L1",
+      "type": "living",
+      "room_class": "standard",
+      "present": true,
+      "x_mm": 4430,
+      "y_mm": 4230,
+      "width_mm": 3786,
+      "height_mm": 6565,
+      "area_mm2": 24855090,
+      "area_m2": 24.8551,
+      "target_area_m2": 22.0,
+      "min_area_m2": 16.0,
+      "max_area_m2": 25.3,
+      "min_short_side_mm": 3400,
+      "max_aspect_ratio": 2.0,
+      "area_deviation_mm2": 2855090,
+      "required": true,
+      "zone_preference": "any",
+      "access_required": true,
+      "grid": {}
+    },
+    {
+      "id": "G1",
+      "type": "garage",
+      "room_class": "standard",
+      "present": true,
+      "x_mm": 9023,
+      "y_mm": 7785,
+      "width_mm": 3864,
+      "height_mm": 6547,
+      "area_mm2": 25297608,
+      "area_m2": 25.2976,
+      "target_area_m2": 22.0,
+      "min_area_m2": 18.0,
+      "max_area_m2": 25.3,
+      "min_short_side_mm": 3000,
+      "max_aspect_ratio": 2.2,
+      "area_deviation_mm2": 3297608,
+      "required": true,
+      "zone_preference": "any",
+      "access_required": true,
+      "grid": {}
+    },
+    {
+      "id": "LA1",
+      "type": "laundry",
+      "room_class": "standard",
+      "present": true,
+      "x_mm": 11270,
+      "y_mm": 4230,
+      "width_mm": 1617,
+      "height_mm": 3555,
+      "area_mm2": 5748435,
+      "area_m2": 5.7484,
+      "target_area_m2": 5.0,
+      "min_area_m2": 3.5,
+      "max_area_m2": 5.75,
+      "min_short_side_mm": 1600,
+      "max_aspect_ratio": 2.2,
+      "area_deviation_mm2": 748435,
+      "required": true,
+      "zone_preference": "any",
+      "access_required": true,
+      "grid": {}
+    }
+  ],
+  "circulation": {
+    "component_count": 1,
+    "connected": true,
+    "corridor_rect": {
+      "x_mm": 1230,
+      "y_mm": 3230,
+      "width_mm": 11657,
+      "height_mm": 1000
+    },
+    "orientation": "horizontal",
+    "main_component_cells": null,
+    "main_component": [],
+    "corridor_cells": [],
+    "corridor_area_mm2": 11657000,
+    "corridor_area_m2": 11.657,
+    "corridor_area_fraction": 0.0901,
+    "cell_min_mm": 1000,
+    "min_width_required_mm": 1000,
+    "measured_min_width_mm": 1000,
+    "width_p05_mm": 1000,
+    "width_ok": true,
+    "segments": [
+      {
+        "segment_id": "COR1",
+        "x_mm": 1230,
+        "y_mm": 3230,
+        "width_mm": 11657,
+        "height_mm": 1000,
+        "area_mm2": 11657000,
+        "shape": "straight",
+        "orientation": "horizontal",
+        "min_dimension_mm": 1000,
+        "width_ok": true
+      }
+    ],
+    "entry": {
+      "entry_id": "ENTRY_ANCHOR",
+      "type": "entry_anchor",
+      "side": "south",
+      "x_mm": 6258,
+      "y_mm": 3230,
+      "width_mm": 1600,
+      "height_mm": 230,
+      "anchor_width_mm": 1600,
+      "in_brief": false,
+      "kind": "opening_through_external_wall"
+    },
+    "entry_touches_front": true,
+    "gap_classification": [
+      {
+        "kind": "circulation_candidate",
+        "area_m2": 2.7155,
+        "touches_corridor": true,
+        "note": "unallocated floor area inside the envelope (the solver charges this in the objective; it is not circulation)"
+      }
+    ],
+    "gap_cells": [],
+    "residual_area_mm2": 2715470,
+    "gap_area_m2": 2.7155,
+    "reaches_all_rooms": null
+  },
+  "access_graph": {
+    "nodes": [
+      "B1",
+      "B2",
+      "B3",
+      "BA1",
+      "BA2",
+      "G1",
+      "K1",
+      "L1",
+      "LA1",
+      "CORRIDOR"
+    ],
+    "edges": [
+      {
+        "a": "B1",
+        "b": "CORRIDOR",
+        "kind": "room_corridor",
+        "shared_wall_mm": 3200,
+        "orientation": "horizontal",
+        "door": true,
+        "traversable": true
+      },
+      {
+        "a": "BA1",
+        "b": "CORRIDOR",
+        "kind": "room_corridor",
+        "shared_wall_mm": 3054,
+        "orientation": "horizontal",
+        "door": true,
+        "traversable": true
+      },
+      {
+        "a": "L1",
+        "b": "CORRIDOR",
+        "kind": "room_corridor",
+        "shared_wall_mm": 3786,
+        "orientation": "horizontal",
+        "door": true,
+        "traversable": true
+      },
+      {
+        "a": "LA1",
+        "b": "CORRIDOR",
+        "kind": "room_corridor",
+        "shared_wall_mm": 1617,
+        "orientation": "horizontal",
+        "door": true,
+        "traversable": true
+      },
+      {
+        "a": "B1",
+        "b": "B3",
+        "kind": "contact",
+        "shared_wall_mm": 3200,
+        "orientation": "horizontal",
+        "door": true,
+        "traversable": true
+      },
+      {
+        "a": "B1",
+        "b": "L1",
+        "kind": "preferred_adjacency",
+        "shared_wall_mm": 3565,
+        "orientation": "vertical",
+        "door": true,
+        "traversable": true
+      },
+      {
+        "a": "B2",
+        "b": "G1",
+        "kind": "contact",
+        "shared_wall_mm": 3537,
+        "orientation": "vertical",
+        "door": true,
+        "traversable": true
+      },
+      {
+        "a": "B2",
+        "b": "K1",
+        "kind": "contact",
+        "shared_wall_mm": 3537,
+        "orientation": "vertical",
+        "door": true,
+        "traversable": true
+      },
+      {
+        "a": "B2",
+        "b": "L1",
+        "kind": "preferred_adjacency",
+        "shared_wall_mm": 2586,
+        "orientation": "horizontal",
+        "door": true,
+        "traversable": true
+      },
+      {
+        "a": "B3",
+        "b": "K1",
+        "kind": "contact",
+        "shared_wall_mm": 3200,
+        "orientation": "horizontal",
+        "door": true,
+        "traversable": true
+      },
+      {
+        "a": "B3",
+        "b": "L1",
+        "kind": "preferred_adjacency",
+        "shared_wall_mm": 3000,
+        "orientation": "vertical",
+        "door": true,
+        "traversable": true
+      },
+      {
+        "a": "BA1",
+        "b": "BA2",
+        "kind": "contact",
+        "shared_wall_mm": 2875,
+        "orientation": "horizontal",
+        "door": true,
+        "traversable": false
+      },
+      {
+        "a": "BA1",
+        "b": "L1",
+        "kind": "contact",
+        "shared_wall_mm": 1955,
+        "orientation": "vertical",
+        "door": true,
+        "traversable": false
+      },
+      {
+        "a": "BA1",
+        "b": "LA1",
+        "kind": "contact",
+        "shared_wall_mm": 1955,
+        "orientation": "vertical",
+        "door": true,
+        "traversable": false
+      },
+      {
+        "a": "BA2",
+        "b": "G1",
+        "kind": "contact",
+        "shared_wall_mm": 2068,
+        "orientation": "horizontal",
+        "door": true,
+        "traversable": false
+      },
+      {
+        "a": "BA2",
+        "b": "L1",
+        "kind": "contact",
+        "shared_wall_mm": 1600,
+        "orientation": "vertical",
+        "door": true,
+        "traversable": false
+      },
+      {
+        "a": "G1",
+        "b": "LA1",
+        "kind": "direct_access",
+        "shared_wall_mm": 1617,
+        "orientation": "horizontal",
+        "door": true,
+        "traversable": true
+      },
+      {
+        "a": "K1",
+        "b": "L1",
+        "kind": "hard_adjacency",
+        "shared_wall_mm": 1200,
+        "orientation": "horizontal",
+        "door": true,
+        "traversable": true
+      }
+    ],
+    "contact_length_mm": {
+      "B1|CORRIDOR": 3200,
+      "BA1|CORRIDOR": 3054,
+      "L1|CORRIDOR": 3786,
+      "LA1|CORRIDOR": 1617,
+      "B1|B3": 3200,
+      "B1|L1": 3565,
+      "B2|G1": 3537,
+      "B2|K1": 3537,
+      "B2|L1": 2586,
+      "B3|K1": 3200,
+      "B3|L1": 3000,
+      "BA1|BA2": 2875,
+      "BA1|L1": 1955,
+      "BA1|LA1": 1955,
+      "BA2|G1": 2068,
+      "BA2|L1": 1600,
+      "G1|LA1": 1617,
+      "K1|L1": 1200
+    }
+  },
+  "access_validation": {
+    "entry_node": "CORRIDOR",
+    "reachable_from_corridor": [
+      "B1",
+      "B2",
+      "B3",
+      "BA1",
+      "BA2",
+      "CORRIDOR",
+      "G1",
+      "K1",
+      "L1",
+      "LA1"
+    ],
+    "unreachable_rooms": [],
+    "corridor_contact_mm": {
+      "B1": 3200,
+      "BA1": 3054,
+      "L1": 3786,
+      "LA1": 1617
+    },
+    "access_hubs": [
+      "L1",
+      "LA1"
+    ],
+    "hub_rooms": [
+      "L1"
+    ],
+    "violations": [],
+    "private_transit_violations": 0,
+    "passed": true
+  },
+  "walls": [
+    {
+      "wall_id": "W_OUT_S",
+      "type": "external",
+      "thickness_mm": 230,
+      "kind": "outer_boundary",
+      "geometry": {
+        "x_mm": 1000,
+        "y_mm": 3000,
+        "width_mm": 12117,
+        "height_mm": 230,
+        "orientation": "horizontal",
+        "side": "south"
+      },
+      "length_mm": 12117
+    },
+    {
+      "wall_id": "W_OUT_N",
+      "type": "external",
+      "thickness_mm": 230,
+      "kind": "outer_boundary",
+      "geometry": {
+        "x_mm": 1000,
+        "y_mm": 14332,
+        "width_mm": 12117,
+        "height_mm": 230,
+        "orientation": "horizontal",
+        "side": "north"
+      },
+      "length_mm": 12117
+    },
+    {
+      "wall_id": "W_OUT_W",
+      "type": "external",
+      "thickness_mm": 230,
+      "kind": "outer_boundary",
+      "geometry": {
+        "x_mm": 1000,
+        "y_mm": 3230,
+        "width_mm": 230,
+        "height_mm": 11102,
+        "orientation": "vertical",
+        "side": "west"
+      },
+      "length_mm": 11102
+    },
+    {
+      "wall_id": "W_OUT_E",
+      "type": "external",
+      "thickness_mm": 230,
+      "kind": "outer_boundary",
+      "geometry": {
+        "x_mm": 12887,
+        "y_mm": 3230,
+        "width_mm": 230,
+        "height_mm": 11102,
+        "orientation": "vertical",
+        "side": "east"
+      },
+      "length_mm": 11102
+    },
+    {
+      "wall_id": "W_V1",
+      "type": "internal",
+      "thickness_mm": 90,
+      "kind": "room_room",
+      "between": [
+        "B1",
+        "L1"
+      ],
+      "geometry": {
+        "x_mm": 4385,
+        "y_mm": 4230,
+        "width_mm": 90,
+        "height_mm": 3500,
+        "orientation": "vertical"
+      },
+      "centreline": {
+        "x_mm": 4430,
+        "y0_mm": 4230,
+        "y1_mm": 7730
+      },
+      "length_mm": 3500
+    },
+    {
+      "wall_id": "W_V2",
+      "type": "internal",
+      "thickness_mm": 90,
+      "kind": "room_room",
+      "between": [
+        "B3",
+        "L1"
+      ],
+      "geometry": {
+        "x_mm": 4385,
+        "y_mm": 7730,
+        "width_mm": 90,
+        "height_mm": 3000,
+        "orientation": "vertical"
+      },
+      "centreline": {
+        "x_mm": 4430,
+        "y0_mm": 7730,
+        "y1_mm": 10730
+      },
+      "length_mm": 3000
+    },
+    {
+      "wall_id": "W_V3",
+      "type": "internal",
+      "thickness_mm": 90,
+      "kind": "room_room",
+      "between": [
+        "K1",
+        "L1"
+      ],
+      "geometry": {
+        "x_mm": 4385,
+        "y_mm": 10730,
+        "width_mm": 90,
+        "height_mm": 100,
+        "orientation": "vertical"
+      },
+      "centreline": {
+        "x_mm": 4430,
+        "y0_mm": 10730,
+        "y1_mm": 10830
+      },
+      "length_mm": 100
+    },
+    {
+      "wall_id": "W_V4",
+      "type": "internal",
+      "thickness_mm": 90,
+      "kind": "room_room",
+      "between": [
+        "B2",
+        "K1"
+      ],
+      "geometry": {
+        "x_mm": 5585,
+        "y_mm": 10830,
+        "width_mm": 90,
+        "height_mm": 3600,
+        "orientation": "vertical"
+      },
+      "centreline": {
+        "x_mm": 5630,
+        "y0_mm": 10830,
+        "y1_mm": 14430
+      },
+      "length_mm": 3600
+    },
+    {
+      "wall_id": "W_V5",
+      "type": "internal",
+      "thickness_mm": 90,
+      "kind": "room_room",
+      "between": [
+        "B2",
+        "L1"
+      ],
+      "geometry": {
+        "x_mm": 8185,
+        "y_mm": 10730,
+        "width_mm": 90,
+        "height_mm": 100,
+        "orientation": "vertical"
+      },
+      "centreline": {
+        "x_mm": 8230,
+        "y0_mm": 10730,
+        "y1_mm": 10830
+      },
+      "length_mm": 100
+    },
+    {
+      "wall_id": "W_V6",
+      "type": "internal",
+      "thickness_mm": 90,
+      "kind": "room_room",
+      "between": [
+        "BA1",
+        "L1"
+      ],
+      "geometry": {
+        "x_mm": 8185,
+        "y_mm": 4230,
+        "width_mm": 90,
+        "height_mm": 1900,
+        "orientation": "vertical"
+      },
+      "centreline": {
+        "x_mm": 8230,
+        "y0_mm": 4230,
+        "y1_mm": 6130
+      },
+      "length_mm": 1900
+    },
+    {
+      "wall_id": "W_V7",
+      "type": "internal",
+      "thickness_mm": 90,
+      "kind": "room_room",
+      "between": [
+        "BA2",
+        "L1"
+      ],
+      "geometry": {
+        "x_mm": 8185,
+        "y_mm": 6130,
+        "width_mm": 90,
+        "height_mm": 1700,
+        "orientation": "vertical"
+      },
+      "centreline": {
+        "x_mm": 8230,
+        "y0_mm": 6130,
+        "y1_mm": 7830
+      },
+      "length_mm": 1700
+    },
+    {
+      "wall_id": "W_V8",
+      "type": "internal",
+      "thickness_mm": 90,
+      "kind": "room_room",
+      "between": [
+        "B2",
+        "G1"
+      ],
+      "geometry": {
+        "x_mm": 8885,
+        "y_mm": 10730,
+        "width_mm": 90,
+        "height_mm": 3700,
+        "orientation": "vertical"
+      },
+      "centreline": {
+        "x_mm": 8930,
+        "y0_mm": 10730,
+        "y1_mm": 14430
+      },
+      "length_mm": 3700
+    },
+    {
+      "wall_id": "W_V9",
+      "type": "internal",
+      "thickness_mm": 90,
+      "kind": "room_room",
+      "between": [
+        "BA2",
+        "G1"
+      ],
+      "geometry": {
+        "x_mm": 8885,
+        "y_mm": 7730,
+        "width_mm": 90,
+        "height_mm": 100,
+        "orientation": "vertical"
+      },
+      "centreline": {
+        "x_mm": 8930,
+        "y0_mm": 7730,
+        "y1_mm": 7830
+      },
+      "length_mm": 100
+    },
+    {
+      "wall_id": "W_V10",
+      "type": "internal",
+      "thickness_mm": 90,
+      "kind": "room_room",
+      "between": [
+        "BA1",
+        "BA2"
+      ],
+      "geometry": {
+        "x_mm": 11085,
+        "y_mm": 6130,
+        "width_mm": 90,
+        "height_mm": 100,
+        "orientation": "vertical"
+      },
+      "centreline": {
+        "x_mm": 11130,
+        "y0_mm": 6130,
+        "y1_mm": 6230
+      },
+      "length_mm": 100
+    },
+    {
+      "wall_id": "W_V11",
+      "type": "internal",
+      "thickness_mm": 90,
+      "kind": "room_room",
+      "between": [
+        "BA1",
+        "LA1"
+      ],
+      "geometry": {
+        "x_mm": 11185,
+        "y_mm": 4230,
+        "width_mm": 90,
+        "height_mm": 2000,
+        "orientation": "vertical"
+      },
+      "centreline": {
+        "x_mm": 11230,
+        "y0_mm": 4230,
+        "y1_mm": 6230
+      },
+      "length_mm": 2000
+    },
+    {
+      "wall_id": "W_V12",
+      "type": "internal",
+      "thickness_mm": 90,
+      "kind": "room_room",
+      "between": [
+        "G1",
+        "LA1"
+      ],
+      "geometry": {
+        "x_mm": 11185,
+        "y_mm": 7730,
+        "width_mm": 90,
+        "height_mm": 100,
+        "orientation": "vertical"
+      },
+      "centreline": {
+        "x_mm": 11230,
+        "y0_mm": 7730,
+        "y1_mm": 7830
+      },
+      "length_mm": 100
+    },
+    {
+      "wall_id": "W_H13",
+      "type": "internal",
+      "thickness_mm": 90,
+      "kind": "room_corridor",
+      "between": [
+        "B1",
+        "CORRIDOR"
+      ],
+      "geometry": {
+        "x_mm": 1230,
+        "y_mm": 4185,
+        "width_mm": 3200,
+        "height_mm": 90,
+        "orientation": "horizontal"
+      },
+      "centreline": {
+        "y_mm": 4230,
+        "x0_mm": 1230,
+        "x1_mm": 4430
+      },
+      "length_mm": 3200
+    },
+    {
+      "wall_id": "W_H14",
+      "type": "internal",
+      "thickness_mm": 90,
+      "kind": "room_corridor",
+      "between": [
+        "BA1",
+        "CORRIDOR"
+      ],
+      "geometry": {
+        "x_mm": 8230,
+        "y_mm": 4185,
+        "width_mm": 3000,
+        "height_mm": 90,
+        "orientation": "horizontal"
+      },
+      "centreline": {
+        "y_mm": 4230,
+        "x0_mm": 8230,
+        "x1_mm": 11230
+      },
+      "length_mm": 3000
+    },
+    {
+      "wall_id": "W_H15",
+      "type": "internal",
+      "thickness_mm": 90,
+      "kind": "room_corridor",
+      "between": [
+        "CORRIDOR",
+        "L1"
+      ],
+      "geometry": {
+        "x_mm": 4430,
+        "y_mm": 4185,
+        "width_mm": 3800,
+        "height_mm": 90,
+        "orientation": "horizontal"
+      },
+      "centreline": {
+        "y_mm": 4230,
+        "x0_mm": 4430,
+        "x1_mm": 8230
+      },
+      "length_mm": 3800
+    },
+    {
+      "wall_id": "W_H16",
+      "type": "internal",
+      "thickness_mm": 90,
+      "kind": "room_corridor",
+      "between": [
+        "CORRIDOR",
+        "LA1"
+      ],
+      "geometry": {
+        "x_mm": 11230,
+        "y_mm": 4185,
+        "width_mm": 1700,
+        "height_mm": 90,
+        "orientation": "horizontal"
+      },
+      "centreline": {
+        "y_mm": 4230,
+        "x0_mm": 11230,
+        "x1_mm": 12930
+      },
+      "length_mm": 1700
+    },
+    {
+      "wall_id": "W_H17",
+      "type": "internal",
+      "thickness_mm": 90,
+      "kind": "room_room",
+      "between": [
+        "BA1",
+        "BA2"
+      ],
+      "geometry": {
+        "x_mm": 8230,
+        "y_mm": 6085,
+        "width_mm": 2900,
+        "height_mm": 90,
+        "orientation": "horizontal"
+      },
+      "centreline": {
+        "y_mm": 6130,
+        "x0_mm": 8230,
+        "x1_mm": 11130
+      },
+      "length_mm": 2900
+    },
+    {
+      "wall_id": "W_H18",
+      "type": "internal",
+      "thickness_mm": 90,
+      "kind": "room_room",
+      "between": [
+        "B1",
+        "B3"
+      ],
+      "geometry": {
+        "x_mm": 1230,
+        "y_mm": 7685,
+        "width_mm": 3200,
+        "height_mm": 90,
+        "orientation": "horizontal"
+      },
+      "centreline": {
+        "y_mm": 7730,
+        "x0_mm": 1230,
+        "x1_mm": 4430
+      },
+      "length_mm": 3200
+    },
+    {
+      "wall_id": "W_H19",
+      "type": "internal",
+      "thickness_mm": 90,
+      "kind": "room_room",
+      "between": [
+        "BA2",
+        "G1"
+      ],
+      "geometry": {
+        "x_mm": 8930,
+        "y_mm": 7685,
+        "width_mm": 2200,
+        "height_mm": 90,
+        "orientation": "horizontal"
+      },
+      "centreline": {
+        "y_mm": 7730,
+        "x0_mm": 8930,
+        "x1_mm": 11130
+      },
+      "length_mm": 2200
+    },
+    {
+      "wall_id": "W_H20",
+      "type": "internal",
+      "thickness_mm": 90,
+      "kind": "room_room",
+      "between": [
+        "G1",
+        "LA1"
+      ],
+      "geometry": {
+        "x_mm": 11230,
+        "y_mm": 7785,
+        "width_mm": 1700,
+        "height_mm": 90,
+        "orientation": "horizontal"
+      },
+      "centreline": {
+        "y_mm": 7830,
+        "x0_mm": 11230,
+        "x1_mm": 12930
+      },
+      "length_mm": 1700
+    },
+    {
+      "wall_id": "W_H21",
+      "type": "internal",
+      "thickness_mm": 90,
+      "kind": "room_room",
+      "between": [
+        "B3",
+        "K1"
+      ],
+      "geometry": {
+        "x_mm": 1230,
+        "y_mm": 10685,
+        "width_mm": 3200,
+        "height_mm": 90,
+        "orientation": "horizontal"
+      },
+      "centreline": {
+        "y_mm": 10730,
+        "x0_mm": 1230,
+        "x1_mm": 4430
+      },
+      "length_mm": 3200
+    },
+    {
+      "wall_id": "W_H22",
+      "type": "internal",
+      "thickness_mm": 90,
+      "kind": "room_room",
+      "between": [
+        "B2",
+        "L1"
+      ],
+      "geometry": {
+        "x_mm": 5630,
+        "y_mm": 10785,
+        "width_mm": 2600,
+        "height_mm": 90,
+        "orientation": "horizontal"
+      },
+      "centreline": {
+        "y_mm": 10830,
+        "x0_mm": 5630,
+        "x1_mm": 8230
+      },
+      "length_mm": 2600
+    },
+    {
+      "wall_id": "W_H23",
+      "type": "internal",
+      "thickness_mm": 90,
+      "kind": "room_room",
+      "between": [
+        "K1",
+        "L1"
+      ],
+      "geometry": {
+        "x_mm": 4430,
+        "y_mm": 10785,
+        "width_mm": 1200,
+        "height_mm": 90,
+        "orientation": "horizontal"
+      },
+      "centreline": {
+        "y_mm": 10830,
+        "x0_mm": 4430,
+        "x1_mm": 5630
+      },
+      "length_mm": 1200
+    }
+  ],
+  "wall_summary": {
+    "n_walls": 27,
+    "n_external": 4,
+    "n_internal": 23,
+    "external_thickness_mm": 230,
+    "internal_thickness_mm": 90,
+    "total_external_length_mm": 46438,
+    "total_internal_length_mm": 48600,
+    "reporting_grid_mm": 100
+  },
+  "openings": [
+    {
+      "opening_id": "D1",
+      "kind": "room_to_corridor",
+      "a": "B1",
+      "b": "CORRIDOR",
+      "wall_id": "W_H13",
+      "x_mm": 2420,
+      "y_mm": 4230,
+      "width_mm": 820,
+      "height_mm": 90,
+      "orientation": "horizontal",
+      "wall_length_mm": 3200,
+      "clamped": false,
+      "fits": true
+    },
+    {
+      "opening_id": "D2",
+      "kind": "room_to_corridor",
+      "a": "BA1",
+      "b": "CORRIDOR",
+      "wall_id": "W_H14",
+      "x_mm": 9320,
+      "y_mm": 4230,
+      "width_mm": 820,
+      "height_mm": 90,
+      "orientation": "horizontal",
+      "wall_length_mm": 3000,
+      "clamped": false,
+      "fits": true
+    },
+    {
+      "opening_id": "D3",
+      "kind": "room_to_corridor",
+      "a": "L1",
+      "b": "CORRIDOR",
+      "wall_id": "W_H15",
+      "x_mm": 5920,
+      "y_mm": 4230,
+      "width_mm": 820,
+      "height_mm": 90,
+      "orientation": "horizontal",
+      "wall_length_mm": 3800,
+      "clamped": false,
+      "fits": true
+    },
+    {
+      "opening_id": "D4",
+      "kind": "room_to_corridor",
+      "a": "LA1",
+      "b": "CORRIDOR",
+      "wall_id": "W_H16",
+      "x_mm": 11670,
+      "y_mm": 4230,
+      "width_mm": 820,
+      "height_mm": 90,
+      "orientation": "horizontal",
+      "wall_length_mm": 1700,
+      "clamped": false,
+      "fits": true
+    },
+    {
+      "opening_id": "D5",
+      "kind": "direct_access",
+      "a": "G1",
+      "b": "LA1",
+      "wall_id": "W_H20",
+      "x_mm": 11670,
+      "y_mm": 7830,
+      "width_mm": 820,
+      "height_mm": 90,
+      "orientation": "horizontal",
+      "wall_length_mm": 1700,
+      "clamped": false,
+      "fits": true
+    },
+    {
+      "opening_id": "D6",
+      "kind": "entry",
+      "a": "OUTSIDE",
+      "b": "CORRIDOR",
+      "wall_id": "W_OUT_S",
+      "x_mm": 6258,
+      "y_mm": 3230,
+      "width_mm": 1600,
+      "height_mm": 230,
+      "side": "south",
+      "orientation": "horizontal",
+      "wall_length_mm": 1600,
+      "fits": true,
+      "source": "engine_entry_anchor"
+    }
+  ],
+  "relationships": [
+    {
+      "a": "B1",
+      "b": "BA1",
+      "relationship": "PREFER_ADJACENT",
+      "weight": 0.4991,
+      "edge_probability": 0.4991,
+      "door_probability": 0.2148,
+      "min_shared_wall_mm": 900,
+      "min_door_width_mm": 820,
+      "authored": null
+    },
+    {
+      "a": "B1",
+      "b": "BA2",
+      "relationship": "PREFER_ADJACENT",
+      "weight": 0.4982,
+      "edge_probability": 0.4982,
+      "door_probability": 0.211,
+      "min_shared_wall_mm": 900,
+      "min_door_width_mm": 820,
+      "authored": null
+    },
+    {
+      "a": "B1",
+      "b": "L1",
+      "relationship": "PREFER_ADJACENT",
+      "weight": 0.944,
+      "edge_probability": 0.944,
+      "door_probability": 0.9082,
+      "min_shared_wall_mm": 900,
+      "min_door_width_mm": 820,
+      "authored": null
+    },
+    {
+      "a": "B1",
+      "b": "G1",
+      "relationship": "CONNECTED_VIA_CIRCULATION",
+      "weight": 0.0,
+      "edge_probability": 0.0,
+      "door_probability": 0.0,
+      "min_shared_wall_mm": 900,
+      "min_door_width_mm": 820,
+      "authored": null
+    },
+    {
+      "a": "B2",
+      "b": "BA1",
+      "relationship": "PREFER_ADJACENT",
+      "weight": 0.5015,
+      "edge_probability": 0.5015,
+      "door_probability": 0.2431,
+      "min_shared_wall_mm": 900,
+      "min_door_width_mm": 820,
+      "authored": null
+    },
+    {
+      "a": "B2",
+      "b": "BA2",
+      "relationship": "PREFER_ADJACENT",
+      "weight": 0.4887,
+      "edge_probability": 0.4887,
+      "door_probability": 0.2282,
+      "min_shared_wall_mm": 900,
+      "min_door_width_mm": 820,
+      "authored": null
+    },
+    {
+      "a": "B2",
+      "b": "L1",
+      "relationship": "PREFER_ADJACENT",
+      "weight": 0.9687,
+      "edge_probability": 0.9687,
+      "door_probability": 0.9404,
+      "min_shared_wall_mm": 900,
+      "min_door_width_mm": 820,
+      "authored": null
+    },
+    {
+      "a": "B2",
+      "b": "G1",
+      "relationship": "CONNECTED_VIA_CIRCULATION",
+      "weight": 0.0,
+      "edge_probability": 0.0,
+      "door_probability": 0.0,
+      "min_shared_wall_mm": 900,
+      "min_door_width_mm": 820,
+      "authored": null
+    },
+    {
+      "a": "B3",
+      "b": "BA1",
+      "relationship": "PREFER_ADJACENT",
+      "weight": 0.4863,
+      "edge_probability": 0.4863,
+      "door_probability": 0.151,
+      "min_shared_wall_mm": 900,
+      "min_door_width_mm": 820,
+      "authored": null
+    },
+    {
+      "a": "B3",
+      "b": "L1",
+      "relationship": "PREFER_ADJACENT",
+      "weight": 0.977,
+      "edge_probability": 0.977,
+      "door_probability": 0.9295,
+      "min_shared_wall_mm": 900,
+      "min_door_width_mm": 820,
+      "authored": null
+    },
+    {
+      "a": "B3",
+      "b": "G1",
+      "relationship": "CONNECTED_VIA_CIRCULATION",
+      "weight": 0.0,
+      "edge_probability": 0.0,
+      "door_probability": 0.0,
+      "min_shared_wall_mm": 900,
+      "min_door_width_mm": 820,
+      "authored": null
+    },
+    {
+      "a": "BA1",
+      "b": "K1",
+      "relationship": "CONNECTED_VIA_CIRCULATION",
+      "weight": 0.0,
+      "edge_probability": 0.0,
+      "door_probability": 0.0,
+      "min_shared_wall_mm": 900,
+      "min_door_width_mm": 820,
+      "authored": null
+    },
+    {
+      "a": "BA1",
+      "b": "L1",
+      "relationship": "CONNECTED_VIA_CIRCULATION",
+      "weight": 0.7181,
+      "edge_probability": 0.7181,
+      "door_probability": 0.3222,
+      "min_shared_wall_mm": 900,
+      "min_door_width_mm": 820,
+      "authored": null
+    },
+    {
+      "a": "BA2",
+      "b": "K1",
+      "relationship": "CONNECTED_VIA_CIRCULATION",
+      "weight": 0.0,
+      "edge_probability": 0.0,
+      "door_probability": 0.0,
+      "min_shared_wall_mm": 900,
+      "min_door_width_mm": 820,
+      "authored": null
+    },
+    {
+      "a": "BA2",
+      "b": "L1",
+      "relationship": "CONNECTED_VIA_CIRCULATION",
+      "weight": 0.5708,
+      "edge_probability": 0.5708,
+      "door_probability": 0.2168,
+      "min_shared_wall_mm": 900,
+      "min_door_width_mm": 820,
+      "authored": null
+    },
+    {
+      "a": "K1",
+      "b": "L1",
+      "relationship": "HARD_ADJACENT",
+      "weight": 0.9258,
+      "edge_probability": 0.9258,
+      "door_probability": 0.4819,
+      "min_shared_wall_mm": 1200,
+      "min_door_width_mm": 820,
+      "authored": "brief_authored"
+    },
+    {
+      "a": "K1",
+      "b": "LA1",
+      "relationship": "CONNECTED_VIA_CIRCULATION",
+      "weight": 0.3936,
+      "edge_probability": 0.3936,
+      "door_probability": 0.0104,
+      "min_shared_wall_mm": 900,
+      "min_door_width_mm": 820,
+      "authored": null
+    },
+    {
+      "a": "L1",
+      "b": "G1",
+      "relationship": "CONNECTED_VIA_CIRCULATION",
+      "weight": 0.0,
+      "edge_probability": 0.0,
+      "door_probability": 0.0,
+      "min_shared_wall_mm": 900,
+      "min_door_width_mm": 820,
+      "authored": null
+    },
+    {
+      "a": "L1",
+      "b": "LA1",
+      "relationship": "CONNECTED_VIA_CIRCULATION",
+      "weight": 0.0,
+      "edge_probability": 0.0,
+      "door_probability": 0.0,
+      "min_shared_wall_mm": 900,
+      "min_door_width_mm": 820,
+      "authored": null
+    },
+    {
+      "a": "G1",
+      "b": "LA1",
+      "relationship": "DIRECT_ACCESS",
+      "weight": 0.967,
+      "edge_probability": 0.967,
+      "door_probability": 0.0137,
+      "min_shared_wall_mm": 900,
+      "min_door_width_mm": 820,
+      "authored": "brief_authored_door"
+    }
+  ],
+  "relationship_table_counts": {
+    "HARD_ADJACENT": 1,
+    "PREFER_ADJACENT": 8,
+    "DIRECT_ACCESS": 1,
+    "CONNECTED_VIA_CIRCULATION": 10,
+    "NO_REQUIREMENT": 16
+  },
+  "relationship_table": {
+    "candidate_id": "v1_rank5_stochastic_11",
+    "n_rooms": 9,
+    "n_pairs": 36,
+    "n_model_edges": 13,
+    "counts": {
+      "HARD_ADJACENT": 1,
+      "PREFER_ADJACENT": 8,
+      "DIRECT_ACCESS": 1,
+      "CONNECTED_VIA_CIRCULATION": 10,
+      "NO_REQUIREMENT": 16
+    },
+    "pairs": [
+      {
+        "a": "B1",
+        "b": "B2",
+        "a_type": "bedroom",
+        "b_type": "bedroom",
+        "model_edge_probability": 0.0,
+        "door_probability": 0.0,
+        "relationship": "NO_REQUIREMENT",
+        "weight": 0.0,
+        "min_shared_wall_mm": 900,
+        "authored": null,
+        "in_model_edge_set": false,
+        "reason": [
+          "[weak_edge_no_requirement] learned edge probability is too weak to imply any geometric relationship (mission section 5)"
+        ]
+      },
+      {
+        "a": "B1",
+        "b": "B3",
+        "a_type": "bedroom",
+        "b_type": "bedroom",
+        "model_edge_probability": 0.0,
+        "door_probability": 0.0,
+        "relationship": "NO_REQUIREMENT",
+        "weight": 0.0,
+        "min_shared_wall_mm": 900,
+        "authored": null,
+        "in_model_edge_set": false,
+        "reason": [
+          "[weak_edge_no_requirement] learned edge probability is too weak to imply any geometric relationship (mission section 5)"
+        ]
+      },
+      {
+        "a": "B1",
+        "b": "BA1",
+        "a_type": "bedroom",
+        "b_type": "bathroom",
+        "model_edge_probability": 0.4991,
+        "door_probability": 0.2148,
+        "relationship": "PREFER_ADJACENT",
+        "weight": 0.4991,
+        "min_shared_wall_mm": 900,
+        "authored": null,
+        "in_model_edge_set": true,
+        "reason": [
+          "[bedroom_bathroom_prefer] bedroom <-> bathroom preferred but not required",
+          "learned edge probability 0.499, door probability 0.215"
+        ]
+      },
+      {
+        "a": "B1",
+        "b": "BA2",
+        "a_type": "bedroom",
+        "b_type": "bathroom",
+        "model_edge_probability": 0.4982,
+        "door_probability": 0.211,
+        "relationship": "PREFER_ADJACENT",
+        "weight": 0.4982,
+        "min_shared_wall_mm": 900,
+        "authored": null,
+        "in_model_edge_set": true,
+        "reason": [
+          "[bedroom_bathroom_prefer] bedroom <-> bathroom preferred but not required",
+          "learned edge probability 0.498, door probability 0.211"
+        ]
+      },
+      {
+        "a": "B1",
+        "b": "K1",
+        "a_type": "bedroom",
+        "b_type": "kitchen",
+        "model_edge_probability": 0.0,
+        "door_probability": 0.0,
+        "relationship": "NO_REQUIREMENT",
+        "weight": 0.0,
+        "min_shared_wall_mm": 900,
+        "authored": null,
+        "in_model_edge_set": false,
+        "reason": [
+          "[weak_edge_no_requirement] learned edge probability is too weak to imply any geometric relationship (mission section 5)"
+        ]
+      },
+      {
+        "a": "B1",
+        "b": "L1",
+        "a_type": "bedroom",
+        "b_type": "living",
+        "model_edge_probability": 0.944,
+        "door_probability": 0.9082,
+        "relationship": "PREFER_ADJACENT",
+        "weight": 0.944,
+        "min_shared_wall_mm": 900,
+        "authored": null,
+        "in_model_edge_set": true,
+        "reason": [
+          "[default_learned_edge_prefer] default learned model edge: preferred adjacency, never a hard shared wall (mission section 7)",
+          "learned edge probability 0.944, door probability 0.908"
+        ]
+      },
+      {
+        "a": "B1",
+        "b": "G1",
+        "a_type": "bedroom",
+        "b_type": "garage",
+        "model_edge_probability": 0.0,
+        "door_probability": 0.0,
+        "relationship": "CONNECTED_VIA_CIRCULATION",
+        "weight": 0.0,
+        "min_shared_wall_mm": 900,
+        "authored": null,
+        "in_model_edge_set": false,
+        "reason": [
+          "[garage_living_circulation] garage <-> living must not be a shared wall by default; route through circulation and never let the garage be internal transit"
+        ]
+      },
+      {
+        "a": "B1",
+        "b": "LA1",
+        "a_type": "bedroom",
+        "b_type": "laundry",
+        "model_edge_probability": 0.0,
+        "door_probability": 0.0,
+        "relationship": "NO_REQUIREMENT",
+        "weight": 0.0,
+        "min_shared_wall_mm": 900,
+        "authored": null,
+        "in_model_edge_set": false,
+        "reason": [
+          "[weak_edge_no_requirement] learned edge probability is too weak to imply any geometric relationship (mission section 5)"
+        ]
+      },
+      {
+        "a": "B2",
+        "b": "B3",
+        "a_type": "bedroom",
+        "b_type": "bedroom",
+        "model_edge_probability": 0.0,
+        "door_probability": 0.0,
+        "relationship": "NO_REQUIREMENT",
+        "weight": 0.0,
+        "min_shared_wall_mm": 900,
+        "authored": null,
+        "in_model_edge_set": false,
+        "reason": [
+          "[weak_edge_no_requirement] learned edge probability is too weak to imply any geometric relationship (mission section 5)"
+        ]
+      },
+      {
+        "a": "B2",
+        "b": "BA1",
+        "a_type": "bedroom",
+        "b_type": "bathroom",
+        "model_edge_probability": 0.5015,
+        "door_probability": 0.2431,
+        "relationship": "PREFER_ADJACENT",
+        "weight": 0.5015,
+        "min_shared_wall_mm": 900,
+        "authored": null,
+        "in_model_edge_set": true,
+        "reason": [
+          "[bedroom_bathroom_prefer] bedroom <-> bathroom preferred but not required",
+          "learned edge probability 0.501, door probability 0.243"
+        ]
+      },
+      {
+        "a": "B2",
+        "b": "BA2",
+        "a_type": "bedroom",
+        "b_type": "bathroom",
+        "model_edge_probability": 0.4887,
+        "door_probability": 0.2282,
+        "relationship": "PREFER_ADJACENT",
+        "weight": 0.4887,
+        "min_shared_wall_mm": 900,
+        "authored": null,
+        "in_model_edge_set": true,
+        "reason": [
+          "[bedroom_bathroom_prefer] bedroom <-> bathroom preferred but not required",
+          "learned edge probability 0.489, door probability 0.228"
+        ]
+      },
+      {
+        "a": "B2",
+        "b": "K1",
+        "a_type": "bedroom",
+        "b_type": "kitchen",
+        "model_edge_probability": 0.0,
+        "door_probability": 0.0,
+        "relationship": "NO_REQUIREMENT",
+        "weight": 0.0,
+        "min_shared_wall_mm": 900,
+        "authored": null,
+        "in_model_edge_set": false,
+        "reason": [
+          "[weak_edge_no_requirement] learned edge probability is too weak to imply any geometric relationship (mission section 5)"
+        ]
+      },
+      {
+        "a": "B2",
+        "b": "L1",
+        "a_type": "bedroom",
+        "b_type": "living",
+        "model_edge_probability": 0.9687,
+        "door_probability": 0.9404,
+        "relationship": "PREFER_ADJACENT",
+        "weight": 0.9687,
+        "min_shared_wall_mm": 900,
+        "authored": null,
+        "in_model_edge_set": true,
+        "reason": [
+          "[default_learned_edge_prefer] default learned model edge: preferred adjacency, never a hard shared wall (mission section 7)",
+          "learned edge probability 0.969, door probability 0.940"
+        ]
+      },
+      {
+        "a": "B2",
+        "b": "G1",
+        "a_type": "bedroom",
+        "b_type": "garage",
+        "model_edge_probability": 0.0,
+        "door_probability": 0.0,
+        "relationship": "CONNECTED_VIA_CIRCULATION",
+        "weight": 0.0,
+        "min_shared_wall_mm": 900,
+        "authored": null,
+        "in_model_edge_set": false,
+        "reason": [
+          "[garage_living_circulation] garage <-> living must not be a shared wall by default; route through circulation and never let the garage be internal transit"
+        ]
+      },
+      {
+        "a": "B2",
+        "b": "LA1",
+        "a_type": "bedroom",
+        "b_type": "laundry",
+        "model_edge_probability": 0.0,
+        "door_probability": 0.0,
+        "relationship": "NO_REQUIREMENT",
+        "weight": 0.0,
+        "min_shared_wall_mm": 900,
+        "authored": null,
+        "in_model_edge_set": false,
+        "reason": [
+          "[weak_edge_no_requirement] learned edge probability is too weak to imply any geometric relationship (mission section 5)"
+        ]
+      },
+      {
+        "a": "B3",
+        "b": "BA1",
+        "a_type": "bedroom",
+        "b_type": "bathroom",
+        "model_edge_probability": 0.4863,
+        "door_probability": 0.151,
+        "relationship": "PREFER_ADJACENT",
+        "weight": 0.4863,
+        "min_shared_wall_mm": 900,
+        "authored": null,
+        "in_model_edge_set": true,
+        "reason": [
+          "[bedroom_bathroom_prefer] bedroom <-> bathroom preferred but not required",
+          "learned edge probability 0.486, door probability 0.151"
+        ]
+      },
+      {
+        "a": "B3",
+        "b": "BA2",
+        "a_type": "bedroom",
+        "b_type": "bathroom",
+        "model_edge_probability": 0.0,
+        "door_probability": 0.0,
+        "relationship": "NO_REQUIREMENT",
+        "weight": 0.0,
+        "min_shared_wall_mm": 900,
+        "authored": null,
+        "in_model_edge_set": false,
+        "reason": [
+          "[weak_edge_no_requirement] learned edge probability is too weak to imply any geometric relationship (mission section 5)"
+        ]
+      },
+      {
+        "a": "B3",
+        "b": "K1",
+        "a_type": "bedroom",
+        "b_type": "kitchen",
+        "model_edge_probability": 0.0,
+        "door_probability": 0.0,
+        "relationship": "NO_REQUIREMENT",
+        "weight": 0.0,
+        "min_shared_wall_mm": 900,
+        "authored": null,
+        "in_model_edge_set": false,
+        "reason": [
+          "[weak_edge_no_requirement] learned edge probability is too weak to imply any geometric relationship (mission section 5)"
+        ]
+      },
+      {
+        "a": "B3",
+        "b": "L1",
+        "a_type": "bedroom",
+        "b_type": "living",
+        "model_edge_probability": 0.977,
+        "door_probability": 0.9295,
+        "relationship": "PREFER_ADJACENT",
+        "weight": 0.977,
+        "min_shared_wall_mm": 900,
+        "authored": null,
+        "in_model_edge_set": true,
+        "reason": [
+          "[default_learned_edge_prefer] default learned model edge: preferred adjacency, never a hard shared wall (mission section 7)",
+          "learned edge probability 0.977, door probability 0.929"
+        ]
+      },
+      {
+        "a": "B3",
+        "b": "G1",
+        "a_type": "bedroom",
+        "b_type": "garage",
+        "model_edge_probability": 0.0,
+        "door_probability": 0.0,
+        "relationship": "CONNECTED_VIA_CIRCULATION",
+        "weight": 0.0,
+        "min_shared_wall_mm": 900,
+        "authored": null,
+        "in_model_edge_set": false,
+        "reason": [
+          "[garage_living_circulation] garage <-> living must not be a shared wall by default; route through circulation and never let the garage be internal transit"
+        ]
+      },
+      {
+        "a": "B3",
+        "b": "LA1",
+        "a_type": "bedroom",
+        "b_type": "laundry",
+        "model_edge_probability": 0.0,
+        "door_probability": 0.0,
+        "relationship": "NO_REQUIREMENT",
+        "weight": 0.0,
+        "min_shared_wall_mm": 900,
+        "authored": null,
+        "in_model_edge_set": false,
+        "reason": [
+          "[weak_edge_no_requirement] learned edge probability is too weak to imply any geometric relationship (mission section 5)"
+        ]
+      },
+      {
+        "a": "BA1",
+        "b": "BA2",
+        "a_type": "bathroom",
+        "b_type": "bathroom",
+        "model_edge_probability": 0.0,
+        "door_probability": 0.0,
+        "relationship": "NO_REQUIREMENT",
+        "weight": 0.0,
+        "min_shared_wall_mm": 900,
+        "authored": null,
+        "in_model_edge_set": false,
+        "reason": [
+          "[weak_edge_no_requirement] learned edge probability is too weak to imply any geometric relationship (mission section 5)"
+        ]
+      },
+      {
+        "a": "BA1",
+        "b": "K1",
+        "a_type": "bathroom",
+        "b_type": "kitchen",
+        "model_edge_probability": 0.0,
+        "door_probability": 0.0,
+        "relationship": "CONNECTED_VIA_CIRCULATION",
+        "weight": 0.0,
+        "min_shared_wall_mm": 900,
+        "authored": null,
+        "in_model_edge_set": false,
+        "reason": [
+          "[wet_room_never_hard] a bathroom/WC must never be required as transit between major rooms (mission section 7/18)"
+        ]
+      },
+      {
+        "a": "BA1",
+        "b": "L1",
+        "a_type": "bathroom",
+        "b_type": "living",
+        "model_edge_probability": 0.7181,
+        "door_probability": 0.3222,
+        "relationship": "CONNECTED_VIA_CIRCULATION",
+        "weight": 0.7181,
+        "min_shared_wall_mm": 900,
+        "authored": null,
+        "in_model_edge_set": true,
+        "reason": [
+          "[wet_room_never_hard] a bathroom/WC must never be required as transit between major rooms (mission section 7/18)",
+          "learned edge probability 0.718, door probability 0.322"
+        ]
+      },
+      {
+        "a": "BA1",
+        "b": "G1",
+        "a_type": "bathroom",
+        "b_type": "garage",
+        "model_edge_probability": 0.0,
+        "door_probability": 0.0,
+        "relationship": "NO_REQUIREMENT",
+        "weight": 0.0,
+        "min_shared_wall_mm": 900,
+        "authored": null,
+        "in_model_edge_set": false,
+        "reason": [
+          "[weak_edge_no_requirement] learned edge probability is too weak to imply any geometric relationship (mission section 5)"
+        ]
+      },
+      {
+        "a": "BA1",
+        "b": "LA1",
+        "a_type": "bathroom",
+        "b_type": "laundry",
+        "model_edge_probability": 0.0,
+        "door_probability": 0.0,
+        "relationship": "NO_REQUIREMENT",
+        "weight": 0.0,
+        "min_shared_wall_mm": 900,
+        "authored": null,
+        "in_model_edge_set": false,
+        "reason": [
+          "[weak_edge_no_requirement] learned edge probability is too weak to imply any geometric relationship (mission section 5)"
+        ]
+      },
+      {
+        "a": "BA2",
+        "b": "K1",
+        "a_type": "bathroom",
+        "b_type": "kitchen",
+        "model_edge_probability": 0.0,
+        "door_probability": 0.0,
+        "relationship": "CONNECTED_VIA_CIRCULATION",
+        "weight": 0.0,
+        "min_shared_wall_mm": 900,
+        "authored": null,
+        "in_model_edge_set": false,
+        "reason": [
+          "[wet_room_never_hard] a bathroom/WC must never be required as transit between major rooms (mission section 7/18)"
+        ]
+      },
+      {
+        "a": "BA2",
+        "b": "L1",
+        "a_type": "bathroom",
+        "b_type": "living",
+        "model_edge_probability": 0.5708,
+        "door_probability": 0.2168,
+        "relationship": "CONNECTED_VIA_CIRCULATION",
+        "weight": 0.5708,
+        "min_shared_wall_mm": 900,
+        "authored": null,
+        "in_model_edge_set": true,
+        "reason": [
+          "[wet_room_never_hard] a bathroom/WC must never be required as transit between major rooms (mission section 7/18)",
+          "learned edge probability 0.571, door probability 0.217"
+        ]
+      },
+      {
+        "a": "BA2",
+        "b": "G1",
+        "a_type": "bathroom",
+        "b_type": "garage",
+        "model_edge_probability": 0.0,
+        "door_probability": 0.0,
+        "relationship": "NO_REQUIREMENT",
+        "weight": 0.0,
+        "min_shared_wall_mm": 900,
+        "authored": null,
+        "in_model_edge_set": false,
+        "reason": [
+          "[weak_edge_no_requirement] learned edge probability is too weak to imply any geometric relationship (mission section 5)"
+        ]
+      },
+      {
+        "a": "BA2",
+        "b": "LA1",
+        "a_type": "bathroom",
+        "b_type": "laundry",
+        "model_edge_probability": 0.0,
+        "door_probability": 0.0,
+        "relationship": "NO_REQUIREMENT",
+        "weight": 0.0,
+        "min_shared_wall_mm": 900,
+        "authored": null,
+        "in_model_edge_set": false,
+        "reason": [
+          "[weak_edge_no_requirement] learned edge probability is too weak to imply any geometric relationship (mission section 5)"
+        ]
+      },
+      {
+        "a": "K1",
+        "b": "L1",
+        "a_type": "kitchen",
+        "b_type": "living",
+        "model_edge_probability": 0.9258,
+        "door_probability": 0.4819,
+        "relationship": "HARD_ADJACENT",
+        "weight": 0.9258,
+        "min_shared_wall_mm": 1200,
+        "authored": "brief_authored",
+        "in_model_edge_set": true,
+        "reason": [
+          "[authored_hard_adjacency] explicitly authored in the brief (mission section 14: hard adjacency is only for user-authored or strongly justified pairs)",
+          "learned edge probability 0.926, door probability 0.482"
+        ],
+        "authored_note": "kitchen opens off the living space"
+      },
+      {
+        "a": "K1",
+        "b": "G1",
+        "a_type": "kitchen",
+        "b_type": "garage",
+        "model_edge_probability": 0.0,
+        "door_probability": 0.0,
+        "relationship": "NO_REQUIREMENT",
+        "weight": 0.0,
+        "min_shared_wall_mm": 900,
+        "authored": null,
+        "in_model_edge_set": false,
+        "reason": [
+          "[weak_edge_no_requirement] learned edge probability is too weak to imply any geometric relationship (mission section 5)"
+        ]
+      },
+      {
+        "a": "K1",
+        "b": "LA1",
+        "a_type": "kitchen",
+        "b_type": "laundry",
+        "model_edge_probability": 0.3936,
+        "door_probability": 0.0104,
+        "relationship": "CONNECTED_VIA_CIRCULATION",
+        "weight": 0.3936,
+        "min_shared_wall_mm": 900,
+        "authored": null,
+        "in_model_edge_set": true,
+        "reason": [
+          "[wet_room_never_hard] a bathroom/WC must never be required as transit between major rooms (mission section 7/18)",
+          "learned edge probability 0.394, door probability 0.010"
+        ]
+      },
+      {
+        "a": "L1",
+        "b": "G1",
+        "a_type": "living",
+        "b_type": "garage",
+        "model_edge_probability": 0.0,
+        "door_probability": 0.0,
+        "relationship": "CONNECTED_VIA_CIRCULATION",
+        "weight": 0.0,
+        "min_shared_wall_mm": 900,
+        "authored": null,
+        "in_model_edge_set": false,
+        "reason": [
+          "[garage_living_circulation] garage <-> living must not be a shared wall by default; route through circulation and never let the garage be internal transit"
+        ]
+      },
+      {
+        "a": "L1",
+        "b": "LA1",
+        "a_type": "living",
+        "b_type": "laundry",
+        "model_edge_probability": 0.0,
+        "door_probability": 0.0,
+        "relationship": "CONNECTED_VIA_CIRCULATION",
+        "weight": 0.0,
+        "min_shared_wall_mm": 900,
+        "authored": null,
+        "in_model_edge_set": false,
+        "reason": [
+          "[wet_room_never_hard] a bathroom/WC must never be required as transit between major rooms (mission section 7/18)"
+        ]
+      },
+      {
+        "a": "G1",
+        "b": "LA1",
+        "a_type": "garage",
+        "b_type": "laundry",
+        "model_edge_probability": 0.967,
+        "door_probability": 0.0137,
+        "relationship": "DIRECT_ACCESS",
+        "weight": 0.967,
+        "min_shared_wall_mm": 900,
+        "authored": "brief_authored_door",
+        "in_model_edge_set": true,
+        "reason": [
+          "[authored_direct_access] explicitly authored door requirement in the brief",
+          "learned edge probability 0.967, door probability 0.014"
+        ],
+        "authored_door_note": "laundry is reached from the garage (service entry)",
+        "min_door_width_mm": 820
+      }
+    ],
+    "model_edges": [
+      {
+        "a": "B1",
+        "b": "BA1",
+        "p": 0.4991,
+        "p_door": 0.2148
+      },
+      {
+        "a": "B1",
+        "b": "BA2",
+        "p": 0.4982,
+        "p_door": 0.211
+      },
+      {
+        "a": "B1",
+        "b": "L1",
+        "p": 0.944,
+        "p_door": 0.9082
+      },
+      {
+        "a": "B2",
+        "b": "BA1",
+        "p": 0.5015,
+        "p_door": 0.2431
+      },
+      {
+        "a": "B2",
+        "b": "BA2",
+        "p": 0.4887,
+        "p_door": 0.2282
+      },
+      {
+        "a": "B2",
+        "b": "L1",
+        "p": 0.9687,
+        "p_door": 0.9404
+      },
+      {
+        "a": "B3",
+        "b": "BA1",
+        "p": 0.4863,
+        "p_door": 0.151
+      },
+      {
+        "a": "B3",
+        "b": "L1",
+        "p": 0.977,
+        "p_door": 0.9295
+      },
+      {
+        "a": "BA1",
+        "b": "L1",
+        "p": 0.7181,
+        "p_door": 0.3222
+      },
+      {
+        "a": "BA2",
+        "b": "L1",
+        "p": 0.5708,
+        "p_door": 0.2168
+      },
+      {
+        "a": "G1",
+        "b": "LA1",
+        "p": 0.967,
+        "p_door": 0.0137
+      },
+      {
+        "a": "K1",
+        "b": "L1",
+        "p": 0.9258,
+        "p_door": 0.4819
+      },
+      {
+        "a": "K1",
+        "b": "LA1",
+        "p": 0.3936,
+        "p_door": 0.0104
+      }
+    ],
+    "brief_authored_hard": [
+      {
+        "a": "K1",
+        "b": "L1",
+        "min_shared_wall_mm": 1200,
+        "note": "kitchen opens off the living space"
+      }
+    ],
+    "brief_authored_doors": [
+      {
+        "a": "G1",
+        "b": "LA1",
+        "min_width_mm": 820,
+        "note": "laundry is reached from the garage (service entry)"
+      }
+    ],
+    "rule_source": "E:\\Projects\\floor-plan-model\\geometry_engine_v1\\config\\architectural_rules.json"
+  },
+  "solver": {
+    "engine": "OR-Tools CP-SAT",
+    "objective_value": 76008266,
+    "best_objective_bound": 54387718.0,
+    "wall_time_s": 14.774,
+    "model": "continuous integer-mm rectangle model: no grid, no cell snapping; the corridor is a straight strip",
+    "objective_terms": {
+      "hard_violations": 0,
+      "access_violations": 0,
+      "entry_missing": 0,
+      "area_deviation_mm2": 13086404,
+      "gap_area_mm2": 2715470,
+      "corridor_area_mm2": 11657000,
+      "perimeter_mm": 126500,
+      "zone_mm": 2833,
+      "preferred_adjacency": 0,
+      "optional_absence": 0
+    },
+    "objective_coefficients": {
+      "hard_per_violation": 1000000,
+      "area_deviation_per_mm2": 1,
+      "gap_per_mm2": 6,
+      "corridor_per_mm2": 4,
+      "absence_per_room": 6000000,
+      "perimeter_per_mm": 0.006,
+      "zone_per_mm": 0.1,
+      "prefer_per_touch": -0.003
+    },
+    "entry_reaches_front": true
+  },
+  "relaxations_applied": [],
+  "validation": {
+    "all_passed": true,
+    "n_passed": 20,
+    "n_checks": 20,
+    "checks": [
+      {
+        "id": "V01",
+        "name": "rooms inside the buildable envelope",
+        "passed": true,
+        "detail": "9 rooms checked; outside: none"
+      },
+      {
+        "id": "V02",
+        "name": "no two rooms overlap",
+        "passed": true,
+        "detail": "36 pairs tested; overlaps: none"
+      },
+      {
+        "id": "V03",
+        "name": "no room overlaps the corridor",
+        "passed": true,
+        "detail": "9 rooms tested against the corridor"
+      },
+      {
+        "id": "V04",
+        "name": "minimum short side respected",
+        "passed": true,
+        "detail": "all rooms pass"
+      },
+      {
+        "id": "V05",
+        "name": "minimum area respected",
+        "passed": true,
+        "detail": "all rooms pass"
+      },
+      {
+        "id": "V06",
+        "name": "maximum area respected",
+        "passed": true,
+        "detail": "all rooms pass"
+      },
+      {
+        "id": "V07",
+        "name": "maximum aspect ratio respected",
+        "passed": true,
+        "detail": "all rooms pass"
+      },
+      {
+        "id": "V08",
+        "name": "all required rooms present",
+        "passed": true,
+        "detail": "all present"
+      },
+      {
+        "id": "V09",
+        "name": "corridor present with width >= 1000 mm",
+        "passed": true,
+        "detail": "corridor 11657x1000 mm (horizontal); measured width 1000 mm"
+      },
+      {
+        "id": "V10",
+        "name": "corridor/entry reaches the front boundary",
+        "passed": true,
+        "detail": "entry anchor on south at (6258,3230) width 1600 mm"
+      },
+      {
+        "id": "V11",
+        "name": "every access room reaches the corridor (directly or via a non-private hub, >= 820 mm)",
+        "passed": true,
+        "detail": "9 access rooms; no legal route: none (direct: 4, via a hub: 9)"
+      },
+      {
+        "id": "V12",
+        "name": "access graph valid (rooms reachable from the corridor)",
+        "passed": true,
+        "detail": "unreachable: none (nodes 10, edges 18)"
+      },
+      {
+        "id": "V13",
+        "name": "no private-room / garage transit",
+        "passed": true,
+        "detail": "no private room or garage is a required transit space"
+      },
+      {
+        "id": "V14",
+        "name": "HARD_ADJACENT relationships satisfied",
+        "passed": true,
+        "detail": "1 hard relationships share enough wall"
+      },
+      {
+        "id": "V15",
+        "name": "DIRECT_ACCESS relationships have a door-width wall",
+        "passed": true,
+        "detail": "1 direct-access pairs have a door-width wall"
+      },
+      {
+        "id": "V16",
+        "name": "door openings are valid and belong to the right pair",
+        "passed": true,
+        "detail": "6 symbolic openings checked"
+      },
+      {
+        "id": "V17",
+        "name": "internal walls separate two different owners",
+        "passed": true,
+        "detail": "23 internal walls checked"
+      },
+      {
+        "id": "V18",
+        "name": "wall thicknesses (230 mm external / 90 mm internal)",
+        "passed": true,
+        "detail": "27 walls, thicknesses correct"
+      },
+      {
+        "id": "V19",
+        "name": "rooms + corridor + residual account for the envelope",
+        "passed": true,
+        "detail": "rooms 115.044 + corridor 11.657 + residual 2.715 = 129.416 m2 envelope (2.1% residual)"
+      },
+      {
+        "id": "V20",
+        "name": "emitted areas match the emitted rectangles exactly",
+        "passed": true,
+        "detail": "all room areas are exactly width x height"
+      }
+    ]
+  },
+  "warnings": [],
+  "timings_s": {
+    "solve_s": 15.086
+  },
+  "attempts": [
+    {
+      "attempt": 1,
+      "candidate_id": "v1_rank5_stochastic_11",
+      "solver_status": "FEASIBLE",
+      "objective_value": 76008266,
+      "wall_time_s": 14.774,
+      "total_time_s": 15.086,
+      "grid": "1x1",
+      "n_rooms": 9,
+      "n_solver_relationships": 20,
+      "solver_relationship_counts": {
+        "PREFER_ADJACENT": 8,
+        "CONNECTED_VIA_CIRCULATION": 10,
+        "HARD_ADJACENT": 1,
+        "DIRECT_ACCESS": 1
+      },
+      "relaxations_applied": {
+        "hard_adjacency": true,
+        "prefer_weight_scale": 1.0,
+        "prefer_min_probability": 0.0
+      },
+      "hard_adjacency_demoted": [],
+      "targets_shrunk_to": null,
+      "branch_count": null,
+      "topology_model_score": null,
+      "topology_final_score": 0.0
+    }
+  ],
+  "candidate_model_score": null,
+  "candidate_final_score": 0.0,
+  "scores": {
+    "topology_score": 1.0,
+    "geometry_score": 0.7179,
+    "circulation_score": 0.995,
+    "preference_score": 0.7,
+    "constraint_score": 1.0,
+    "final_score": 0.8749,
+    "weights": {
+      "topology": 0.2,
+      "geometry": 0.28,
+      "circulation": 0.22,
+      "preference": 0.15,
+      "constraint": 0.15
+    },
+    "components": {
+      "geometry": {
+        "area_fit": 0.888,
+        "mean_relative_area_deviation": 0.112,
+        "aspect_ok_fraction_le_1p5": 0.4444,
+        "compactness_room_area_over_bbox": 0.9769,
+        "wall_complexity": 0.0,
+        "circulation_fraction": 0.0901,
+        "total_room_area_m2": 115.044,
+        "internal_wall_length_mm": 48600
+      },
+      "circulation": {
+        "measured_min_width_mm": 1000,
+        "required_min_width_mm": 1000,
+        "width_ok": 1.0,
+        "connected_components": 1,
+        "entry_on_front": true,
+        "unreachable_rooms": [],
+        "private_transit_violations": 0,
+        "corridor_area_fraction": 0.0901,
+        "efficiency": 0.9505,
+        "segments": 1,
+        "simplicity": 1.0
+      },
+      "preference": {
+        "satisfied": 7,
+        "violated": 3,
+        "details": [
+          {
+            "preference": "garage_toward_front",
+            "room": "G1",
+            "ok": false,
+            "centre_fraction_from_front": 0.996,
+            "weight": 0.08
+          },
+          {
+            "preference": "living_toward_rear",
+            "room": "L1",
+            "ok": true,
+            "centre_fraction_from_front": 0.677,
+            "weight": 0.06
+          },
+          {
+            "preference": "bedrooms_away_from_front",
+            "room": "B1",
+            "ok": true,
+            "centre_fraction_from_front": 0.542,
+            "weight": 0.03
+          },
+          {
+            "preference": "bedrooms_away_from_front",
+            "room": "B2",
+            "ok": false,
+            "centre_fraction_from_front": 1.132,
+            "weight": 0.03
+          },
+          {
+            "preference": "bedrooms_away_from_front",
+            "room": "B3",
+            "ok": false,
+            "centre_fraction_from_front": 0.837,
+            "weight": 0.03
+          },
+          {
+            "preference": "kitchen_near_living",
+            "room": "K1",
+            "ok": true,
+            "weight": 0.05
+          },
+          {
+            "preference": "laundry_near_kitchen_or_garage",
+            "room": "LA1",
+            "ok": true,
+            "weight": 0.03
+          },
+          {
+            "preference": "wet_rooms_clustered",
+            "room": "BA1",
+            "ok": true,
+            "weight": 0.03
+          },
+          {
+            "preference": "wet_rooms_clustered",
+            "room": "BA2",
+            "ok": true,
+            "weight": 0.03
+          },
+          {
+            "preference": "entry_on_front_side",
+            "ok": true,
+            "weight": 0.06
+          }
+        ]
+      },
+      "constraint": {
+        "checks_passed": 20,
+        "checks_total": 20,
+        "failed_checks": []
+      },
+      "topology": {
+        "source": "single candidate",
+        "final_score": 0.0
+      }
+    },
+    "relationship_satisfaction": {
+      "hard_adjacent": {
+        "satisfied": 1,
+        "total": 1
+      },
+      "prefer_adjacent": {
+        "satisfied": 3,
+        "total": 8
+      },
+      "direct_access": {
+        "satisfied": 1,
+        "total": 1
+      },
+      "connected_via_circulation": {
+        "satisfied": 10,
+        "total": 10
+      }
+    },
+    "area_deviation_m2": 13.086,
+    "circulation_area_m2": 11.657,
+    "compactness": 0.9769,
+    "wall_complexity": 0.0,
+    "n_awkward_gaps": 0
+  }
+}

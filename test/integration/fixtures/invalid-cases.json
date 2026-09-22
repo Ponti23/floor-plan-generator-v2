@@ -1,0 +1,472 @@
+{
+  "fixtureVersion": 1,
+  "kind": "case-corpus",
+  "origin": {
+    "derivedFrom": "brief-B.json, brief-D.json, layout-B.json",
+    "convertedAt": "2026-09-22",
+    "conversion": "Cases are expressed as a base fixture plus a small patch list, or as a named builder that both the Python and the TypeScript suite implement identically. Placeholder numbers use {\"$number\": \"NaN\"|\"Infinity\"|\"-Infinity\"} because JSON cannot carry them literally."
+  },
+  "patchOps": {
+    "set": "{\"op\":\"set\",\"path\":[...],\"value\":any}",
+    "delete": "{\"op\":\"delete\",\"path\":[...]}",
+    "append": "{\"op\":\"append\",\"path\":[...],\"value\":any}"
+  },
+  "builders": {
+    "brief-too-many-rooms": "brief B with 25 bedroom nodes",
+    "brief-fine-type-cap": "brief B with 9 bedroom nodes",
+    "brief-too-many-relationships": "brief B with 65 unique mustShareWall pairs",
+    "brief-relationship-self-edge": "a relationship whose two endpoints are the same room",
+    "brief-relationship-unknown-endpoint": "a relationship that names a room id not in rooms",
+    "brief-duplicate-relationship-pair": "two relationships over the same unordered pair",
+    "brief-target-gfa-above-max": "targetGfaM2 200 with maxGfaM2 150",
+    "brief-topn-above-topk": "topK 2 with topN 3",
+    "brief-min-area-above-target": "minAreaM2 20 with targetAreaM2 14",
+    "brief-axis-minimum-below-short-side": "minWidthMm 2000 with minShortSideMm 3200",
+    "brief-no-living-or-dining": "every room retyped to bedroom or bathroom",
+    "brief-no-required-room": "every room marked optional",
+    "brief-min-site-axis-ok": "site axes at the 3000 mm minimum (accept)",
+    "brief-three-decimals-ok": "room areas at three decimal places (accept)",
+    "editor-document-over-64k": "an editor document whose serialized size exceeds 64 KiB",
+    "layout-below-authored-axis-minimum": "one room rect consistent in area but under the authored axis minimum",
+    "layout-omitted-room-also-present": "a room id appears in both rooms and omittedRoomIds",
+    "layout-zero-width-wall": "an internal wall with zero width"
+  },
+  "cases": [
+    {
+      "name": "brief-numeric-string-area",
+      "target": "brief",
+      "base": "brief-B.json",
+      "expect": "reject",
+      "reason": "numeric strings must not be coerced",
+      "patch": [{ "op": "set", "path": ["rooms", 0, "targetAreaM2"], "value": "14" }]
+    },
+    {
+      "name": "brief-nan-area",
+      "target": "brief",
+      "base": "brief-B.json",
+      "expect": "reject",
+      "reason": "NaN is not a number the contract accepts",
+      "patch": [
+        { "op": "set", "path": ["rooms", 0, "targetAreaM2"], "value": { "$number": "NaN" } }
+      ]
+    },
+    {
+      "name": "brief-infinite-area",
+      "target": "brief",
+      "base": "brief-B.json",
+      "expect": "reject",
+      "reason": "infinity is not a number the contract accepts",
+      "patch": [
+        { "op": "set", "path": ["rooms", 0, "minAreaM2"], "value": { "$number": "Infinity" } }
+      ]
+    },
+    {
+      "name": "brief-bool-as-length",
+      "target": "brief",
+      "base": "brief-B.json",
+      "expect": "reject",
+      "reason": "booleans are not integers",
+      "patch": [{ "op": "set", "path": ["site", "widthMm"], "value": true }]
+    },
+    {
+      "name": "brief-fractional-millimetre",
+      "target": "brief",
+      "base": "brief-B.json",
+      "expect": "reject",
+      "reason": "millimetres are integers",
+      "patch": [{ "op": "set", "path": ["site", "widthMm"], "value": 14117.5 }]
+    },
+    {
+      "name": "brief-area-precision-4dp",
+      "target": "brief",
+      "base": "brief-B.json",
+      "expect": "reject",
+      "reason": "areas carry at most three decimal places",
+      "patch": [{ "op": "set", "path": ["rooms", 0, "targetAreaM2"], "value": 14.0001 }]
+    },
+    {
+      "name": "brief-unknown-room-field",
+      "target": "brief",
+      "base": "brief-B.json",
+      "expect": "reject",
+      "reason": "unknown fields are forbidden",
+      "patch": [{ "op": "set", "path": ["rooms", 0, "colour"], "value": "red" }]
+    },
+    {
+      "name": "brief-unknown-top-level-field",
+      "target": "brief",
+      "base": "brief-B.json",
+      "expect": "reject",
+      "reason": "engine internals such as topology_candidates are not part of the public brief",
+      "patch": [{ "op": "set", "path": ["topology_candidates"], "value": [] }]
+    },
+    {
+      "name": "brief-duplicate-room-ids",
+      "target": "brief",
+      "base": "brief-B.json",
+      "expect": "reject",
+      "reason": "room ids must be unique",
+      "patch": [{ "op": "set", "path": ["rooms", 1, "id"], "value": "B1" }]
+    },
+    {
+      "name": "brief-reserved-room-id",
+      "target": "brief",
+      "base": "brief-B.json",
+      "expect": "reject",
+      "reason": "CORRIDOR and EXTERIOR are reserved ids",
+      "patch": [{ "op": "set", "path": ["rooms", 0, "id"], "value": "CORRIDOR" }]
+    },
+    {
+      "name": "brief-id-format-invalid",
+      "target": "brief",
+      "base": "brief-B.json",
+      "expect": "reject",
+      "reason": "ids start with a letter and stay within 40 characters",
+      "patch": [{ "op": "set", "path": ["rooms", 0, "id"], "value": "1-bedroom" }]
+    },
+    {
+      "name": "brief-label-empty",
+      "target": "brief",
+      "base": "brief-B.json",
+      "expect": "reject",
+      "reason": "labels are 1 to 80 characters",
+      "patch": [{ "op": "set", "path": ["rooms", 0, "label"], "value": "" }]
+    },
+    {
+      "name": "brief-site-axis-too-small",
+      "target": "brief",
+      "base": "brief-B.json",
+      "expect": "reject",
+      "reason": "site axes are 3000 to 60000 mm",
+      "patch": [{ "op": "set", "path": ["site", "widthMm"], "value": 2999 }]
+    },
+    {
+      "name": "brief-setback-above-limit",
+      "target": "brief",
+      "base": "brief-B.json",
+      "expect": "reject",
+      "reason": "setbacks are 0 to 30000 mm",
+      "patch": [{ "op": "set", "path": ["setbacks", "westMm"], "value": 30001 }]
+    },
+    {
+      "name": "brief-external-wall-too-thin",
+      "target": "brief",
+      "base": "brief-B.json",
+      "expect": "reject",
+      "reason": "external walls are 100 to 500 mm",
+      "patch": [{ "op": "set", "path": ["walls", "externalMm"], "value": 90 }]
+    },
+    {
+      "name": "brief-internal-wall-too-thick",
+      "target": "brief",
+      "base": "brief-B.json",
+      "expect": "reject",
+      "reason": "internal walls are 50 to 300 mm",
+      "patch": [{ "op": "set", "path": ["walls", "internalMm"], "value": 301 }]
+    },
+    {
+      "name": "brief-corridor-too-narrow",
+      "target": "brief",
+      "base": "brief-B.json",
+      "expect": "reject",
+      "reason": "circulation is 1000 to 3000 mm",
+      "patch": [{ "op": "set", "path": ["circulation", "minWidthMm"], "value": 999 }]
+    },
+    {
+      "name": "brief-door-too-narrow",
+      "target": "brief",
+      "base": "brief-B.json",
+      "expect": "reject",
+      "reason": "door openings are 600 to 1500 mm",
+      "patch": [{ "op": "set", "path": ["doors", "minWidthMm"], "value": 599 }]
+    },
+    {
+      "name": "brief-seed-overflow",
+      "target": "brief",
+      "base": "brief-B.json",
+      "expect": "reject",
+      "reason": "seed is a 32-bit non-negative integer",
+      "patch": [{ "op": "set", "path": ["settings", "seed"], "value": 2147483648 }]
+    },
+    {
+      "name": "brief-units-not-mm",
+      "target": "brief",
+      "base": "brief-B.json",
+      "expect": "reject",
+      "reason": "units are fixed to mm",
+      "patch": [{ "op": "set", "path": ["units"], "value": "m" }]
+    },
+    {
+      "name": "brief-schema-version-wrong",
+      "target": "brief",
+      "base": "brief-B.json",
+      "expect": "reject",
+      "reason": "the brief schema version is fixed",
+      "patch": [{ "op": "set", "path": ["schemaVersion"], "value": "planlab.brief/2" }]
+    },
+    {
+      "name": "brief-room-count-one",
+      "target": "brief",
+      "base": "brief-B.json",
+      "expect": "reject",
+      "reason": "a programme needs at least two rooms",
+      "patch": [
+        {
+          "op": "set",
+          "path": ["rooms"],
+          "value": [
+            {
+              "id": "L1",
+              "label": "Living Room 1",
+              "type": "living",
+              "roomClass": "standard",
+              "sourceRequirementId": "living",
+              "ordinal": 0,
+              "required": true,
+              "targetAreaM2": 22,
+              "minAreaM2": 16,
+              "maxAreaM2": 25.3,
+              "minShortSideMm": 3400,
+              "minWidthMm": 3400,
+              "minHeightMm": 3400,
+              "maxAspectRatio": 2
+            }
+          ]
+        },
+        { "op": "set", "path": ["relationships"], "value": [] }
+      ]
+    },
+    {
+      "name": "brief-too-many-rooms",
+      "target": "brief",
+      "base": "brief-B.json",
+      "expect": "reject",
+      "reason": "at most 24 explicit room nodes",
+      "builder": "brief-too-many-rooms"
+    },
+    {
+      "name": "brief-fine-type-cap",
+      "target": "brief",
+      "base": "brief-B.json",
+      "expect": "reject",
+      "reason": "at most eight rooms of one topology fine type, bathroom and WC counting together",
+      "builder": "brief-fine-type-cap"
+    },
+    {
+      "name": "brief-too-many-relationships",
+      "target": "brief",
+      "base": "brief-B.json",
+      "expect": "reject",
+      "reason": "at most 64 relationships",
+      "builder": "brief-too-many-relationships"
+    },
+    {
+      "name": "brief-relationship-self-edge",
+      "target": "brief",
+      "base": "brief-B.json",
+      "expect": "reject",
+      "reason": "a relationship cannot join a room to itself",
+      "builder": "brief-relationship-self-edge"
+    },
+    {
+      "name": "brief-relationship-unknown-endpoint",
+      "target": "brief",
+      "base": "brief-B.json",
+      "expect": "reject",
+      "reason": "relationship endpoints must exist in rooms",
+      "builder": "brief-relationship-unknown-endpoint"
+    },
+    {
+      "name": "brief-duplicate-relationship-pair",
+      "target": "brief",
+      "base": "brief-B.json",
+      "expect": "reject",
+      "reason": "one relationship per unordered pair",
+      "builder": "brief-duplicate-relationship-pair"
+    },
+    {
+      "name": "brief-target-gfa-above-max",
+      "target": "brief",
+      "base": "brief-B.json",
+      "expect": "reject",
+      "reason": "target GFA cannot exceed the max GFA cap",
+      "builder": "brief-target-gfa-above-max"
+    },
+    {
+      "name": "brief-topn-above-topk",
+      "target": "brief",
+      "base": "brief-B.json",
+      "expect": "reject",
+      "reason": "topN cannot exceed topK",
+      "builder": "brief-topn-above-topk"
+    },
+    {
+      "name": "brief-min-area-above-target",
+      "target": "brief",
+      "base": "brief-B.json",
+      "expect": "reject",
+      "reason": "minAreaM2 <= targetAreaM2 <= maxAreaM2",
+      "builder": "brief-min-area-above-target"
+    },
+    {
+      "name": "brief-axis-minimum-below-short-side",
+      "target": "brief",
+      "base": "brief-B.json",
+      "expect": "reject",
+      "reason": "explicit axis minima cannot be below the short-side minimum",
+      "builder": "brief-axis-minimum-below-short-side"
+    },
+    {
+      "name": "brief-no-living-or-dining",
+      "target": "brief",
+      "base": "brief-B.json",
+      "expect": "reject",
+      "reason": "at least one living or dining node is required",
+      "builder": "brief-no-living-or-dining"
+    },
+    {
+      "name": "brief-no-required-room",
+      "target": "brief",
+      "base": "brief-B.json",
+      "expect": "reject",
+      "reason": "at least one room must be required",
+      "builder": "brief-no-required-room"
+    },
+    {
+      "name": "brief-min-site-axis-ok",
+      "target": "brief",
+      "base": "brief-B.json",
+      "expect": "accept",
+      "reason": "3000 mm is the smallest legal site axis",
+      "builder": "brief-min-site-axis-ok"
+    },
+    {
+      "name": "brief-three-decimals-ok",
+      "target": "brief",
+      "base": "brief-B.json",
+      "expect": "accept",
+      "reason": "three decimal places are allowed on areas",
+      "builder": "brief-three-decimals-ok"
+    },
+    {
+      "name": "request-numeric-string-project-id",
+      "target": "request",
+      "base": "layout-B.json",
+      "expect": "reject",
+      "reason": "identifiers are not coerced from strings that are not uuids",
+      "patch": [{ "op": "set", "path": ["projectId"], "value": "1" }]
+    },
+    {
+      "name": "request-extra-engine-field",
+      "target": "request",
+      "base": "layout-B.json",
+      "expect": "reject",
+      "reason": "a client cannot inject a checkpoint, output path or solver settings",
+      "patch": [{ "op": "set", "path": ["checkpoint"], "value": "E:/secrets/best.pt" }]
+    },
+    {
+      "name": "request-empty-idempotency-key",
+      "target": "request",
+      "base": "layout-B.json",
+      "expect": "reject",
+      "reason": "an idempotency key is required",
+      "patch": [{ "op": "set", "path": ["idempotencyKey"], "value": "" }]
+    },
+    {
+      "name": "layout-failed-validation-check",
+      "target": "layout",
+      "base": "layout-B.json",
+      "expect": "reject",
+      "reason": "a persisted layout cannot carry a failed check",
+      "patch": [{ "op": "set", "path": ["validation", "checks", 0, "passed"], "value": false }]
+    },
+    {
+      "name": "layout-area-does-not-match-rect",
+      "target": "layout",
+      "base": "layout-B.json",
+      "expect": "reject",
+      "reason": "public areaM2 is width*height/1e6",
+      "patch": [{ "op": "set", "path": ["rooms", 0, "areaM2"], "value": 10 }]
+    },
+    {
+      "name": "layout-below-authored-axis-minimum",
+      "target": "layout",
+      "base": "layout-B.json",
+      "expect": "reject",
+      "reason": "authored axis minima are enforced on the returned rectangle",
+      "builder": "layout-below-authored-axis-minimum"
+    },
+    {
+      "name": "layout-unknown-opening-wall",
+      "target": "layout",
+      "base": "layout-B.json",
+      "expect": "reject",
+      "reason": "openings reference a wall of the same layout",
+      "patch": [{ "op": "set", "path": ["openings", 0, "wallId"], "value": "W_MISSING" }]
+    },
+    {
+      "name": "layout-validation-status-not-passed",
+      "target": "layout",
+      "base": "layout-B.json",
+      "expect": "reject",
+      "reason": "only validated layouts are published",
+      "patch": [{ "op": "set", "path": ["validationStatus"], "value": "FAILED" }]
+    },
+    {
+      "name": "layout-score-out-of-range",
+      "target": "layout",
+      "base": "layout-B.json",
+      "expect": "reject",
+      "reason": "scores are finite and between 0 and 1",
+      "patch": [{ "op": "set", "path": ["scores", "final"], "value": 1.4 }]
+    },
+    {
+      "name": "layout-rank-out-of-range",
+      "target": "layout",
+      "base": "layout-B.json",
+      "expect": "reject",
+      "reason": "ranks are 1 to 3",
+      "patch": [{ "op": "set", "path": ["rank"], "value": 4 }]
+    },
+    {
+      "name": "layout-omitted-room-also-present",
+      "target": "layout",
+      "base": "layout-B.json",
+      "expect": "reject",
+      "reason": "a room is either present or omitted",
+      "builder": "layout-omitted-room-also-present"
+    },
+    {
+      "name": "layout-zero-width-wall",
+      "target": "layout",
+      "base": "layout-B.json",
+      "expect": "reject",
+      "reason": "walls have positive extents",
+      "builder": "layout-zero-width-wall"
+    },
+    {
+      "name": "layout-circulation-below-brief-minimum",
+      "target": "layout",
+      "base": "layout-B.json",
+      "expect": "reject",
+      "reason": "measured circulation cannot be narrower than the brief requires",
+      "patch": [{ "op": "set", "path": ["circulation", "measuredMinWidthMm"], "value": 900 }]
+    },
+    {
+      "name": "layout-provenance-not-model",
+      "target": "layout",
+      "base": "layout-B.json",
+      "expect": "reject",
+      "reason": "public provenance is topology_model_v1 only",
+      "patch": [{ "op": "set", "path": ["provenance", "topologySource"], "value": "brief_provided" }]
+    },
+    {
+      "name": "editor-document-over-64k",
+      "target": "editor",
+      "base": "brief-B.json",
+      "expect": "reject",
+      "reason": "the editor document is capped at 64 KiB",
+      "builder": "editor-document-over-64k"
+    }
+  ]
+}

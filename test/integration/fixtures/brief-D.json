@@ -1,0 +1,213 @@
+{
+  "fixtureVersion": 1,
+  "kind": "brief",
+  "origin": {
+    "engineFile": "geometry_engine_v1/demos/demo_D_brief.json",
+    "engineBriefId": "demo_D_tight_site_3bed_2bath",
+    "engineFileSha256": "fcf657bacd57cbd0076ac1ecc5ca74b6cfffa13ddadf08413cccf3451efda531",
+    "convertedAt": "2026-09-22",
+    "conversion": "Engine brief converted to planlab.brief/1: room IDs and authored sizes kept verbatim, axis minima set equal to the authored short-side minimum because the golden engine brief does not distinguish them, max area taken as target*1.15 to match the class policy default, walls/circulation/doors taken from the engine defaults (230/90/1000/820), and engine adjacency/doors_required mapped to relationships."
+  },
+  "notes": [
+    "Golden demo D: demo B's programme on a site whose buildable envelope is deliberately below the programme minimum, so the expected architectural outcome is infeasible."
+  ],
+  "payload": {
+    "schemaVersion": "planlab.brief/1",
+    "units": "mm",
+    "site": {
+      "widthMm": 11000,
+      "heightMm": 11500,
+      "front": "south"
+    },
+    "setbacks": {
+      "northMm": 1500,
+      "eastMm": 1000,
+      "southMm": 3000,
+      "westMm": 1000
+    },
+    "walls": {
+      "externalMm": 230,
+      "internalMm": 90
+    },
+    "circulation": {
+      "minWidthMm": 1000
+    },
+    "doors": {
+      "minWidthMm": 820
+    },
+    "rooms": [
+      {
+        "id": "B1",
+        "label": "Bedroom 1",
+        "type": "bedroom",
+        "roomClass": "standard",
+        "sourceRequirementId": "bedroom",
+        "ordinal": 0,
+        "required": true,
+        "targetAreaM2": 14.0,
+        "minAreaM2": 11.0,
+        "maxAreaM2": 16.1,
+        "minShortSideMm": 3200,
+        "minWidthMm": 3200,
+        "minHeightMm": 3200,
+        "maxAspectRatio": 1.8
+      },
+      {
+        "id": "B2",
+        "label": "Bedroom 2",
+        "type": "bedroom",
+        "roomClass": "standard",
+        "sourceRequirementId": "bedroom",
+        "ordinal": 1,
+        "required": true,
+        "targetAreaM2": 12.0,
+        "minAreaM2": 10.0,
+        "maxAreaM2": 13.8,
+        "minShortSideMm": 3000,
+        "minWidthMm": 3000,
+        "minHeightMm": 3000,
+        "maxAspectRatio": 1.8
+      },
+      {
+        "id": "B3",
+        "label": "Bedroom 3",
+        "type": "bedroom",
+        "roomClass": "standard",
+        "sourceRequirementId": "bedroom",
+        "ordinal": 2,
+        "required": true,
+        "targetAreaM2": 11.0,
+        "minAreaM2": 9.0,
+        "maxAreaM2": 12.65,
+        "minShortSideMm": 3000,
+        "minWidthMm": 3000,
+        "minHeightMm": 3000,
+        "maxAspectRatio": 1.8
+      },
+      {
+        "id": "BA1",
+        "label": "Bathroom 1",
+        "type": "bathroom",
+        "roomClass": "standard",
+        "sourceRequirementId": "bathroom",
+        "ordinal": 0,
+        "required": true,
+        "targetAreaM2": 6.0,
+        "minAreaM2": 4.5,
+        "maxAreaM2": 6.9,
+        "minShortSideMm": 1800,
+        "minWidthMm": 1800,
+        "minHeightMm": 1800,
+        "maxAspectRatio": 2.2
+      },
+      {
+        "id": "BA2",
+        "label": "Bathroom 2",
+        "type": "bathroom",
+        "roomClass": "standard",
+        "sourceRequirementId": "bathroom",
+        "ordinal": 1,
+        "required": true,
+        "targetAreaM2": 4.0,
+        "minAreaM2": 3.0,
+        "maxAreaM2": 4.6,
+        "minShortSideMm": 1600,
+        "minWidthMm": 1600,
+        "minHeightMm": 1600,
+        "maxAspectRatio": 2.2
+      },
+      {
+        "id": "K1",
+        "label": "Kitchen 1",
+        "type": "kitchen",
+        "roomClass": "standard",
+        "sourceRequirementId": "kitchen",
+        "ordinal": 0,
+        "required": true,
+        "targetAreaM2": 14.0,
+        "minAreaM2": 10.0,
+        "maxAreaM2": 16.1,
+        "minShortSideMm": 2800,
+        "minWidthMm": 2800,
+        "minHeightMm": 2800,
+        "maxAspectRatio": 2.0
+      },
+      {
+        "id": "L1",
+        "label": "Living Room 1",
+        "type": "living",
+        "roomClass": "standard",
+        "sourceRequirementId": "living",
+        "ordinal": 0,
+        "required": true,
+        "targetAreaM2": 22.0,
+        "minAreaM2": 16.0,
+        "maxAreaM2": 25.3,
+        "minShortSideMm": 3400,
+        "minWidthMm": 3400,
+        "minHeightMm": 3400,
+        "maxAspectRatio": 2.0
+      },
+      {
+        "id": "G1",
+        "label": "Garage 1",
+        "type": "garage",
+        "roomClass": "standard",
+        "sourceRequirementId": "garage",
+        "ordinal": 0,
+        "required": true,
+        "targetAreaM2": 22.0,
+        "minAreaM2": 18.0,
+        "maxAreaM2": 25.3,
+        "minShortSideMm": 3000,
+        "minWidthMm": 3000,
+        "minHeightMm": 3000,
+        "maxAspectRatio": 2.2
+      },
+      {
+        "id": "LA1",
+        "label": "Laundry 1",
+        "type": "laundry",
+        "roomClass": "standard",
+        "sourceRequirementId": "laundry",
+        "ordinal": 0,
+        "required": true,
+        "targetAreaM2": 5.0,
+        "minAreaM2": 3.5,
+        "maxAreaM2": 5.75,
+        "minShortSideMm": 1600,
+        "minWidthMm": 1600,
+        "minHeightMm": 1600,
+        "maxAspectRatio": 2.2
+      }
+    ],
+    "relationships": [
+      {
+        "id": "REL-K1-L1-share",
+        "a": "K1",
+        "b": "L1",
+        "kind": "mustShareWall",
+        "minSharedWallMm": 1200,
+        "minOpeningWidthMm": 820
+      },
+      {
+        "id": "REL-G1-LA1-access",
+        "a": "G1",
+        "b": "LA1",
+        "kind": "directAccess",
+        "minSharedWallMm": 900,
+        "minOpeningWidthMm": 820
+      }
+    ],
+    "building": {
+      "targetGfaM2": null,
+      "maxGfaM2": null
+    },
+    "settings": {
+      "topK": 5,
+      "topN": 3,
+      "solverTimeLimitS": 30,
+      "seed": 20260922
+    }
+  }
+}
