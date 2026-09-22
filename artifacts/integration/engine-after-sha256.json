@@ -1,0 +1,27 @@
+{
+  "patchVersion": "geometry_engine_v1+integration.1",
+  "recordedAt": "2026-09-23",
+  "baselineManifest": "artifacts/integration/protected-source-sha256.json",
+  "changed": [
+    {
+      "path": "E:/Projects/floor-plan-model/geometry_engine_v1/ge_layout_model.py",
+      "beforeSha256": "b652c7ffbe71b30bbaa74020ce8413c51c5bf58a6d11fc036b1b268f179f8a8e",
+      "afterSha256": "cd3536838239def22dfe770a93e6e8b4e5329f3b10477e73e1ed2883bca6cfe4"
+    },
+    {
+      "path": "E:/Projects/floor-plan-model/geometry_engine_v1/ge_validator.py",
+      "beforeSha256": "b9cc31274dc1402dd243d1588716e25b696ee03560cab41d1bf8f83331bfc07c",
+      "afterSha256": "1e3663ba3c8752cc5d7a01f8859b859568cc0b79093c618b17e828678e017fe1"
+    }
+  ],
+  "changedCount": 2,
+  "unchangedCount": 87,
+  "missing": [],
+  "newFiles": [
+    {
+      "path": "E:/Projects/floor-plan-model/geometry_engine_v1/test_integration_constraints.py",
+      "sha256": "d8abbb084966e6d985b5012b7ac465094970a3ebc076ad4cb28c6a7c364be5c3"
+    }
+  ],
+  "note": "S02 may modify only ge_layout_model.py and ge_validator.py. Every other hashed protected file must still match its S00 hash; this record is the proof."
+}

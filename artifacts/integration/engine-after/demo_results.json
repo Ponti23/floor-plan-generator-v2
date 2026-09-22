@@ -1,0 +1,952 @@
+{
+  "recordedAt": "2026-09-22T16:19:36Z",
+  "runner": ".tmp/run_engine_after_demos.py",
+  "budget": {
+    "top_k": 5,
+    "top_n": 3,
+    "time_limit_s": 30,
+    "render": false
+  },
+  "results": [
+    {
+      "demo": "A",
+      "brief_id": "demo_A_compact_2bed_1bath",
+      "description": "Demo A - compact: 2 bedrooms, 1 bathroom, kitchen, living.",
+      "layoutCount": 3,
+      "validatedCount": 3,
+      "layoutIds": [
+        "L_v1_rank1_threshold_0.3_a1",
+        "L_v1_rank2_diversify_swap_0_3_a1",
+        "L_v1_rank3_diversify_swap_2_3_a1"
+      ],
+      "candidateCount": 3,
+      "attempts": [
+        {
+          "candidate_id": "v1_rank1_threshold_0.3",
+          "attempt": 1,
+          "solver_status": "OPTIMAL",
+          "total_time_s": 19.266
+        },
+        {
+          "candidate_id": "v1_rank2_diversify_swap_0_3",
+          "attempt": 1,
+          "solver_status": "OPTIMAL",
+          "total_time_s": 21.064
+        },
+        {
+          "candidate_id": "v1_rank3_diversify_swap_2_3",
+          "attempt": 1,
+          "solver_status": "FEASIBLE",
+          "total_time_s": 30.146
+        }
+      ],
+      "structuredStatuses": [
+        "FEASIBLE",
+        "OPTIMAL"
+      ],
+      "gate": {
+        "any_layout": true,
+        "any_validated_layout": true,
+        "n_candidates_attempted": 3,
+        "n_layouts": 3,
+        "n_validated": 3
+      },
+      "failures": [],
+      "timings": {
+        "total_s": 73.26
+      },
+      "elapsedS": 73.26,
+      "presentRoomCounts": [
+        {
+          "layoutId": "L_v1_rank1_threshold_0.3_a1",
+          "present": 5,
+          "omitted": [],
+          "checksPassed": 20,
+          "checksTotal": 20
+        },
+        {
+          "layoutId": "L_v1_rank2_diversify_swap_0_3_a1",
+          "present": 5,
+          "omitted": [],
+          "checksPassed": 20,
+          "checksTotal": 20
+        },
+        {
+          "layoutId": "L_v1_rank3_diversify_swap_2_3_a1",
+          "present": 5,
+          "omitted": [],
+          "checksPassed": 20,
+          "checksTotal": 20
+        }
+      ]
+    },
+    {
+      "demo": "B",
+      "brief_id": "demo_B_typical_3bed_2bath_garage_laundry",
+      "description": "Demo B - typical: 3 bedrooms, 2 bathrooms, kitchen, living, garage, laundry.",
+      "layoutCount": 3,
+      "validatedCount": 3,
+      "layoutIds": [
+        "L_v1_rank1_threshold_0.3_a1",
+        "L_v1_rank3_stochastic_12_a1",
+        "L_v1_rank2_stochastic_14_a1"
+      ],
+      "candidateCount": 5,
+      "attempts": [
+        {
+          "candidate_id": "v1_rank1_threshold_0.3",
+          "attempt": 1,
+          "solver_status": "FEASIBLE",
+          "total_time_s": 30.146
+        },
+        {
+          "candidate_id": "v1_rank2_stochastic_14",
+          "attempt": 1,
+          "solver_status": "FEASIBLE",
+          "total_time_s": 30.16
+        },
+        {
+          "candidate_id": "v1_rank3_stochastic_12",
+          "attempt": 1,
+          "solver_status": "FEASIBLE",
+          "total_time_s": 30.113
+        },
+        {
+          "candidate_id": "v1_rank4_threshold_0.5",
+          "attempt": 1,
+          "solver_status": "FEASIBLE",
+          "total_time_s": 30.115
+        },
+        {
+          "candidate_id": "v1_rank5_stochastic_11",
+          "attempt": 1,
+          "solver_status": "FEASIBLE",
+          "total_time_s": 30.12
+        }
+      ],
+      "structuredStatuses": [
+        "FEASIBLE"
+      ],
+      "gate": {
+        "any_layout": true,
+        "any_validated_layout": true,
+        "n_candidates_attempted": 5,
+        "n_layouts": 5,
+        "n_validated": 5
+      },
+      "failures": [],
+      "timings": {
+        "total_s": 151.28
+      },
+      "elapsedS": 151.28,
+      "presentRoomCounts": [
+        {
+          "layoutId": "L_v1_rank1_threshold_0.3_a1",
+          "present": 9,
+          "omitted": [],
+          "checksPassed": 20,
+          "checksTotal": 20
+        },
+        {
+          "layoutId": "L_v1_rank3_stochastic_12_a1",
+          "present": 9,
+          "omitted": [],
+          "checksPassed": 20,
+          "checksTotal": 20
+        },
+        {
+          "layoutId": "L_v1_rank2_stochastic_14_a1",
+          "present": 9,
+          "omitted": [],
+          "checksPassed": 20,
+          "checksTotal": 20
+        }
+      ]
+    },
+    {
+      "demo": "C",
+      "brief_id": "demo_C_larger_4bed_2bath_study",
+      "description": "Demo C - larger: 4 bedrooms, 2 bathrooms, kitchen, living, garage, laundry, study.",
+      "layoutCount": 3,
+      "validatedCount": 3,
+      "layoutIds": [
+        "L_v1_rank1_threshold_0.3_a1",
+        "L_v1_rank2_stochastic_4_a1",
+        "L_v1_rank3_stochastic_6_a1"
+      ],
+      "candidateCount": 5,
+      "attempts": [
+        {
+          "candidate_id": "v1_rank1_threshold_0.3",
+          "attempt": 1,
+          "solver_status": "FEASIBLE",
+          "total_time_s": 30.054
+        },
+        {
+          "candidate_id": "v1_rank2_stochastic_4",
+          "attempt": 1,
+          "solver_status": "FEASIBLE",
+          "total_time_s": 30.061
+        },
+        {
+          "candidate_id": "v1_rank3_stochastic_6",
+          "attempt": 1,
+          "solver_status": "FEASIBLE",
+          "total_time_s": 30.052
+        },
+        {
+          "candidate_id": "v1_rank4_stochastic_2",
+          "attempt": 1,
+          "solver_status": "OPTIMAL",
+          "total_time_s": 30.092
+        },
+        {
+          "candidate_id": "v1_rank5_stochastic_3",
+          "attempt": 1,
+          "solver_status": "FEASIBLE",
+          "total_time_s": 30.053
+        }
+      ],
+      "structuredStatuses": [
+        "FEASIBLE",
+        "OPTIMAL"
+      ],
+      "gate": {
+        "any_layout": true,
+        "any_validated_layout": true,
+        "n_candidates_attempted": 5,
+        "n_layouts": 5,
+        "n_validated": 4
+      },
+      "failures": [],
+      "timings": {
+        "total_s": 151.01
+      },
+      "elapsedS": 151.01,
+      "presentRoomCounts": [
+        {
+          "layoutId": "L_v1_rank1_threshold_0.3_a1",
+          "present": 11,
+          "omitted": [],
+          "checksPassed": 20,
+          "checksTotal": 20
+        },
+        {
+          "layoutId": "L_v1_rank2_stochastic_4_a1",
+          "present": 11,
+          "omitted": [],
+          "checksPassed": 20,
+          "checksTotal": 20
+        },
+        {
+          "layoutId": "L_v1_rank3_stochastic_6_a1",
+          "present": 11,
+          "omitted": [],
+          "checksPassed": 20,
+          "checksTotal": 20
+        }
+      ]
+    },
+    {
+      "demo": "D",
+      "brief_id": "demo_D_tight_site_3bed_2bath",
+      "description": "Demo D - tight site: Demo B's programme on a site whose buildable envelope is deliberately below the programme minimum (section 32).",
+      "layoutCount": 0,
+      "validatedCount": 0,
+      "layoutIds": [],
+      "candidateCount": 5,
+      "attempts": [
+        {
+          "candidate_id": "v1_rank1_threshold_0.3",
+          "attempt": 1,
+          "solver_status": "INFEASIBLE",
+          "total_time_s": 0.011
+        },
+        {
+          "candidate_id": "v1_rank1_threshold_0.3",
+          "attempt": 2,
+          "solver_status": "INFEASIBLE",
+          "total_time_s": 0.011
+        },
+        {
+          "candidate_id": "v1_rank1_threshold_0.3",
+          "attempt": 3,
+          "solver_status": "INFEASIBLE",
+          "total_time_s": 0.011
+        },
+        {
+          "candidate_id": "v1_rank2_stochastic_14",
+          "attempt": 1,
+          "solver_status": "INFEASIBLE",
+          "total_time_s": 0.01
+        },
+        {
+          "candidate_id": "v1_rank2_stochastic_14",
+          "attempt": 2,
+          "solver_status": "INFEASIBLE",
+          "total_time_s": 0.011
+        },
+        {
+          "candidate_id": "v1_rank2_stochastic_14",
+          "attempt": 3,
+          "solver_status": "INFEASIBLE",
+          "total_time_s": 0.012
+        },
+        {
+          "candidate_id": "v1_rank3_stochastic_12",
+          "attempt": 1,
+          "solver_status": "INFEASIBLE",
+          "total_time_s": 0.01
+        },
+        {
+          "candidate_id": "v1_rank3_stochastic_12",
+          "attempt": 2,
+          "solver_status": "INFEASIBLE",
+          "total_time_s": 0.011
+        },
+        {
+          "candidate_id": "v1_rank3_stochastic_12",
+          "attempt": 3,
+          "solver_status": "INFEASIBLE",
+          "total_time_s": 0.011
+        },
+        {
+          "candidate_id": "v1_rank4_threshold_0.5",
+          "attempt": 1,
+          "solver_status": "INFEASIBLE",
+          "total_time_s": 0.01
+        },
+        {
+          "candidate_id": "v1_rank4_threshold_0.5",
+          "attempt": 2,
+          "solver_status": "INFEASIBLE",
+          "total_time_s": 0.011
+        },
+        {
+          "candidate_id": "v1_rank4_threshold_0.5",
+          "attempt": 3,
+          "solver_status": "INFEASIBLE",
+          "total_time_s": 0.011
+        },
+        {
+          "candidate_id": "v1_rank5_stochastic_11",
+          "attempt": 1,
+          "solver_status": "INFEASIBLE",
+          "total_time_s": 0.012
+        },
+        {
+          "candidate_id": "v1_rank5_stochastic_11",
+          "attempt": 2,
+          "solver_status": "INFEASIBLE",
+          "total_time_s": 0.01
+        },
+        {
+          "candidate_id": "v1_rank5_stochastic_11",
+          "attempt": 3,
+          "solver_status": "INFEASIBLE",
+          "total_time_s": 0.011
+        }
+      ],
+      "structuredStatuses": [
+        "INFEASIBLE"
+      ],
+      "gate": {
+        "any_layout": false,
+        "any_validated_layout": false,
+        "n_candidates_attempted": 5,
+        "n_layouts": 0,
+        "n_validated": 0
+      },
+      "failures": [
+        {
+          "stage": "geometry",
+          "candidate_id": "v1_rank1_threshold_0.3",
+          "error": "INFEASIBLE after 3 attempt(s)",
+          "attempts": [
+            {
+              "attempt": 1,
+              "status": "INFEASIBLE",
+              "relaxations": {
+                "hard_adjacency": true,
+                "prefer_weight_scale": 1.0,
+                "prefer_min_probability": 0.0
+              }
+            },
+            {
+              "attempt": 2,
+              "status": "INFEASIBLE",
+              "relaxations": {
+                "hard_adjacency": true,
+                "prefer_weight_scale": 0.35,
+                "prefer_min_probability": 0.25
+              }
+            },
+            {
+              "attempt": 3,
+              "status": "INFEASIBLE",
+              "relaxations": {
+                "hard_adjacency": false,
+                "prefer_weight_scale": 0.25,
+                "prefer_min_probability": 0.35,
+                "shrink_targets_to": 0.85
+              }
+            }
+          ],
+          "remediation": {
+            "reason": "candidate v1_rank1_threshold_0.3 infeasible",
+            "attempts": [
+              {
+                "attempt": 1,
+                "status": "INFEASIBLE",
+                "relaxations": {
+                  "hard_adjacency": true,
+                  "prefer_weight_scale": 1.0,
+                  "prefer_min_probability": 0.0
+                }
+              },
+              {
+                "attempt": 2,
+                "status": "INFEASIBLE",
+                "relaxations": {
+                  "hard_adjacency": true,
+                  "prefer_weight_scale": 0.35,
+                  "prefer_min_probability": 0.25
+                }
+              },
+              {
+                "attempt": 3,
+                "status": "INFEASIBLE",
+                "relaxations": {
+                  "hard_adjacency": false,
+                  "prefer_weight_scale": 0.25,
+                  "prefer_min_probability": 0.35,
+                  "shrink_targets_to": 0.85
+                }
+              }
+            ],
+            "suggestions": [
+              {
+                "action": "shrink rooms toward minimum",
+                "detail": "target areas sum to 110.0 m2 against a 55.9 m2 envelope; minimums sum to 85.0 m2",
+                "expected_effect": "reduces the area that must be packed"
+              },
+              {
+                "action": "reduce offsets / enlarge the site",
+                "detail": "the envelope is 55.9 m2 and the programme minimum is 85.0 m2, so only 0.0 m2 is left for circulation and walls \u2014 the programme minimum alone exceeds the envelope",
+                "expected_effect": "gives the circulation engine room to work"
+              },
+              {
+                "action": "step room class down",
+                "detail": "Compact class reduces targets by 15% and short sides by 8%",
+                "expected_effect": "smaller rooms, same programme"
+              },
+              {
+                "action": "drop optional rooms",
+                "detail": "optional rooms are already non-binding but may be forced in",
+                "expected_effect": "removes programme that cannot be placed"
+              },
+              {
+                "action": "relax a relationship",
+                "detail": "convert a HARD_ADJACENT pair to PREFER_ADJACENT (must be authorised: it is a brief change, not a solver change)",
+                "expected_effect": "removes a shared-wall obligation"
+              },
+              {
+                "action": "accept an area shortfall",
+                "detail": "allow rooms below their brief minimum, reported explicitly",
+                "expected_effect": "makes a tight brief feasible at a stated cost"
+              }
+            ]
+          }
+        },
+        {
+          "stage": "geometry",
+          "candidate_id": "v1_rank2_stochastic_14",
+          "error": "INFEASIBLE after 3 attempt(s)",
+          "attempts": [
+            {
+              "attempt": 1,
+              "status": "INFEASIBLE",
+              "relaxations": {
+                "hard_adjacency": true,
+                "prefer_weight_scale": 1.0,
+                "prefer_min_probability": 0.0
+              }
+            },
+            {
+              "attempt": 2,
+              "status": "INFEASIBLE",
+              "relaxations": {
+                "hard_adjacency": true,
+                "prefer_weight_scale": 0.35,
+                "prefer_min_probability": 0.25
+              }
+            },
+            {
+              "attempt": 3,
+              "status": "INFEASIBLE",
+              "relaxations": {
+                "hard_adjacency": false,
+                "prefer_weight_scale": 0.25,
+                "prefer_min_probability": 0.35,
+                "shrink_targets_to": 0.85
+              }
+            }
+          ],
+          "remediation": {
+            "reason": "candidate v1_rank2_stochastic_14 infeasible",
+            "attempts": [
+              {
+                "attempt": 1,
+                "status": "INFEASIBLE",
+                "relaxations": {
+                  "hard_adjacency": true,
+                  "prefer_weight_scale": 1.0,
+                  "prefer_min_probability": 0.0
+                }
+              },
+              {
+                "attempt": 2,
+                "status": "INFEASIBLE",
+                "relaxations": {
+                  "hard_adjacency": true,
+                  "prefer_weight_scale": 0.35,
+                  "prefer_min_probability": 0.25
+                }
+              },
+              {
+                "attempt": 3,
+                "status": "INFEASIBLE",
+                "relaxations": {
+                  "hard_adjacency": false,
+                  "prefer_weight_scale": 0.25,
+                  "prefer_min_probability": 0.35,
+                  "shrink_targets_to": 0.85
+                }
+              }
+            ],
+            "suggestions": [
+              {
+                "action": "shrink rooms toward minimum",
+                "detail": "target areas sum to 110.0 m2 against a 55.9 m2 envelope; minimums sum to 85.0 m2",
+                "expected_effect": "reduces the area that must be packed"
+              },
+              {
+                "action": "reduce offsets / enlarge the site",
+                "detail": "the envelope is 55.9 m2 and the programme minimum is 85.0 m2, so only 0.0 m2 is left for circulation and walls \u2014 the programme minimum alone exceeds the envelope",
+                "expected_effect": "gives the circulation engine room to work"
+              },
+              {
+                "action": "step room class down",
+                "detail": "Compact class reduces targets by 15% and short sides by 8%",
+                "expected_effect": "smaller rooms, same programme"
+              },
+              {
+                "action": "drop optional rooms",
+                "detail": "optional rooms are already non-binding but may be forced in",
+                "expected_effect": "removes programme that cannot be placed"
+              },
+              {
+                "action": "relax a relationship",
+                "detail": "convert a HARD_ADJACENT pair to PREFER_ADJACENT (must be authorised: it is a brief change, not a solver change)",
+                "expected_effect": "removes a shared-wall obligation"
+              },
+              {
+                "action": "accept an area shortfall",
+                "detail": "allow rooms below their brief minimum, reported explicitly",
+                "expected_effect": "makes a tight brief feasible at a stated cost"
+              }
+            ]
+          }
+        },
+        {
+          "stage": "geometry",
+          "candidate_id": "v1_rank3_stochastic_12",
+          "error": "INFEASIBLE after 3 attempt(s)",
+          "attempts": [
+            {
+              "attempt": 1,
+              "status": "INFEASIBLE",
+              "relaxations": {
+                "hard_adjacency": true,
+                "prefer_weight_scale": 1.0,
+                "prefer_min_probability": 0.0
+              }
+            },
+            {
+              "attempt": 2,
+              "status": "INFEASIBLE",
+              "relaxations": {
+                "hard_adjacency": true,
+                "prefer_weight_scale": 0.35,
+                "prefer_min_probability": 0.25
+              }
+            },
+            {
+              "attempt": 3,
+              "status": "INFEASIBLE",
+              "relaxations": {
+                "hard_adjacency": false,
+                "prefer_weight_scale": 0.25,
+                "prefer_min_probability": 0.35,
+                "shrink_targets_to": 0.85
+              }
+            }
+          ],
+          "remediation": {
+            "reason": "candidate v1_rank3_stochastic_12 infeasible",
+            "attempts": [
+              {
+                "attempt": 1,
+                "status": "INFEASIBLE",
+                "relaxations": {
+                  "hard_adjacency": true,
+                  "prefer_weight_scale": 1.0,
+                  "prefer_min_probability": 0.0
+                }
+              },
+              {
+                "attempt": 2,
+                "status": "INFEASIBLE",
+                "relaxations": {
+                  "hard_adjacency": true,
+                  "prefer_weight_scale": 0.35,
+                  "prefer_min_probability": 0.25
+                }
+              },
+              {
+                "attempt": 3,
+                "status": "INFEASIBLE",
+                "relaxations": {
+                  "hard_adjacency": false,
+                  "prefer_weight_scale": 0.25,
+                  "prefer_min_probability": 0.35,
+                  "shrink_targets_to": 0.85
+                }
+              }
+            ],
+            "suggestions": [
+              {
+                "action": "shrink rooms toward minimum",
+                "detail": "target areas sum to 110.0 m2 against a 55.9 m2 envelope; minimums sum to 85.0 m2",
+                "expected_effect": "reduces the area that must be packed"
+              },
+              {
+                "action": "reduce offsets / enlarge the site",
+                "detail": "the envelope is 55.9 m2 and the programme minimum is 85.0 m2, so only 0.0 m2 is left for circulation and walls \u2014 the programme minimum alone exceeds the envelope",
+                "expected_effect": "gives the circulation engine room to work"
+              },
+              {
+                "action": "step room class down",
+                "detail": "Compact class reduces targets by 15% and short sides by 8%",
+                "expected_effect": "smaller rooms, same programme"
+              },
+              {
+                "action": "drop optional rooms",
+                "detail": "optional rooms are already non-binding but may be forced in",
+                "expected_effect": "removes programme that cannot be placed"
+              },
+              {
+                "action": "relax a relationship",
+                "detail": "convert a HARD_ADJACENT pair to PREFER_ADJACENT (must be authorised: it is a brief change, not a solver change)",
+                "expected_effect": "removes a shared-wall obligation"
+              },
+              {
+                "action": "accept an area shortfall",
+                "detail": "allow rooms below their brief minimum, reported explicitly",
+                "expected_effect": "makes a tight brief feasible at a stated cost"
+              }
+            ]
+          }
+        },
+        {
+          "stage": "geometry",
+          "candidate_id": "v1_rank4_threshold_0.5",
+          "error": "INFEASIBLE after 3 attempt(s)",
+          "attempts": [
+            {
+              "attempt": 1,
+              "status": "INFEASIBLE",
+              "relaxations": {
+                "hard_adjacency": true,
+                "prefer_weight_scale": 1.0,
+                "prefer_min_probability": 0.0
+              }
+            },
+            {
+              "attempt": 2,
+              "status": "INFEASIBLE",
+              "relaxations": {
+                "hard_adjacency": true,
+                "prefer_weight_scale": 0.35,
+                "prefer_min_probability": 0.25
+              }
+            },
+            {
+              "attempt": 3,
+              "status": "INFEASIBLE",
+              "relaxations": {
+                "hard_adjacency": false,
+                "prefer_weight_scale": 0.25,
+                "prefer_min_probability": 0.35,
+                "shrink_targets_to": 0.85
+              }
+            }
+          ],
+          "remediation": {
+            "reason": "candidate v1_rank4_threshold_0.5 infeasible",
+            "attempts": [
+              {
+                "attempt": 1,
+                "status": "INFEASIBLE",
+                "relaxations": {
+                  "hard_adjacency": true,
+                  "prefer_weight_scale": 1.0,
+                  "prefer_min_probability": 0.0
+                }
+              },
+              {
+                "attempt": 2,
+                "status": "INFEASIBLE",
+                "relaxations": {
+                  "hard_adjacency": true,
+                  "prefer_weight_scale": 0.35,
+                  "prefer_min_probability": 0.25
+                }
+              },
+              {
+                "attempt": 3,
+                "status": "INFEASIBLE",
+                "relaxations": {
+                  "hard_adjacency": false,
+                  "prefer_weight_scale": 0.25,
+                  "prefer_min_probability": 0.35,
+                  "shrink_targets_to": 0.85
+                }
+              }
+            ],
+            "suggestions": [
+              {
+                "action": "shrink rooms toward minimum",
+                "detail": "target areas sum to 110.0 m2 against a 55.9 m2 envelope; minimums sum to 85.0 m2",
+                "expected_effect": "reduces the area that must be packed"
+              },
+              {
+                "action": "reduce offsets / enlarge the site",
+                "detail": "the envelope is 55.9 m2 and the programme minimum is 85.0 m2, so only 0.0 m2 is left for circulation and walls \u2014 the programme minimum alone exceeds the envelope",
+                "expected_effect": "gives the circulation engine room to work"
+              },
+              {
+                "action": "step room class down",
+                "detail": "Compact class reduces targets by 15% and short sides by 8%",
+                "expected_effect": "smaller rooms, same programme"
+              },
+              {
+                "action": "drop optional rooms",
+                "detail": "optional rooms are already non-binding but may be forced in",
+                "expected_effect": "removes programme that cannot be placed"
+              },
+              {
+                "action": "relax a relationship",
+                "detail": "convert a HARD_ADJACENT pair to PREFER_ADJACENT (must be authorised: it is a brief change, not a solver change)",
+                "expected_effect": "removes a shared-wall obligation"
+              },
+              {
+                "action": "accept an area shortfall",
+                "detail": "allow rooms below their brief minimum, reported explicitly",
+                "expected_effect": "makes a tight brief feasible at a stated cost"
+              }
+            ]
+          }
+        },
+        {
+          "stage": "geometry",
+          "candidate_id": "v1_rank5_stochastic_11",
+          "error": "INFEASIBLE after 3 attempt(s)",
+          "attempts": [
+            {
+              "attempt": 1,
+              "status": "INFEASIBLE",
+              "relaxations": {
+                "hard_adjacency": true,
+                "prefer_weight_scale": 1.0,
+                "prefer_min_probability": 0.0
+              }
+            },
+            {
+              "attempt": 2,
+              "status": "INFEASIBLE",
+              "relaxations": {
+                "hard_adjacency": true,
+                "prefer_weight_scale": 0.35,
+                "prefer_min_probability": 0.25
+              }
+            },
+            {
+              "attempt": 3,
+              "status": "INFEASIBLE",
+              "relaxations": {
+                "hard_adjacency": false,
+                "prefer_weight_scale": 0.25,
+                "prefer_min_probability": 0.35,
+                "shrink_targets_to": 0.85
+              }
+            }
+          ],
+          "remediation": {
+            "reason": "candidate v1_rank5_stochastic_11 infeasible",
+            "attempts": [
+              {
+                "attempt": 1,
+                "status": "INFEASIBLE",
+                "relaxations": {
+                  "hard_adjacency": true,
+                  "prefer_weight_scale": 1.0,
+                  "prefer_min_probability": 0.0
+                }
+              },
+              {
+                "attempt": 2,
+                "status": "INFEASIBLE",
+                "relaxations": {
+                  "hard_adjacency": true,
+                  "prefer_weight_scale": 0.35,
+                  "prefer_min_probability": 0.25
+                }
+              },
+              {
+                "attempt": 3,
+                "status": "INFEASIBLE",
+                "relaxations": {
+                  "hard_adjacency": false,
+                  "prefer_weight_scale": 0.25,
+                  "prefer_min_probability": 0.35,
+                  "shrink_targets_to": 0.85
+                }
+              }
+            ],
+            "suggestions": [
+              {
+                "action": "shrink rooms toward minimum",
+                "detail": "target areas sum to 110.0 m2 against a 55.9 m2 envelope; minimums sum to 85.0 m2",
+                "expected_effect": "reduces the area that must be packed"
+              },
+              {
+                "action": "reduce offsets / enlarge the site",
+                "detail": "the envelope is 55.9 m2 and the programme minimum is 85.0 m2, so only 0.0 m2 is left for circulation and walls \u2014 the programme minimum alone exceeds the envelope",
+                "expected_effect": "gives the circulation engine room to work"
+              },
+              {
+                "action": "step room class down",
+                "detail": "Compact class reduces targets by 15% and short sides by 8%",
+                "expected_effect": "smaller rooms, same programme"
+              },
+              {
+                "action": "drop optional rooms",
+                "detail": "optional rooms are already non-binding but may be forced in",
+                "expected_effect": "removes programme that cannot be placed"
+              },
+              {
+                "action": "relax a relationship",
+                "detail": "convert a HARD_ADJACENT pair to PREFER_ADJACENT (must be authorised: it is a brief change, not a solver change)",
+                "expected_effect": "removes a shared-wall obligation"
+              },
+              {
+                "action": "accept an area shortfall",
+                "detail": "allow rooms below their brief minimum, reported explicitly",
+                "expected_effect": "makes a tight brief feasible at a stated cost"
+              }
+            ]
+          }
+        }
+      ],
+      "timings": {
+        "total_s": 0.66
+      },
+      "elapsedS": 0.66,
+      "presentRoomCounts": []
+    },
+    {
+      "demo": "E",
+      "brief_id": "demo_E_optional_study",
+      "description": "Demo E - optional room: Demo B plus an OPTIONAL study.",
+      "layoutCount": 3,
+      "validatedCount": 3,
+      "layoutIds": [
+        "L_v1_rank1_threshold_0.3_a1",
+        "L_v1_rank2_stochastic_2_a1",
+        "L_v1_rank3_stochastic_5_a1"
+      ],
+      "candidateCount": 5,
+      "attempts": [
+        {
+          "candidate_id": "v1_rank1_threshold_0.3",
+          "attempt": 1,
+          "solver_status": "FEASIBLE",
+          "total_time_s": 30.073
+        },
+        {
+          "candidate_id": "v1_rank2_stochastic_2",
+          "attempt": 1,
+          "solver_status": "FEASIBLE",
+          "total_time_s": 30.077
+        },
+        {
+          "candidate_id": "v1_rank3_stochastic_5",
+          "attempt": 1,
+          "solver_status": "FEASIBLE",
+          "total_time_s": 30.073
+        },
+        {
+          "candidate_id": "v1_rank4_stochastic_7",
+          "attempt": 1,
+          "solver_status": "FEASIBLE",
+          "total_time_s": 30.063
+        },
+        {
+          "candidate_id": "v1_rank5_stochastic_6",
+          "attempt": 1,
+          "solver_status": "FEASIBLE",
+          "total_time_s": 30.062
+        }
+      ],
+      "structuredStatuses": [
+        "FEASIBLE"
+      ],
+      "gate": {
+        "any_layout": true,
+        "any_validated_layout": true,
+        "n_candidates_attempted": 5,
+        "n_layouts": 5,
+        "n_validated": 5
+      },
+      "failures": [],
+      "timings": {
+        "total_s": 150.84
+      },
+      "elapsedS": 150.84,
+      "presentRoomCounts": [
+        {
+          "layoutId": "L_v1_rank1_threshold_0.3_a1",
+          "present": 10,
+          "omitted": [],
+          "checksPassed": 20,
+          "checksTotal": 20
+        },
+        {
+          "layoutId": "L_v1_rank2_stochastic_2_a1",
+          "present": 10,
+          "omitted": [],
+          "checksPassed": 20,
+          "checksTotal": 20
+        },
+        {
+          "layoutId": "L_v1_rank3_stochastic_5_a1",
+          "present": 10,
+          "omitted": [],
+          "checksPassed": 20,
+          "checksTotal": 20
+        }
+      ]
+    }
+  ]
+}
