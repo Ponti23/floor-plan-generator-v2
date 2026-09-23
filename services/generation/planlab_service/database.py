@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import sqlite3
 import time
+from contextlib import contextmanager
 from pathlib import Path
 
 MIGRATIONS_DIR = Path(__file__).resolve().parent.parent / "migrations"
@@ -26,6 +27,7 @@ def connect(db_path, *, read_only: bool = False) -> sqlite3.Connection:
 
 
 def applied_versions(connection: sqlite3.Connection) -> set[int]:
+    """(helper) which migrations this database already has."""
     row = connection.execute(
         "SELECT name FROM sqlite_master WHERE type='table' AND name='schema_migrations'"
     ).fetchone()
@@ -74,3 +76,13 @@ def backup(db_path, data_dir, *, label: str | None = None) -> Path:
         source.backup(target)
     source.close()
     return target_path
+
+
+@contextmanager
+def session(db_path, *, read_only: bool = False):
+    """Connection that is always closed, unlike sqlite3's commit-only context manager."""
+    connection = connect(db_path, read_only=read_only)
+    try:
+        yield connection
+    finally:
+        connection.close()

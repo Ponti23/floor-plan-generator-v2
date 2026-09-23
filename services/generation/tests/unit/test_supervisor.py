@@ -15,7 +15,8 @@ for candidate in (SERVICE, REPO_ROOT / ".runtime" / "generation" / "site-package
 
 from planlab_service import repository as repo  # noqa: E402
 from planlab_service.contracts import BriefV1, brief_sha256  # noqa: E402
-from planlab_service.database import connect, migrate  # noqa: E402
+from planlab_service.database import migrate  # noqa: E402
+from planlab_service.database import session as connect  # noqa: E402
 from planlab_service.supervisor import Supervisor  # noqa: E402
 
 FIXTURES = REPO_ROOT / "test" / "integration" / "fixtures"

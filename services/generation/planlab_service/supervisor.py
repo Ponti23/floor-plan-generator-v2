@@ -10,7 +10,8 @@ from pathlib import Path
 
 from . import repository as repo
 from .contracts import BriefV1, brief_sha256
-from .database import connect, migrate
+from .database import migrate
+from .database import session as connect
 
 DEFAULT_JOB_DEADLINE_S = 360
 WORKER_WARMUP_DEADLINE_S = 45

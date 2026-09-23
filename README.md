@@ -88,3 +88,49 @@ component library.
   npm run dev -- --host 127.0.0.1 --port 5173 &
   node scripts/capture-ui.mjs --out artifacts/planlab/milestone-6/check.png
   ```
+# PlanLab generation service (draft run instructions — verified locally)
+
+The integration work lives on the `integration/planlab-engine-mvp` branch. There are two
+services: the existing Vite frontend and a new local Python generation service that runs the
+real Topology Model v1 and Geometry Engine v1 behind a single-origin HTTP API.
+
+## Development
+
+```powershell
+# terminal 1 — prepare the service overlay once, then run the API + warm worker on 8010
+pwsh -NoProfile -File scripts/start-generation.ps1 -Setup
+
+# terminal 2 — Vite on 5173 with /api proxied to 127.0.0.1:8010
+npm run dev
+```
+
+## Installed release on this machine
+
+```powershell
+npm run build
+pwsh -NoProfile -File scripts/start-planlab.ps1      # serves dist + API on http://127.0.0.1:8010
+```
+
+`vercel.json` still builds a static preview, but a static bundle cannot run the model: real
+generation only works against the local service. There is no public deployment and no API key.
+
+## Configuration
+
+Copy `.env.generation.example` to `.env.generation.local` if your paths differ. The service binds
+loopback only, requires `X-PlanLab-Client: 1` on mutations, caps request bodies at 128 KiB, and
+refuses a second instance on the same data directory.
+
+## Verification
+
+```powershell
+npm test                # 207 frontend tests
+npm run typecheck
+npm run build
+npm run contracts:check # schema + room policy are in sync with the implementation
+npm run test:service    # 56 service unit tests
+npm run test:service:integration
+```
+
+Known limitations: one job at a time, 360 s active-job deadline, straight corridors only,
+symbolic openings, and architectural infeasibility reported as a limited search rather than a
+proof about every possible footprint.

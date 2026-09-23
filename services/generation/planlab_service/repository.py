@@ -89,11 +89,14 @@ def list_projects(conn, limit=20, cursor=None) -> tuple[list[dict], str | None]:
 
 
 def bump_revision(conn, project_id, **fields) -> dict:
-    sets = ", ".join(f"{key} = ?" for key in fields)
-    values = list(fields.values())
+    assignments = ["revision = revision + 1", "updated_at = ?"]
+    values: list = [now_iso()]
+    for key, value in fields.items():
+        assignments.append(f"{key} = ?")
+        values.append(value)
     updated = conn.execute(
-        f"UPDATE projects SET revision = revision + 1, updated_at = ?, {sets} WHERE id = ?",
-        [now_iso(), *values, project_id],
+        f"UPDATE projects SET {', '.join(assignments)} WHERE id = ?",
+        [*values, project_id],
     ).rowcount
     if not updated:
         raise NotFound(f"project {project_id} not found")
@@ -237,6 +240,14 @@ def get_generation(conn, generation_id) -> dict | None:
     record["diagnostics"] = _loads(record.pop("diagnostics_json"), None)
     record["cancel_requested"] = bool(record["cancel_requested"])
     return record
+
+
+def generation_by_idempotency(conn, project_id, idempotency_key) -> dict | None:
+    row = conn.execute(
+        "SELECT id FROM generations WHERE project_id = ? AND idempotency_key = ?",
+        (project_id, idempotency_key),
+    ).fetchone()
+    return get_generation(conn, row["id"]) if row is not None else None
 
 
 def transition(
@@ -447,7 +458,9 @@ def select_layout(conn, project_id, layout_id, *, expected_project_revision) -> 
         {"layoutId": layout_id, "generationId": layout["generation_id"]},
         generation_id=layout["generation_id"], layout_id=layout_id,
     )
-    project = bump_revision(conn, project_id, selected_layout_id=layout_id)
+    # the selection itself lives in selected_layouts; the project row only bumps
+    # its revision so clients can detect the change
+    project = bump_revision(conn, project_id)
     return {
         "projectId": project_id,
         "layoutId": layout_id,
