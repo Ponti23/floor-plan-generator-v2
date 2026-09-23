@@ -171,6 +171,15 @@ export function mountEnginePage(root: HTMLElement, hooks: EnginePageHooks = {}):
               </select>
               <button type="button" data-action="add-room">Add room</button>
             </div>
+            <div class="room room-head" aria-hidden="true">
+              <span class="room-id">room</span>
+              <span class="wide" title="readable name shown in the plan">name</span>
+              <span title="area the solver aims for, in square metres">target m²</span>
+              <span title="smallest acceptable area, in square metres">min m²</span>
+              <span title="largest acceptable area, in square metres">max m²</span>
+              <span title="minimum width on the east axis, in millimetres">min width mm</span>
+              <span title="minimum height on the north axis, in millimetres">min height mm</span>
+            </div>
             ${state.editor.groups.map((group) => renderGroup(group, rooms)).join("")}
           </fieldset>
           <fieldset><legend>Review</legend>
@@ -240,7 +249,7 @@ export function mountEnginePage(root: HTMLElement, hooks: EnginePageHooks = {}):
           .map((room) => html`
             <div class="room" data-room="${escapeHtml(room.id)}">
               <span class="room-id">${escapeHtml(room.id)}</span>
-              <input data-room-field="label" data-room-id="${escapeHtml(room.id)}" value="${escapeHtml(room.label)}" aria-label="label for ${escapeHtml(room.id)}" />
+              <input class="wide" data-room-field="label" data-room-id="${escapeHtml(room.id)}" value="${escapeHtml(room.label)}" aria-label="name for ${escapeHtml(room.id)}" title="room name" />
               <input data-room-field="targetAreaM2" data-room-id="${escapeHtml(room.id)}" value="${escapeHtml(room.targetAreaM2)}" aria-label="target area for ${escapeHtml(room.id)}" />
               <input data-room-field="minAreaM2" data-room-id="${escapeHtml(room.id)}" value="${escapeHtml(room.minAreaM2)}" aria-label="minimum area for ${escapeHtml(room.id)}" />
               <input data-room-field="maxAreaM2" data-room-id="${escapeHtml(room.id)}" value="${escapeHtml(room.maxAreaM2)}" aria-label="maximum area for ${escapeHtml(room.id)}" />
@@ -684,7 +693,12 @@ const ENGINE_CSS = `
   .group-head { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
   .room { display: flex; gap: 6px; align-items: center; padding: 3px 0; }
   .room input { width: 92px; }
+  .room input.wide { width: 132px; }
   .room-id { font-weight: 600; width: 52px; }
+  .room-head { color: #6a6459; font-size: 11px; text-transform: uppercase; letter-spacing: 0.04em; }
+  .room-head span { width: 92px; }
+  .room-head span.wide { width: 132px; }
+  .room-head span:first-child { width: 52px; }
   .issues { color: #a33c14; }
   .actions { display: flex; gap: 8px; margin-top: 8px; }
   .options { display: grid; gap: 16px; }
