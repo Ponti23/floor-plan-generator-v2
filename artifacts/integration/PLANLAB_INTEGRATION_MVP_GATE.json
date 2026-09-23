@@ -1,0 +1,104 @@
+{
+  "gate": "PLANLAB_INTEGRATION_MVP_GATE",
+  "verdict": "NO_GO",
+  "runId": "gate-1790148479269",
+  "startedAt": "2026-09-23T07:27:48Z",
+  "finishedAt": "2026-09-23T07:27:59Z",
+  "frontendCommit": "unknown",
+  "engineSourceSha256": "checkpoint 3ea6225e6c58…",
+  "checkpointSha256": "3ea6225e6c582e167cb9a2450eae5b068cc2189cae182cb015503e3d47e220d8",
+  "checks": [
+    {
+      "id": "health.ready",
+      "passed": true,
+      "detail": "service ready with the model loaded",
+      "evidencePaths": []
+    },
+    {
+      "id": "api.nonblocking-post",
+      "passed": true,
+      "detail": "POST returned 202 in 0.01s while the worker solved",
+      "evidencePaths": []
+    },
+    {
+      "id": "engine.real-generation",
+      "passed": true,
+      "detail": "job COMPLETED with 1 layout(s)",
+      "evidencePaths": []
+    },
+    {
+      "id": "layout.self-contained-dto",
+      "passed": true,
+      "detail": "9 rooms, 25 walls, 6 openings, 20 checks",
+      "evidencePaths": []
+    },
+    {
+      "id": "layout.integer-mm-and-walls",
+      "passed": true,
+      "detail": "wall thicknesses are integer millimetres (230 external / 90 internal)",
+      "evidencePaths": []
+    },
+    {
+      "id": "layout.provenance",
+      "passed": true,
+      "detail": "checkpoint 3ea6225e6c58…",
+      "evidencePaths": []
+    },
+    {
+      "id": "selection.persists",
+      "passed": true,
+      "detail": "PUT 200; reload shows the same selected layout",
+      "evidencePaths": []
+    },
+    {
+      "id": "failure.architectural-separate",
+      "passed": true,
+      "detail": "demo D -> INFEASIBLE PROGRAMME_TOO_LARGE (necessary_condition)",
+      "evidencePaths": []
+    },
+    {
+      "id": "ui.editor-compiles-brief",
+      "passed": false,
+      "detail": "the Land/Walls/Rooms/Review editor is not mounted in main.ts yet",
+      "evidencePaths": []
+    },
+    {
+      "id": "ui.viewer-exact-mm",
+      "passed": false,
+      "detail": "the exact-mm renderer exists and is unit-tested but is not mounted in the page",
+      "evidencePaths": []
+    },
+    {
+      "id": "ui.selection-round-trip",
+      "passed": false,
+      "detail": "selection works over HTTP but is not yet driven from the UI",
+      "evidencePaths": []
+    },
+    {
+      "id": "e2e.no-mocked-generation",
+      "passed": false,
+      "detail": "no browser-driven end-to-end run exists yet",
+      "evidencePaths": []
+    }
+  ],
+  "realGenerationIds": [
+    "8ff373ad-5979-4cb4-b6aa-3b346bccc554",
+    "8818e538-2b56-4cfa-9da0-30ce294d7617"
+  ],
+  "latencyMs": {
+    "demoB": {
+      "postSeconds": 0.011,
+      "elapsedMs": 5000
+    },
+    "demoD": {
+      "postSeconds": 0.007,
+      "elapsedMs": 0
+    }
+  },
+  "knownLimitations": [
+    "one generation at a time; 360 s active-job deadline",
+    "straight corridors only, symbolic openings, 100 mm wall reporting raster",
+    "architectural infeasibility is a limited search unless the minima alone exceed the envelope",
+    "the browser UI path (editor, viewer, selection) is not mounted yet"
+  ]
+}
