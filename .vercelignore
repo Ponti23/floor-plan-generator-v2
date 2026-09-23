@@ -1,0 +1,15 @@
+# Local runtime overlay, durable generation data, databases and logs.
+.runtime/
+.local/
+
+# Build output is produced on Vercel by `npm run build`.
+dist/
+node_modules/
+
+# Regenerated run evidence and large local artifacts.
+artifacts/
+
+# Editor and OS noise.
+*.log
+Thumbs.db
+.DS_Store
