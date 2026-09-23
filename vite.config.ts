@@ -1,7 +1,15 @@
 import { defineConfig } from "vite";
 import { resolve } from "node:path";
 
+// The exact-engine page can be hosted away from the model service (Vercel serves
+// the page, the tunnel serves the API). Vite only substitutes env access it can
+// see literally, so the value is defined explicitly here.
+const apiBase = process.env.VITE_PLANLAB_API_BASE ?? "";
+
 export default defineConfig({
+  define: {
+    "import.meta.env.VITE_PLANLAB_API_BASE": JSON.stringify(apiBase),
+  },
   build: {
     rollupOptions: {
       input: {

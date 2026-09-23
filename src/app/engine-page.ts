@@ -31,6 +31,7 @@ import {
   savePointer,
 } from "./engine-project-store.ts";
 import { importLegacyProject } from "../integration/legacy-import.ts";
+import { resolveApiBase } from "../integration/api-base.ts";
 import { buildDebugSections, debugEnabled } from "./generation-debug.ts";
 
 const LEGACY_KEY = "planlab:v1:project";
@@ -70,7 +71,7 @@ function html(strings: TemplateStringsArray, ...values: unknown[]): string {
 }
 
 export function mountEnginePage(root: HTMLElement, hooks: EnginePageHooks = {}): void {
-  const client = hooks.client ?? new ProjectClient({ baseUrl: "" });
+  const client = hooks.client ?? new ProjectClient({ baseUrl: resolveApiBase() });
   const storage = hooks.storage === undefined ? safeStorage() : hooks.storage;
   const state: PageState = {
     editor: createEngineEditorState(),

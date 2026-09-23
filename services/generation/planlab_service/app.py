@@ -10,6 +10,7 @@ from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
+from starlette.responses import Response
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from . import errors as E
@@ -23,12 +24,17 @@ from .supervisor import Supervisor
 MUTATION_METHODS = {"POST", "PUT", "PATCH", "DELETE"}
 MAX_REQUEST_BYTES = 128 * 1024
 CLIENT_HEADER = "x-planlab-client"
-ALLOWED_HOSTS_PREFIXES = ("127.0.0.1", "localhost", "[::1]")
+LOOPBACK_HOSTS = {"127.0.0.1", "localhost", "::1", "[::1]"}
 
 logger = logging.getLogger("planlab.service")
 
 
-def _host_allowed(value: str | None) -> bool:
+def _host_allowed(value: str | None, extra: tuple[str, ...] = ()) -> bool:
+    """A request Host is acceptable when it is loopback or operator-allowlisted.
+
+    The allowlist exists for tunnelled access: a proxy in front of the loopback
+    service forwards the public hostname, which would otherwise be refused.
+    """
     if not value:
         return False
     host = value.strip().lower()
@@ -36,7 +42,18 @@ def _host_allowed(value: str | None) -> bool:
         host = host.split("]")[0] + "]"
     else:
         host = host.split(":")[0]
-    return host in {"127.0.0.1", "localhost", "::1", "[::1]"}
+    return host in LOOPBACK_HOSTS or host in extra
+
+
+def _cors_headers(origin: str) -> dict[str, str]:
+    """The explicit grant a browser needs to call this service cross-origin."""
+    return {
+        "Access-Control-Allow-Origin": origin,
+        "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+        "Access-Control-Allow-Headers": "content-type, x-planlab-client",
+        "Access-Control-Max-Age": "600",
+        "Vary": "Origin",
+    }
 
 
 def create_app(settings: Settings | None = None, supervisor_factory=None) -> FastAPI:
@@ -96,7 +113,7 @@ def create_app(settings: Settings | None = None, supervisor_factory=None) -> Fas
         request.state.correlation_id = uuid.uuid4().hex[:16]
         response_headers = {"Cache-Control": "no-store",
                             "X-PlanLab-Correlation-Id": request.state.correlation_id}
-        if not _host_allowed(request.headers.get("host")):
+        if not _host_allowed(request.headers.get("host"), resolved.allowed_hosts):
             return JSONResponse(
                 status_code=421,
                 content={"schemaVersion": CONTRACT_VERSION,
@@ -107,7 +124,8 @@ def create_app(settings: Settings | None = None, supervisor_factory=None) -> Fas
                 headers=response_headers,
             )
         origin = request.headers.get("origin")
-        if origin and origin not in request.app.state.settings.allowed_origins():
+        origin_allowed = bool(origin) and origin in resolved.allowed_origins()
+        if origin and not origin_allowed:
             return JSONResponse(
                 status_code=403,
                 content={"schemaVersion": CONTRACT_VERSION,
@@ -117,6 +135,11 @@ def create_app(settings: Settings | None = None, supervisor_factory=None) -> Fas
                                    "correlationId": request.state.correlation_id}},
                 headers=response_headers,
             )
+        cors = _cors_headers(origin) if origin_allowed else {}
+        if request.method == "OPTIONS" and request.url.path.startswith("/api/"):
+            # Browsers never send the mutation header on a preflight, so the
+            # preflight is answered here and never reaches the route handlers.
+            return Response(status_code=204, headers={**response_headers, **cors})
         if request.method in MUTATION_METHODS:
             client = request.headers.get(CLIENT_HEADER)
             if client != "1":
@@ -168,6 +191,8 @@ def create_app(settings: Settings | None = None, supervisor_factory=None) -> Fas
                 )
         response = await call_next(request)
         for key, value in response_headers.items():
+            response.headers.setdefault(key, value)
+        for key, value in cors.items():
             response.headers.setdefault(key, value)
         return response
 

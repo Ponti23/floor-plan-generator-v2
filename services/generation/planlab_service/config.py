@@ -20,6 +20,10 @@ class Settings:
     static_dir: Path | None = None
     host: str = "127.0.0.1"
     port: int = 8010
+    # Hostnames (no scheme, no port) the service will answer for in addition to
+    # loopback. Set when the loopback service is reached through a tunnel whose
+    # proxy forwards the public Host header.
+    allowed_hosts: tuple[str, ...] = ()
     dev_origins: tuple[str, ...] = (
         "http://127.0.0.1:5173",
         "http://localhost:5173",
@@ -49,6 +53,15 @@ class Settings:
             raise ValueError("PLANLAB_MAX_ACTIVE_JOBS must be 1 for this MVP")
         if not 1 <= int(self.port) <= 65535:
             raise ValueError("PLANLAB_PORT must be a valid TCP port")
+        for host in self.allowed_hosts:
+            if not host or host != host.strip().lower():
+                raise ValueError(
+                    f"PLANLAB_ALLOWED_HOSTS entries must be lowercase hostnames, got {host!r}"
+                )
+            if any(character in host for character in "/:@ ") or ":" in host:
+                raise ValueError(
+                    f"PLANLAB_ALLOWED_HOSTS entries must be bare hostnames, got {host!r}"
+                )
 
     @classmethod
     def from_env(cls, env=None, repo_root: Path | None = None) -> "Settings":
@@ -81,13 +94,24 @@ class Settings:
             settings.dev_origins = tuple(
                 origin.strip() for origin in origins.split(",") if origin.strip()
             )
+        hosts = env.get("PLANLAB_ALLOWED_HOSTS")
+        if hosts:
+            settings.allowed_hosts = tuple(
+                host.strip().lower() for host in hosts.split(",") if host.strip()
+            )
         settings.validate()
         return settings
 
     def allowed_origins(self) -> set[str]:
-        return {
+        origins = {
             f"http://{self.host}:{self.port}",
             f"http://127.0.0.1:{self.port}",
             f"http://localhost:{self.port}",
             *self.dev_origins,
         }
+        # A page served through the tunnel is the same origin as the service it
+        # calls, but its module scripts still arrive with an Origin header.
+        for host in self.allowed_hosts:
+            origins.add(f"https://{host}")
+            origins.add(f"http://{host}")
+        return origins

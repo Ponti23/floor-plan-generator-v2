@@ -48,7 +48,7 @@ async function debuggerUrl(port, attempts = 80) {
   throw new Error("Chrome DevTools endpoint never became available");
 }
 
-function connect(url) {
+function connect(url, onEvent) {
   const socket = new WebSocket(url);
   const pending = new Map();
   let nextId = 1;
@@ -58,6 +58,13 @@ function connect(url) {
   });
   socket.addEventListener("message", (event) => {
     const message = JSON.parse(event.data);
+    if (onEvent && message.method) {
+      try {
+        onEvent(message);
+      } catch {
+        // a diagnostic hook must never break the driver
+      }
+    }
     if (message.id && pending.has(message.id)) {
       const { resolveResult, rejectResult } = pending.get(message.id);
       pending.delete(message.id);
@@ -80,7 +87,7 @@ function connect(url) {
   return { send, close: () => socket.close(), ready };
 }
 
-export async function launchBrowser({ url, chrome, width = 1400, height = 1000, port = 9333 }) {
+export async function launchBrowser({ url, chrome, width = 1400, height = 1000, port = 9333, onEvent }) {
   const executable = findBrowser(chrome);
   const profile = mkdtempSync(join(tmpdir(), "planlab-cdp-"));
   const process_ = spawn(executable, [
@@ -94,11 +101,15 @@ export async function launchBrowser({ url, chrome, width = 1400, height = 1000, 
     "about:blank",
   ], { stdio: "ignore" });
 
-  const connection = connect(await debuggerUrl(port));
+  const connection = connect(await debuggerUrl(port), onEvent);
   await connection.ready;
   const { send } = connection;
   await send("Page.enable");
   await send("Runtime.enable");
+  if (onEvent) {
+    await send("Network.enable");
+    await send("Log.enable");
+  }
   await send("Page.navigate", { url });
 
   const evaluate = async (expression) => {

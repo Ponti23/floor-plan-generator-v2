@@ -291,6 +291,80 @@ class ApiTests(unittest.TestCase):
         response = self.client.get("/api/v1/health/live", headers={"Host": "example.com"})
         self.assertEqual(response.status_code, 421)
 
+    def _isolated_client(self, **overrides):
+        directory = Path(tempfile.mkdtemp(prefix="s05-boundary-"))
+        settings = Settings(data_dir=directory, static_dir=None, **overrides)
+        app = create_app(settings, supervisor_factory=lambda cfg: FakeSupervisor(cfg))
+        return TestClient(app, base_url=BASE)
+
+    def test_allowlisted_tunnel_host_is_accepted(self):
+        with self._isolated_client(
+            allowed_hosts=("planlab-overnight.trycloudflare.com",)
+        ) as client:
+            response = client.get(
+                "/api/v1/health/live",
+                headers={"Host": "planlab-overnight.trycloudflare.com"},
+            )
+            self.assertEqual(response.status_code, 200)
+
+    def test_page_served_through_the_tunnel_is_its_own_origin(self):
+        # Vite emits module scripts with `crossorigin`, so the page's own module
+        # requests carry an Origin header. The tunnel host must be accepted as an
+        # origin as well as a Host, or the page never boots.
+        with self._isolated_client(
+            allowed_hosts=("planlab-overnight.trycloudflare.com",)
+        ) as client:
+            response = client.get(
+                "/api/v1/health/live",
+                headers={
+                    "Host": "planlab-overnight.trycloudflare.com",
+                    "Origin": "https://planlab-overnight.trycloudflare.com",
+                },
+            )
+            self.assertEqual(response.status_code, 200)
+
+    def test_allowlisted_origin_receives_cors_grant(self):
+        with self._isolated_client(
+            dev_origins=("https://floor-plan-generator-v2.vercel.app",)
+        ) as client:
+            response = client.get(
+                "/api/v1/health/live",
+                headers={"Origin": "https://floor-plan-generator-v2.vercel.app"},
+            )
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(
+                response.headers["access-control-allow-origin"],
+                "https://floor-plan-generator-v2.vercel.app",
+            )
+
+    def test_preflight_from_allowlisted_origin_is_answered(self):
+        with self._isolated_client(
+            dev_origins=("https://floor-plan-generator-v2.vercel.app",)
+        ) as client:
+            response = client.options(
+                "/api/v1/projects",
+                headers={
+                    "Origin": "https://floor-plan-generator-v2.vercel.app",
+                    "Access-Control-Request-Method": "POST",
+                    "Access-Control-Request-Headers": "content-type,x-planlab-client",
+                },
+            )
+            self.assertEqual(response.status_code, 204)
+            self.assertIn(
+                "x-planlab-client", response.headers["access-control-allow-headers"]
+            )
+
+    def test_preflight_from_foreign_origin_is_refused(self):
+        with self._isolated_client() as client:
+            response = client.options(
+                "/api/v1/projects",
+                headers={
+                    "Origin": "https://evil.example",
+                    "Access-Control-Request-Method": "POST",
+                },
+            )
+            self.assertEqual(response.status_code, 403)
+
     def test_oversized_body_is_refused(self):
         response = self.client.post(
             "/api/v1/projects",
