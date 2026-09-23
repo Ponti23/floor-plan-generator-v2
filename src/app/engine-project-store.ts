@@ -21,6 +21,43 @@ export function draftKey(projectId: string): string {
   return `planlab:v2:draft:${projectId}`;
 }
 
+export function generationKey(projectId: string): string {
+  return `planlab:v2:lastGeneration:${projectId}`;
+}
+
+/** Remember the last generation so its alternatives survive a page reload. */
+export function saveLastGeneration(
+  projectId: string,
+  generationId: string,
+  storage?: Storage | null,
+): boolean {
+  const target = storageOrNull(storage);
+  if (!target) {
+    return false;
+  }
+  try {
+    target.setItem(generationKey(projectId), generationId);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+export function loadLastGeneration(
+  projectId: string,
+  storage?: Storage | null,
+): string | null {
+  const target = storageOrNull(storage);
+  if (!target) {
+    return null;
+  }
+  try {
+    return target.getItem(generationKey(projectId));
+  } catch {
+    return null;
+  }
+}
+
 function storageOrNull(storage?: Storage | null): Storage | null {
   if (storage) {
     return storage;

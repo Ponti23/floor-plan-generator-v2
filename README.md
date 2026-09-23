@@ -111,6 +111,14 @@ npm run build
 pwsh -NoProfile -File scripts/start-planlab.ps1      # serves dist + API on http://127.0.0.1:8010
 ```
 
+Two pages are served from the same origin:
+
+* `http://127.0.0.1:8010/engine.html` — the exact engine UI: Land / Walls / Rooms / Review editing,
+  Generate against the real model and geometry engine, options with the six engine scores and the
+  independent checks, and "Use this option" which persists your choice.
+* `http://127.0.0.1:8010/` — the earlier grid-shell page, kept intact for its existing tests. Merging
+  the exact editor into that shell is a product/UX decision, not a technical blocker.
+
 `vercel.json` still builds a static preview, but a static bundle cannot run the model: real
 generation only works against the local service. There is no public deployment and no API key.
 
@@ -129,6 +137,7 @@ npm run build
 npm run contracts:check # schema + room policy are in sync with the implementation
 npm run test:service    # 56 service unit tests
 npm run test:service:integration
+node scripts/integration-e2e.mjs   # the real-engine MVP gate (headless browser, no mocks)
 ```
 
 Known limitations: one job at a time, 360 s active-job deadline, straight corridors only,

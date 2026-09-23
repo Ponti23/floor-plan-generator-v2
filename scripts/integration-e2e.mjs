@@ -13,12 +13,15 @@ import { spawn } from "node:child_process";
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import { launchBrowser } from "./lib/browser.mjs";
 
 const REPO = resolve(fileURLToPath(new URL("..", import.meta.url)));
 const OUT_DIR = resolve(REPO, "artifacts", "integration");
 const PYTHON = "E:/Projects/floor-plan-model/.python/python.exe";
 const BASE = "http://127.0.0.1:8010";
 const HEADERS = { "X-PlanLab-Client": "1", "Content-Type": "application/json" };
+const CHECKPOINT_SHA256 =
+  "3ea6225e6c582e167cb9a2450eae5b068cc2189cae182cb015503e3d47e220d8";
 
 const checks = [];
 function record(id, passed, detail, evidence = null) {
@@ -131,6 +134,7 @@ async function main() {
   let verdict = "NO_GO";
   const realGenerationIds = [];
   const latency = {};
+  let browser = null;
   try {
     const ready = await waitForReady();
     record("health.ready", Boolean(ready), ready ? "service ready with the model loaded" : "readiness never returned 200");
@@ -172,17 +176,105 @@ async function main() {
       && ["necessary_condition", "limited_search"].includes(d.job?.error?.proof),
       `demo D -> ${d.job?.status} ${d.job?.error?.code} (${d.job?.error?.proof})`);
 
-    // Items that require the browser UI path, which is not wired yet.
-    record("ui.editor-compiles-brief", false, "the Land/Walls/Rooms/Review editor is not mounted in main.ts yet");
-    record("ui.viewer-exact-mm", false, "the exact-mm renderer exists and is unit-tested but is not mounted in the page");
-    record("ui.selection-round-trip", false, "selection works over HTTP but is not yet driven from the UI");
-    record("e2e.no-mocked-generation", false, "no browser-driven end-to-end run exists yet");
+    // ---- the browser path: the real page drives the real service ----------
+    browser = await launchBrowser({ url: `${BASE}/engine.html` });
+    await browser.waitFor("Boolean(window.__planlabEngine)", { label: "engine page boot", timeoutMs: 30_000 });
+    record("ui.editor-boots", true, "the exact engine page booted with its Land/Walls/Rooms/Review editor");
+
+    const editorRooms = await browser.evaluate(
+      "document.querySelectorAll('[data-room]').length",
+    );
+    record("ui.editor-room-instances", editorRooms >= 9,
+      `${editorRooms} editable room instances are rendered with ids, areas and authored minima`);
+
+    // edit through the real control: 17.321 m must reach the engine unchanged
+    await browser.evaluate(`(() => {
+      const input = document.querySelector('#site-width');
+      input.value = '17.321';
+      input.dispatchEvent(new Event('input', { bubbles: true }));
+      input.dispatchEvent(new Event('change', { bubbles: true }));
+      return input.value;
+    })()`);
+    const reviewText = await browser.evaluate("document.querySelector('[data-review]')?.textContent ?? ''");
+    record("ui.exact-metre-input", String(reviewText).includes("17.321"),
+      "the Review section shows the authored 17.321 m site value");
+
+    await browser.evaluate("document.querySelector('#generate').click()");
+    // the page uses the product defaults (topK 5, 30 s per attempt), so allow the
+    // full active-job deadline plus overhead
+    await browser.waitFor("window.__planlabEngine.state().layouts > 0", { timeoutMs: 420_000, label: "a generated option" });
+    const uiState = await browser.evaluate("window.__planlabEngine.state()");
+    record("ui.generate-round-trip", uiState.status === "COMPLETED" && uiState.layouts > 0,
+      `the page submitted through the API and received ${uiState.layouts} option(s) (status ${uiState.status})`);
+    const renderedLayoutId = await browser.evaluate(
+      "document.querySelector('[data-layout-id]')?.getAttribute('data-layout-id') ?? null",
+    );
+
+    const pageProject = await api(`/api/v1/projects/${uiState.projectId}`);
+    record("ui.editor-compiles-brief", pageProject.body?.brief?.site?.widthMm === 17_321,
+      `the brief the UI saved has site width ${pageProject.body?.brief?.site?.widthMm} mm`);
+
+    const svgInfo = await browser.evaluate(`(() => {
+      const svg = document.querySelector('[data-plan] svg');
+      if (!svg) return null;
+      return {
+        viewBox: svg.getAttribute('viewBox'),
+        rooms: svg.querySelectorAll('[data-room-id]').length,
+        walls: svg.querySelectorAll('[data-wall-id]').length,
+        openings: svg.querySelectorAll('[data-opening-id]').length,
+        hasNorth: svg.textContent.includes('N ↑'),
+      };
+    })()`);
+    record("ui.viewer-exact-mm", Boolean(svgInfo && svgInfo.viewBox === "0 0 17321 16062"
+      && svgInfo.rooms > 0 && svgInfo.walls > 0 && svgInfo.openings > 0 && svgInfo.hasNorth),
+      svgInfo ? `rendered ${svgInfo.rooms} rooms, ${svgInfo.walls} walls, ${svgInfo.openings} openings at viewBox ${svgInfo.viewBox}` : "no plan rendered");
+
+    const analysis = await browser.evaluate(`(() => {
+      const panel = document.querySelector('[data-analysis]');
+      if (!panel) return null;
+      return {
+        scores: panel.querySelectorAll('[data-score]').length,
+        checks: panel.querySelectorAll('[data-check]').length,
+        text: panel.textContent,
+      };
+    })()`);
+    record("ui.analysis-from-engine-scores", Boolean(analysis && analysis.scores === 6 && analysis.checks >= 20
+      && !/optimal/i.test(analysis.text)),
+      analysis ? `${analysis.scores} engine scores and ${analysis.checks} independent checks are shown in the option` : "no analysis panel");
+
+    await browser.evaluate("document.querySelector('[data-action=\"use-option\"]').click()");
+    await browser.waitFor("document.querySelector('[data-selected-marker]') !== null",
+      { timeoutMs: 30_000, label: "the selected marker" });
+    const selectedId = await browser.evaluate("window.__planlabEngine.state().selectedLayoutId");
+    await browser.send("Page.reload", { ignoreCache: false });
+    await browser.waitFor("Boolean(window.__planlabEngine)", { label: "engine page after reload", timeoutMs: 30_000 });
+    const afterReload = await browser.waitFor(
+      "window.__planlabEngine.state().selectedLayoutId",
+      { timeoutMs: 30_000, label: "the restored selection" },
+    );
+    record("ui.selection-round-trip", afterReload === selectedId && Boolean(selectedId),
+      `selected ${String(selectedId).slice(0, 8)}…, reloaded the page and the same option is still selected`);
+
+    const jobId = uiState.jobId;
+    const real = jobId ? await api(`/api/v1/generations/${jobId}`) : null;
+    const layoutIds = real?.body?.layoutIds ?? [];
+    record("e2e.no-mocked-generation", Boolean(real && real.body?.versions?.checkpointSha256 === CHECKPOINT_SHA256),
+      real ? `the option came from real job ${String(jobId).slice(0, 8)}… with checkpoint ${real.body.versions.checkpointSha256.slice(0, 12)}…`
+        : "no job id was exposed by the page");
+    record("e2e.job-matches-rendered-option", Boolean(layoutIds.length && layoutIds.includes(renderedLayoutId)),
+      `the layout rendered in the page (${String(renderedLayoutId).slice(0, 8)}…) is one of the job's persisted layout ids`);
+    const restoredOptions = await browser.evaluate("window.__planlabEngine.state().layouts");
+    record("ui.alternatives-survive-reload", restoredOptions > 0,
+      `${restoredOptions} option(s) are still available after the page reload`);
 
     verdict = checks.every((check) => check.passed) ? "GO" : "NO_GO";
   } catch (error) {
     record("gate.runner", false, String(error?.message ?? error));
     verdict = "NO_GO";
   } finally {
+    if (browser) {
+      await browser.close();
+    }
     service.kill();
   }
 

@@ -52,7 +52,10 @@ export class ProjectClient {
 
   constructor(options: ProjectClientOptions = {}) {
     this.baseUrl = (options.baseUrl ?? "").replace(/\/$/, "");
-    this.fetchImpl = options.fetchImpl ?? fetch;
+    // bind to the global object: calling window.fetch with a different receiver
+    // throws "Illegal invocation" in browsers
+    const implementation = options.fetchImpl ?? globalThis.fetch;
+    this.fetchImpl = implementation.bind(globalThis);
   }
 
   private async request<T>(

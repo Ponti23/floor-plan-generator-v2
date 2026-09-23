@@ -1,0 +1,93 @@
+{
+  "manifestVersion": 1,
+  "recordedAt": "2026-09-23",
+  "plan": "E:/Projects/floor-plan-model/docs/integration/ASTRA_IMPLEMENTATION_MASTER_PLAN.md",
+  "branch": "integration/planlab-engine-mvp",
+  "gate": {
+    "name": "PLANLAB_INTEGRATION_MVP_GATE",
+    "verdict": "GO",
+    "passed": 19,
+    "total": 19,
+    "artifact": "artifacts/integration/PLANLAB_INTEGRATION_MVP_GATE.json",
+    "runner": "node scripts/integration-e2e.mjs",
+    "note": "Driven through a real headless browser against the real service, engine and SQLite. No mocked generation."
+  },
+  "protectedSources": {
+    "manifest": "artifacts/integration/protected-source-sha256.json",
+    "enginePatch": "artifacts/integration/engine-patch.md",
+    "engineAfter": "artifacts/integration/engine-after-sha256.json",
+    "changedEngineFiles": [
+      {
+        "path": "geometry_engine_v1/ge_layout_model.py",
+        "beforeSha256": "b652c7ffbe71b30bbaa74020ce8413c51c5bf58a6d11fc036b1b268f179f8a8e",
+        "afterSha256": "cd3536838239def22dfe770a93e6e8b4e5329f3b10477e73e1ed2883bca6cfe4"
+      },
+      {
+        "path": "geometry_engine_v1/ge_validator.py",
+        "beforeSha256": "b9cc31274dc1402dd243d1588716e25b696ee03560cab41d1bf8f83331bfc07c",
+        "afterSha256": "1e3663ba3c8752cc5d7a01f8859b859568cc0b79093c618b17e828678e017fe1"
+      }
+    ],
+    "unchangedCount": 87,
+    "missingCount": 0
+  },
+  "contracts": {
+    "version": "planlab.generation/1",
+    "schema": {
+      "path": "contracts/generation-v1.schema.json",
+      "sha256": "bdafc31e887c583df0c5efeeeedae6bf7da12d3b9daabd24f81833592e7f3ec3"
+    },
+    "roomPolicy": {
+      "path": "contracts/room-policy-v1.json",
+      "sha256": "d32b456e2e21c9343689f87af3c3a09c824e61f4712a8f829bd10be4d84b2d3a"
+    },
+    "checkCommand": "npm run contracts:check"
+  },
+  "model": {
+    "checkpointId": "full_v1a/best",
+    "checkpointSha256": "3ea6225e6c582e167cb9a2450eae5b068cc2189cae182cb015503e3d47e220d8",
+    "storeManifestSha256": "f56a3eec5ade2bf694d834f0241da8b2a714fb3c696dfb10bce80637cdc7ce6c",
+    "dataManifestSha256": "7b88ba0ea80684a9e0abfd9753c84d49440fe260f0c2c3f7a97c2d1f5b283647",
+    "device": "cpu"
+  },
+  "verification": {
+    "frontendTests": { "command": "npm test", "tests": 238, "passed": 238, "failed": 0 },
+    "typecheck": { "command": "npm run typecheck", "passed": true },
+    "build": { "command": "npm run build", "passed": true, "entries": ["dist/index.html", "dist/engine.html"] },
+    "serviceUnitTests": { "command": "npm run test:service", "tests": 62, "passed": 62 },
+    "serviceLifecycleTests": { "command": "npm run test:service:integration", "tests": 3, "passed": 3 },
+    "realEngineTests": {
+      "command": "<engine python> services/generation/tests/integration/test_real_engine.py",
+      "tests": 4,
+      "passed": 4,
+      "seconds": 72.4
+    },
+    "engineSchemaCheck": { "command": "<engine python> geometry_engine_v1/check_schemas.py", "documents": 27, "valid": 27 },
+    "engineRegressions": { "command": "<engine python> geometry_engine_v1/test_integration_constraints.py", "tests": 8, "passed": 8 },
+    "gate": { "command": "node scripts/integration-e2e.mjs", "verdict": "GO", "passed": 19, "total": 19 }
+  },
+  "runtime": {
+    "interpreter": "E:/Projects/floor-plan-model/.python/python.exe",
+    "python": "3.14.7",
+    "torch": "2.9.0+cu129",
+    "ortools": "9.15.6755",
+    "serviceOverlay": ".runtime/generation/site-packages",
+    "dataDir": ".local/planlab",
+    "bind": "127.0.0.1:8010",
+    "startCommands": {
+      "setup": "pwsh -NoProfile -File scripts/start-generation.ps1 -Setup",
+      "devApi": "npm run dev:engine",
+      "devUi": "npm run dev",
+      "release": "npm run build; pwsh -NoProfile -File scripts/start-planlab.ps1",
+      "enginePage": "http://127.0.0.1:8010/engine.html",
+      "legacyPage": "http://127.0.0.1:8010/"
+    }
+  },
+  "knownLimitations": [
+    "One generation at a time; a full 5-candidate demo takes about 150 s against a 360 s active-job deadline.",
+    "Straight corridors only; 100 mm wall reporting raster; symbolic openings that do not guarantee a door per room.",
+    "Architectural infeasibility is a limited search unless the required minima alone exceed the envelope.",
+    "Selection is local single-user: no authentication and no public deployment.",
+    "The exact engine UI lives at /engine.html; the legacy grid page still owns / on index.html. Merging the exact editor into the preserved three-pane shell is a product/UX decision left to the user."
+  ]
+}

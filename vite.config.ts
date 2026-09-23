@@ -1,6 +1,15 @@
 import { defineConfig } from "vite";
+import { resolve } from "node:path";
 
 export default defineConfig({
+  build: {
+    rollupOptions: {
+      input: {
+        index: resolve(import.meta.dirname, "index.html"),
+        engine: resolve(import.meta.dirname, "engine.html"),
+      },
+    },
+  },
   server: {
     proxy: {
       // dev only: the API runs as a separate local process on 8010

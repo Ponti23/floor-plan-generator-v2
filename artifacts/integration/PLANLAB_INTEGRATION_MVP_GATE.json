@@ -1,9 +1,9 @@
 {
   "gate": "PLANLAB_INTEGRATION_MVP_GATE",
-  "verdict": "NO_GO",
-  "runId": "gate-1790148479269",
-  "startedAt": "2026-09-23T07:27:48Z",
-  "finishedAt": "2026-09-23T07:27:59Z",
+  "verdict": "GO",
+  "runId": "gate-1790150519763",
+  "startedAt": "2026-09-23T07:59:15Z",
+  "finishedAt": "2026-09-23T08:01:59Z",
   "frontendCommit": "unknown",
   "engineSourceSha256": "checkpoint 3ea6225e6c58…",
   "checkpointSha256": "3ea6225e6c582e167cb9a2450eae5b068cc2189cae182cb015503e3d47e220d8",
@@ -29,7 +29,7 @@
     {
       "id": "layout.self-contained-dto",
       "passed": true,
-      "detail": "9 rooms, 25 walls, 6 openings, 20 checks",
+      "detail": "9 rooms, 27 walls, 5 openings, 20 checks",
       "evidencePaths": []
     },
     {
@@ -57,37 +57,79 @@
       "evidencePaths": []
     },
     {
+      "id": "ui.editor-boots",
+      "passed": true,
+      "detail": "the exact engine page booted with its Land/Walls/Rooms/Review editor",
+      "evidencePaths": []
+    },
+    {
+      "id": "ui.editor-room-instances",
+      "passed": true,
+      "detail": "9 editable room instances are rendered with ids, areas and authored minima",
+      "evidencePaths": []
+    },
+    {
+      "id": "ui.exact-metre-input",
+      "passed": true,
+      "detail": "the Review section shows the authored 17.321 m site value",
+      "evidencePaths": []
+    },
+    {
+      "id": "ui.generate-round-trip",
+      "passed": true,
+      "detail": "the page submitted through the API and received 3 option(s) (status COMPLETED)",
+      "evidencePaths": []
+    },
+    {
       "id": "ui.editor-compiles-brief",
-      "passed": false,
-      "detail": "the Land/Walls/Rooms/Review editor is not mounted in main.ts yet",
+      "passed": true,
+      "detail": "the brief the UI saved has site width 17321 mm",
       "evidencePaths": []
     },
     {
       "id": "ui.viewer-exact-mm",
-      "passed": false,
-      "detail": "the exact-mm renderer exists and is unit-tested but is not mounted in the page",
+      "passed": true,
+      "detail": "rendered 9 rooms, 24 walls, 4 openings at viewBox 0 0 17321 16062",
+      "evidencePaths": []
+    },
+    {
+      "id": "ui.analysis-from-engine-scores",
+      "passed": true,
+      "detail": "6 engine scores and 20 independent checks are shown in the option",
       "evidencePaths": []
     },
     {
       "id": "ui.selection-round-trip",
-      "passed": false,
-      "detail": "selection works over HTTP but is not yet driven from the UI",
+      "passed": true,
+      "detail": "selected 7d675419…, reloaded the page and the same option is still selected",
       "evidencePaths": []
     },
     {
       "id": "e2e.no-mocked-generation",
-      "passed": false,
-      "detail": "no browser-driven end-to-end run exists yet",
+      "passed": true,
+      "detail": "the option came from real job 85011e61… with checkpoint 3ea6225e6c58…",
+      "evidencePaths": []
+    },
+    {
+      "id": "e2e.job-matches-rendered-option",
+      "passed": true,
+      "detail": "the layout rendered in the page (7d675419…) is one of the job's persisted layout ids",
+      "evidencePaths": []
+    },
+    {
+      "id": "ui.alternatives-survive-reload",
+      "passed": true,
+      "detail": "3 option(s) are still available after the page reload",
       "evidencePaths": []
     }
   ],
   "realGenerationIds": [
-    "8ff373ad-5979-4cb4-b6aa-3b346bccc554",
-    "8818e538-2b56-4cfa-9da0-30ce294d7617"
+    "197f57ea-49ec-4447-b16f-0106c1afe4b5",
+    "7bc52c52-b54f-4c02-bda0-24aa990c9e75"
   ],
   "latencyMs": {
     "demoB": {
-      "postSeconds": 0.011,
+      "postSeconds": 0.013,
       "elapsedMs": 5000
     },
     "demoD": {
