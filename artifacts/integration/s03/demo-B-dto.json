@@ -1,0 +1,1819 @@
+{
+  "summary": {
+    "brief": "demo_B_typical_3bed_2bath_garage_laundry",
+    "status": "COMPLETED",
+    "layouts": [
+      {
+        "rank": 1,
+        "layoutId": "b74f074e-cae0-5794-aad2-02bc519dedc1",
+        "finalScore": 0.8703,
+        "rooms": 9,
+        "omitted": [],
+        "checks": 20
+      },
+      {
+        "rank": 2,
+        "layoutId": "5279a47c-dafb-51bc-a9f6-14a1ef376c97",
+        "finalScore": 0.8677,
+        "rooms": 9,
+        "omitted": [],
+        "checks": 20
+      }
+    ],
+    "error": null,
+    "warnings": [],
+    "stages": [
+      "GENERATING_TOPOLOGIES",
+      "SOLVING",
+      "VALIDATING",
+      "RANKING"
+    ],
+    "diagnostics": {
+      "footprint": {
+        "reason": "full-legal-envelope",
+        "outerRect": {
+          "xMm": 1000,
+          "yMm": 3000,
+          "widthMm": 12117,
+          "heightMm": 11562
+        },
+        "effectiveOffsets": {
+          "northMm": 1500,
+          "eastMm": 1000,
+          "southMm": 3000,
+          "westMm": 1000
+        },
+        "gfaM2": 140.096754
+      },
+      "candidateCount": 2,
+      "attemptStatuses": [
+        "FEASIBLE",
+        "FEASIBLE"
+      ],
+      "elapsedMs": 40236
+    },
+    "elapsedS": 40.24,
+    "warmJobs": 1
+  },
+  "layouts": [
+    {
+      "schemaVersion": "planlab.layout/1",
+      "layoutId": "b74f074e-cae0-5794-aad2-02bc519dedc1",
+      "generationId": "d078399b-0fb4-54f1-835a-3f14bd94980b",
+      "projectId": "247d96a9-5d60-5cd1-97a0-2544a6abf892",
+      "briefVersionId": "7894cd34-5cf7-5702-80f3-b12c75dae6ae",
+      "briefHash": "2ba73d676f853e439c780efde728e422483600817c300609fcf9b33b9c5dbf7a",
+      "rank": 1,
+      "createdAt": "2026-09-23T06:35:03Z",
+      "solverStatus": "FEASIBLE",
+      "validationStatus": "PASSED",
+      "coordinateSystem": "site-sw-x-east-y-north-mm",
+      "site": {
+        "widthMm": 14117,
+        "heightMm": 16062,
+        "front": "south"
+      },
+      "setbacks": {
+        "northMm": 1500,
+        "eastMm": 1000,
+        "southMm": 3000,
+        "westMm": 1000
+      },
+      "setbackEnvelope": {
+        "xMm": 1000,
+        "yMm": 3000,
+        "widthMm": 12117,
+        "heightMm": 11562
+      },
+      "buildingEnvelope": {
+        "xMm": 1000,
+        "yMm": 3000,
+        "widthMm": 12117,
+        "heightMm": 11562
+      },
+      "buildableEnvelope": {
+        "xMm": 1230,
+        "yMm": 3230,
+        "widthMm": 11657,
+        "heightMm": 11102
+      },
+      "rooms": [
+        {
+          "id": "B1",
+          "label": "Bedroom 1",
+          "type": "bedroom",
+          "roomClass": "standard",
+          "sourceRequirementId": "bedroom",
+          "ordinal": 0,
+          "required": true,
+          "targetAreaM2": 14.0,
+          "minAreaM2": 11.0,
+          "maxAreaM2": 16.1,
+          "minShortSideMm": 3200,
+          "minWidthMm": 3200,
+          "minHeightMm": 3200,
+          "maxAspectRatio": 1.8,
+          "present": true,
+          "rect": {
+            "xMm": 8481,
+            "yMm": 11036,
+            "widthMm": 4406,
+            "heightMm": 3296
+          },
+          "areaM2": 14.522176
+        },
+        {
+          "id": "B2",
+          "label": "Bedroom 2",
+          "type": "bedroom",
+          "roomClass": "standard",
+          "sourceRequirementId": "bedroom",
+          "ordinal": 1,
+          "required": true,
+          "targetAreaM2": 12.0,
+          "minAreaM2": 10.0,
+          "maxAreaM2": 13.8,
+          "minShortSideMm": 3000,
+          "minWidthMm": 3000,
+          "minHeightMm": 3000,
+          "maxAspectRatio": 1.8,
+          "present": true,
+          "rect": {
+            "xMm": 9887,
+            "yMm": 4230,
+            "widthMm": 3000,
+            "heightMm": 4506
+          },
+          "areaM2": 13.518
+        },
+        {
+          "id": "B3",
+          "label": "Bedroom 3",
+          "type": "bedroom",
+          "roomClass": "standard",
+          "sourceRequirementId": "bedroom",
+          "ordinal": 2,
+          "required": true,
+          "targetAreaM2": 11.0,
+          "minAreaM2": 9.0,
+          "maxAreaM2": 12.65,
+          "minShortSideMm": 3000,
+          "minWidthMm": 3000,
+          "minHeightMm": 3000,
+          "maxAspectRatio": 1.8,
+          "present": true,
+          "rect": {
+            "xMm": 1230,
+            "yMm": 7030,
+            "widthMm": 3000,
+            "heightMm": 4006
+          },
+          "areaM2": 12.018
+        },
+        {
+          "id": "BA1",
+          "label": "Bathroom 1",
+          "type": "bathroom",
+          "roomClass": "standard",
+          "sourceRequirementId": "bathroom",
+          "ordinal": 0,
+          "required": true,
+          "targetAreaM2": 6.0,
+          "minAreaM2": 4.5,
+          "maxAreaM2": 6.9,
+          "minShortSideMm": 1800,
+          "minWidthMm": 1800,
+          "minHeightMm": 1800,
+          "maxAspectRatio": 2.2,
+          "present": true,
+          "rect": {
+            "xMm": 9887,
+            "yMm": 8736,
+            "widthMm": 3000,
+            "heightMm": 2300
+          },
+          "areaM2": 6.9
+        },
+        {
+          "id": "BA2",
+          "label": "Bathroom 2",
+          "type": "bathroom",
+          "roomClass": "standard",
+          "sourceRequirementId": "bathroom",
+          "ordinal": 1,
+          "required": true,
+          "targetAreaM2": 4.0,
+          "minAreaM2": 3.0,
+          "maxAreaM2": 4.6,
+          "minShortSideMm": 1600,
+          "minWidthMm": 1600,
+          "minHeightMm": 1600,
+          "maxAspectRatio": 2.2,
+          "present": true,
+          "rect": {
+            "xMm": 4230,
+            "yMm": 7030,
+            "widthMm": 2251,
+            "heightMm": 1777
+          },
+          "areaM2": 4.000027
+        },
+        {
+          "id": "K1",
+          "label": "Kitchen 1",
+          "type": "kitchen",
+          "roomClass": "standard",
+          "sourceRequirementId": "kitchen",
+          "ordinal": 0,
+          "required": true,
+          "targetAreaM2": 14.0,
+          "minAreaM2": 10.0,
+          "maxAreaM2": 16.1,
+          "minShortSideMm": 2800,
+          "minWidthMm": 2800,
+          "minHeightMm": 2800,
+          "maxAspectRatio": 2.0,
+          "present": true,
+          "rect": {
+            "xMm": 1230,
+            "yMm": 4230,
+            "widthMm": 5251,
+            "heightMm": 2800
+          },
+          "areaM2": 14.7028
+        },
+        {
+          "id": "L1",
+          "label": "Living 1",
+          "type": "living",
+          "roomClass": "standard",
+          "sourceRequirementId": "living",
+          "ordinal": 0,
+          "required": true,
+          "targetAreaM2": 22.0,
+          "minAreaM2": 16.0,
+          "maxAreaM2": 25.3,
+          "minShortSideMm": 3400,
+          "minWidthMm": 3400,
+          "minHeightMm": 3400,
+          "maxAspectRatio": 2.0,
+          "present": true,
+          "rect": {
+            "xMm": 6481,
+            "yMm": 4230,
+            "widthMm": 3406,
+            "heightMm": 6806
+          },
+          "areaM2": 23.181236
+        },
+        {
+          "id": "G1",
+          "label": "Garage 1",
+          "type": "garage",
+          "roomClass": "standard",
+          "sourceRequirementId": "garage",
+          "ordinal": 0,
+          "required": true,
+          "targetAreaM2": 22.0,
+          "minAreaM2": 18.0,
+          "maxAreaM2": 25.3,
+          "minShortSideMm": 3000,
+          "minWidthMm": 3000,
+          "minHeightMm": 3000,
+          "maxAspectRatio": 2.2,
+          "present": true,
+          "rect": {
+            "xMm": 1230,
+            "yMm": 11036,
+            "widthMm": 7251,
+            "heightMm": 3296
+          },
+          "areaM2": 23.899296
+        },
+        {
+          "id": "LA1",
+          "label": "Laundry 1",
+          "type": "laundry",
+          "roomClass": "standard",
+          "sourceRequirementId": "laundry",
+          "ordinal": 0,
+          "required": true,
+          "targetAreaM2": 5.0,
+          "minAreaM2": 3.5,
+          "maxAreaM2": 5.75,
+          "minShortSideMm": 1600,
+          "minWidthMm": 1600,
+          "minHeightMm": 1600,
+          "maxAspectRatio": 2.2,
+          "present": true,
+          "rect": {
+            "xMm": 4230,
+            "yMm": 8807,
+            "widthMm": 2251,
+            "heightMm": 2229
+          },
+          "areaM2": 5.017479
+        }
+      ],
+      "omittedRoomIds": [],
+      "circulation": {
+        "id": "CORRIDOR",
+        "rect": {
+          "xMm": 1230,
+          "yMm": 3230,
+          "widthMm": 11657,
+          "heightMm": 1000
+        },
+        "minWidthMm": 1000,
+        "measuredMinWidthMm": 1000,
+        "areaM2": 11.657,
+        "entry": {
+          "side": "south",
+          "xMm": 6258,
+          "yMm": 3230,
+          "widthMm": 1600
+        }
+      },
+      "walls": [
+        {
+          "id": "W_OUT_S",
+          "type": "external",
+          "thicknessMm": 230,
+          "rect": {
+            "xMm": 1000,
+            "yMm": 3000,
+            "widthMm": 12117,
+            "heightMm": 230
+          },
+          "orientation": "horizontal",
+          "between": []
+        },
+        {
+          "id": "W_OUT_N",
+          "type": "external",
+          "thicknessMm": 230,
+          "rect": {
+            "xMm": 1000,
+            "yMm": 14332,
+            "widthMm": 12117,
+            "heightMm": 230
+          },
+          "orientation": "horizontal",
+          "between": []
+        },
+        {
+          "id": "W_OUT_W",
+          "type": "external",
+          "thicknessMm": 230,
+          "rect": {
+            "xMm": 1000,
+            "yMm": 3230,
+            "widthMm": 230,
+            "heightMm": 11102
+          },
+          "orientation": "vertical",
+          "between": []
+        },
+        {
+          "id": "W_OUT_E",
+          "type": "external",
+          "thicknessMm": 230,
+          "rect": {
+            "xMm": 12887,
+            "yMm": 3230,
+            "widthMm": 230,
+            "heightMm": 11102
+          },
+          "orientation": "vertical",
+          "between": []
+        },
+        {
+          "id": "W_V1",
+          "type": "internal",
+          "thicknessMm": 90,
+          "rect": {
+            "xMm": 4185,
+            "yMm": 7030,
+            "widthMm": 90,
+            "heightMm": 1700
+          },
+          "orientation": "vertical",
+          "between": []
+        },
+        {
+          "id": "W_V2",
+          "type": "internal",
+          "thicknessMm": 90,
+          "rect": {
+            "xMm": 4185,
+            "yMm": 8730,
+            "widthMm": 90,
+            "heightMm": 2300
+          },
+          "orientation": "vertical",
+          "between": []
+        },
+        {
+          "id": "W_V3",
+          "type": "internal",
+          "thicknessMm": 90,
+          "rect": {
+            "xMm": 4185,
+            "yMm": 11030,
+            "widthMm": 90,
+            "heightMm": 100
+          },
+          "orientation": "vertical",
+          "between": []
+        },
+        {
+          "id": "W_V4",
+          "type": "internal",
+          "thicknessMm": 90,
+          "rect": {
+            "xMm": 6385,
+            "yMm": 7030,
+            "widthMm": 90,
+            "heightMm": 1700
+          },
+          "orientation": "vertical",
+          "between": []
+        },
+        {
+          "id": "W_V5",
+          "type": "internal",
+          "thicknessMm": 90,
+          "rect": {
+            "xMm": 6385,
+            "yMm": 4230,
+            "widthMm": 90,
+            "heightMm": 2800
+          },
+          "orientation": "vertical",
+          "between": []
+        },
+        {
+          "id": "W_V6",
+          "type": "internal",
+          "thicknessMm": 90,
+          "rect": {
+            "xMm": 6485,
+            "yMm": 11030,
+            "widthMm": 90,
+            "heightMm": 100
+          },
+          "orientation": "vertical",
+          "between": []
+        },
+        {
+          "id": "W_V7",
+          "type": "internal",
+          "thicknessMm": 90,
+          "rect": {
+            "xMm": 6485,
+            "yMm": 8730,
+            "widthMm": 90,
+            "heightMm": 2300
+          },
+          "orientation": "vertical",
+          "between": []
+        },
+        {
+          "id": "W_V8",
+          "type": "internal",
+          "thicknessMm": 90,
+          "rect": {
+            "xMm": 8485,
+            "yMm": 11130,
+            "widthMm": 90,
+            "heightMm": 3300
+          },
+          "orientation": "vertical",
+          "between": []
+        },
+        {
+          "id": "W_V9",
+          "type": "internal",
+          "thicknessMm": 90,
+          "rect": {
+            "xMm": 8485,
+            "yMm": 11030,
+            "widthMm": 90,
+            "heightMm": 100
+          },
+          "orientation": "vertical",
+          "between": []
+        },
+        {
+          "id": "W_V10",
+          "type": "internal",
+          "thicknessMm": 90,
+          "rect": {
+            "xMm": 9885,
+            "yMm": 4230,
+            "widthMm": 90,
+            "heightMm": 4500
+          },
+          "orientation": "vertical",
+          "between": []
+        },
+        {
+          "id": "W_V11",
+          "type": "internal",
+          "thicknessMm": 90,
+          "rect": {
+            "xMm": 9885,
+            "yMm": 8730,
+            "widthMm": 90,
+            "heightMm": 2400
+          },
+          "orientation": "vertical",
+          "between": []
+        },
+        {
+          "id": "W_H12",
+          "type": "internal",
+          "thicknessMm": 90,
+          "rect": {
+            "xMm": 9930,
+            "yMm": 4185,
+            "widthMm": 3000,
+            "heightMm": 90
+          },
+          "orientation": "horizontal",
+          "between": []
+        },
+        {
+          "id": "W_H13",
+          "type": "internal",
+          "thicknessMm": 90,
+          "rect": {
+            "xMm": 1230,
+            "yMm": 4185,
+            "widthMm": 5200,
+            "heightMm": 90
+          },
+          "orientation": "horizontal",
+          "between": []
+        },
+        {
+          "id": "W_H14",
+          "type": "internal",
+          "thicknessMm": 90,
+          "rect": {
+            "xMm": 6430,
+            "yMm": 4185,
+            "widthMm": 3500,
+            "heightMm": 90
+          },
+          "orientation": "horizontal",
+          "between": []
+        },
+        {
+          "id": "W_H15",
+          "type": "internal",
+          "thicknessMm": 90,
+          "rect": {
+            "xMm": 1230,
+            "yMm": 6985,
+            "widthMm": 3000,
+            "heightMm": 90
+          },
+          "orientation": "horizontal",
+          "between": []
+        },
+        {
+          "id": "W_H16",
+          "type": "internal",
+          "thicknessMm": 90,
+          "rect": {
+            "xMm": 4230,
+            "yMm": 6985,
+            "widthMm": 2200,
+            "heightMm": 90
+          },
+          "orientation": "horizontal",
+          "between": []
+        },
+        {
+          "id": "W_H17",
+          "type": "internal",
+          "thicknessMm": 90,
+          "rect": {
+            "xMm": 9930,
+            "yMm": 8685,
+            "widthMm": 3000,
+            "heightMm": 90
+          },
+          "orientation": "horizontal",
+          "between": []
+        },
+        {
+          "id": "W_H18",
+          "type": "internal",
+          "thicknessMm": 90,
+          "rect": {
+            "xMm": 4230,
+            "yMm": 8685,
+            "widthMm": 2200,
+            "heightMm": 90
+          },
+          "orientation": "horizontal",
+          "between": []
+        },
+        {
+          "id": "W_H19",
+          "type": "internal",
+          "thicknessMm": 90,
+          "rect": {
+            "xMm": 6430,
+            "yMm": 8685,
+            "widthMm": 100,
+            "heightMm": 90
+          },
+          "orientation": "horizontal",
+          "between": []
+        },
+        {
+          "id": "W_H20",
+          "type": "internal",
+          "thicknessMm": 90,
+          "rect": {
+            "xMm": 1230,
+            "yMm": 10985,
+            "widthMm": 3000,
+            "heightMm": 90
+          },
+          "orientation": "horizontal",
+          "between": []
+        },
+        {
+          "id": "W_H21",
+          "type": "internal",
+          "thicknessMm": 90,
+          "rect": {
+            "xMm": 6530,
+            "yMm": 10985,
+            "widthMm": 2000,
+            "heightMm": 90
+          },
+          "orientation": "horizontal",
+          "between": []
+        },
+        {
+          "id": "W_H22",
+          "type": "internal",
+          "thicknessMm": 90,
+          "rect": {
+            "xMm": 9930,
+            "yMm": 11085,
+            "widthMm": 3000,
+            "heightMm": 90
+          },
+          "orientation": "horizontal",
+          "between": []
+        },
+        {
+          "id": "W_H23",
+          "type": "internal",
+          "thicknessMm": 90,
+          "rect": {
+            "xMm": 8530,
+            "yMm": 11085,
+            "widthMm": 1400,
+            "heightMm": 90
+          },
+          "orientation": "horizontal",
+          "between": []
+        },
+        {
+          "id": "W_H24",
+          "type": "internal",
+          "thicknessMm": 90,
+          "rect": {
+            "xMm": 4230,
+            "yMm": 11085,
+            "widthMm": 2300,
+            "heightMm": 90
+          },
+          "orientation": "horizontal",
+          "between": []
+        }
+      ],
+      "openings": [
+        {
+          "id": "D1",
+          "wallId": "W_H12",
+          "kind": "room_to_corridor",
+          "a": "B2",
+          "b": "CORRIDOR",
+          "rect": {
+            "xMm": 11020,
+            "yMm": 4230,
+            "widthMm": 820,
+            "heightMm": 90
+          },
+          "orientation": "horizontal",
+          "fits": true
+        },
+        {
+          "id": "D2",
+          "wallId": "W_H13",
+          "kind": "room_to_corridor",
+          "a": "K1",
+          "b": "CORRIDOR",
+          "rect": {
+            "xMm": 3420,
+            "yMm": 4230,
+            "widthMm": 820,
+            "heightMm": 90
+          },
+          "orientation": "horizontal",
+          "fits": true
+        },
+        {
+          "id": "D3",
+          "wallId": "W_H14",
+          "kind": "room_to_corridor",
+          "a": "L1",
+          "b": "CORRIDOR",
+          "rect": {
+            "xMm": 7770,
+            "yMm": 4230,
+            "widthMm": 820,
+            "heightMm": 90
+          },
+          "orientation": "horizontal",
+          "fits": true
+        },
+        {
+          "id": "D4",
+          "wallId": "W_H24",
+          "kind": "direct_access",
+          "a": "G1",
+          "b": "LA1",
+          "rect": {
+            "xMm": 4970,
+            "yMm": 11130,
+            "widthMm": 820,
+            "heightMm": 90
+          },
+          "orientation": "horizontal",
+          "fits": true
+        },
+        {
+          "id": "D5",
+          "wallId": "W_OUT_S",
+          "kind": "entry",
+          "a": "OUTSIDE",
+          "b": "CORRIDOR",
+          "rect": {
+            "xMm": 6258,
+            "yMm": 3230,
+            "widthMm": 1600,
+            "heightMm": 230
+          },
+          "orientation": "horizontal",
+          "fits": true
+        }
+      ],
+      "scores": {
+        "final": 0.8703,
+        "topology": 1.0,
+        "geometry": 0.755,
+        "circulation": 0.995,
+        "preference": 0.6,
+        "constraint": 1.0
+      },
+      "areas": {
+        "grossExternalM2": 140.097,
+        "roomRectangleM2": 117.759,
+        "circulationM2": 11.657,
+        "residualM2": 0.0
+      },
+      "validation": {
+        "allPassed": true,
+        "checks": [
+          {
+            "id": "V01",
+            "name": "rooms inside the buildable envelope",
+            "passed": true,
+            "detail": "9 rooms checked; outside: none"
+          },
+          {
+            "id": "V02",
+            "name": "no two rooms overlap",
+            "passed": true,
+            "detail": "36 pairs tested; overlaps: none"
+          },
+          {
+            "id": "V03",
+            "name": "no room overlaps the corridor",
+            "passed": true,
+            "detail": "9 rooms tested against the corridor"
+          },
+          {
+            "id": "V04",
+            "name": "minimum short side and authored axis minima respected",
+            "passed": true,
+            "detail": "all rooms pass"
+          },
+          {
+            "id": "V05",
+            "name": "minimum area respected",
+            "passed": true,
+            "detail": "all rooms pass"
+          },
+          {
+            "id": "V06",
+            "name": "maximum area respected",
+            "passed": true,
+            "detail": "all rooms pass"
+          },
+          {
+            "id": "V07",
+            "name": "maximum aspect ratio respected",
+            "passed": true,
+            "detail": "all rooms pass"
+          },
+          {
+            "id": "V08",
+            "name": "all required rooms present",
+            "passed": true,
+            "detail": "all present"
+          },
+          {
+            "id": "V09",
+            "name": "corridor present with width >= 1000 mm",
+            "passed": true,
+            "detail": "corridor 11657x1000 mm (horizontal); measured width 1000 mm"
+          },
+          {
+            "id": "V10",
+            "name": "corridor/entry reaches the front boundary",
+            "passed": true,
+            "detail": "entry anchor on south at (6258,3230) width 1600 mm"
+          },
+          {
+            "id": "V11",
+            "name": "every access room reaches the corridor (directly or via a non-private hub, >= 820 mm)",
+            "passed": true,
+            "detail": "9 access rooms; no legal route: none (direct: 3, via a hub: 9)"
+          },
+          {
+            "id": "V12",
+            "name": "access graph valid (rooms reachable from the corridor)",
+            "passed": true,
+            "detail": "unreachable: none (nodes 10, edges 20)"
+          },
+          {
+            "id": "V13",
+            "name": "no private-room / garage transit",
+            "passed": true,
+            "detail": "no private room or garage is a required transit space"
+          },
+          {
+            "id": "V14",
+            "name": "HARD_ADJACENT relationships satisfied",
+            "passed": true,
+            "detail": "1 hard relationships share enough wall"
+          },
+          {
+            "id": "V15",
+            "name": "DIRECT_ACCESS relationships have a door-width wall",
+            "passed": true,
+            "detail": "1 direct-access pairs have a door-width wall"
+          },
+          {
+            "id": "V16",
+            "name": "door openings are valid and belong to the right pair",
+            "passed": true,
+            "detail": "5 symbolic openings checked"
+          },
+          {
+            "id": "V17",
+            "name": "internal walls separate two different owners",
+            "passed": true,
+            "detail": "24 internal walls checked"
+          },
+          {
+            "id": "V18",
+            "name": "wall thicknesses (230 mm external / 90 mm internal)",
+            "passed": true,
+            "detail": "28 walls, thicknesses correct"
+          },
+          {
+            "id": "V19",
+            "name": "rooms + corridor + residual account for the envelope",
+            "passed": true,
+            "detail": "rooms 117.759 + corridor 11.657 + residual 0.000 = 129.416 m2 envelope (0.0% residual)"
+          },
+          {
+            "id": "V20",
+            "name": "emitted areas match the emitted rectangles exactly",
+            "passed": true,
+            "detail": "all room areas are exactly width x height"
+          }
+        ]
+      },
+      "warnings": [],
+      "remediation": [],
+      "relaxations": [],
+      "versions": {
+        "engineVersion": "geometry_engine_v1",
+        "engineSourceSha256": "8b198878792afbcb7d506c8538ccb0787c6406ac8e4f67302ae923558c6b32b0",
+        "modelVersion": "topology_v1",
+        "checkpointId": "full_v1a/best",
+        "checkpointSha256": "3ea6225e6c582e167cb9a2450eae5b068cc2189cae182cb015503e3d47e220d8",
+        "vocabularySha256": "648641a0a3de8b74d03248ffa08de1c0a9f78d1a8a193fc577574112ca3ae085",
+        "serviceVersion": "0.1.0",
+        "contractVersion": "planlab.generation/1",
+        "pythonVersion": "3.14.7",
+        "torchVersion": "2.9.0+cu129",
+        "ortoolsVersion": "9.15.6755"
+      },
+      "provenance": {
+        "topologyCandidateId": "v1_rank2_threshold_0.5",
+        "topologySource": "topology_model_v1",
+        "solverTimeLimitS": 20,
+        "solverWorkers": 8,
+        "seed": 20260923,
+        "attempts": 1
+      }
+    },
+    {
+      "schemaVersion": "planlab.layout/1",
+      "layoutId": "5279a47c-dafb-51bc-a9f6-14a1ef376c97",
+      "generationId": "d078399b-0fb4-54f1-835a-3f14bd94980b",
+      "projectId": "247d96a9-5d60-5cd1-97a0-2544a6abf892",
+      "briefVersionId": "7894cd34-5cf7-5702-80f3-b12c75dae6ae",
+      "briefHash": "2ba73d676f853e439c780efde728e422483600817c300609fcf9b33b9c5dbf7a",
+      "rank": 2,
+      "createdAt": "2026-09-23T06:35:03Z",
+      "solverStatus": "FEASIBLE",
+      "validationStatus": "PASSED",
+      "coordinateSystem": "site-sw-x-east-y-north-mm",
+      "site": {
+        "widthMm": 14117,
+        "heightMm": 16062,
+        "front": "south"
+      },
+      "setbacks": {
+        "northMm": 1500,
+        "eastMm": 1000,
+        "southMm": 3000,
+        "westMm": 1000
+      },
+      "setbackEnvelope": {
+        "xMm": 1000,
+        "yMm": 3000,
+        "widthMm": 12117,
+        "heightMm": 11562
+      },
+      "buildingEnvelope": {
+        "xMm": 1000,
+        "yMm": 3000,
+        "widthMm": 12117,
+        "heightMm": 11562
+      },
+      "buildableEnvelope": {
+        "xMm": 1230,
+        "yMm": 3230,
+        "widthMm": 11657,
+        "heightMm": 11102
+      },
+      "rooms": [
+        {
+          "id": "B1",
+          "label": "Bedroom 1",
+          "type": "bedroom",
+          "roomClass": "standard",
+          "sourceRequirementId": "bedroom",
+          "ordinal": 0,
+          "required": true,
+          "targetAreaM2": 14.0,
+          "minAreaM2": 11.0,
+          "maxAreaM2": 16.1,
+          "minShortSideMm": 3200,
+          "minWidthMm": 3200,
+          "minHeightMm": 3200,
+          "maxAspectRatio": 1.8,
+          "present": true,
+          "rect": {
+            "xMm": 1230,
+            "yMm": 10931,
+            "widthMm": 4603,
+            "heightMm": 3401
+          },
+          "areaM2": 15.654803
+        },
+        {
+          "id": "B2",
+          "label": "Bedroom 2",
+          "type": "bedroom",
+          "roomClass": "standard",
+          "sourceRequirementId": "bedroom",
+          "ordinal": 1,
+          "required": true,
+          "targetAreaM2": 12.0,
+          "minAreaM2": 10.0,
+          "maxAreaM2": 13.8,
+          "minShortSideMm": 3000,
+          "minWidthMm": 3000,
+          "minHeightMm": 3000,
+          "maxAspectRatio": 1.8,
+          "present": true,
+          "rect": {
+            "xMm": 1230,
+            "yMm": 7930,
+            "widthMm": 3783,
+            "heightMm": 3001
+          },
+          "areaM2": 11.352783
+        },
+        {
+          "id": "B3",
+          "label": "Bedroom 3",
+          "type": "bedroom",
+          "roomClass": "standard",
+          "sourceRequirementId": "bedroom",
+          "ordinal": 2,
+          "required": true,
+          "targetAreaM2": 11.0,
+          "minAreaM2": 9.0,
+          "maxAreaM2": 12.65,
+          "minShortSideMm": 3000,
+          "minWidthMm": 3000,
+          "minHeightMm": 3000,
+          "maxAspectRatio": 1.8,
+          "present": true,
+          "rect": {
+            "xMm": 5833,
+            "yMm": 10931,
+            "widthMm": 3210,
+            "heightMm": 3401
+          },
+          "areaM2": 10.91721
+        },
+        {
+          "id": "BA1",
+          "label": "Bathroom 1",
+          "type": "bathroom",
+          "roomClass": "standard",
+          "sourceRequirementId": "bathroom",
+          "ordinal": 0,
+          "required": true,
+          "targetAreaM2": 6.0,
+          "minAreaM2": 4.5,
+          "maxAreaM2": 6.9,
+          "minShortSideMm": 1800,
+          "minWidthMm": 1800,
+          "minHeightMm": 1800,
+          "maxAspectRatio": 2.2,
+          "present": true,
+          "rect": {
+            "xMm": 8788,
+            "yMm": 5830,
+            "widthMm": 2498,
+            "heightMm": 1922
+          },
+          "areaM2": 4.801156
+        },
+        {
+          "id": "BA2",
+          "label": "Bathroom 2",
+          "type": "bathroom",
+          "roomClass": "standard",
+          "sourceRequirementId": "bathroom",
+          "ordinal": 1,
+          "required": true,
+          "targetAreaM2": 4.0,
+          "minAreaM2": 3.0,
+          "maxAreaM2": 4.6,
+          "minShortSideMm": 1600,
+          "minWidthMm": 1600,
+          "minHeightMm": 1600,
+          "maxAspectRatio": 2.2,
+          "present": true,
+          "rect": {
+            "xMm": 8788,
+            "yMm": 4230,
+            "widthMm": 2498,
+            "heightMm": 1600
+          },
+          "areaM2": 3.9968
+        },
+        {
+          "id": "K1",
+          "label": "Kitchen 1",
+          "type": "kitchen",
+          "roomClass": "standard",
+          "sourceRequirementId": "kitchen",
+          "ordinal": 0,
+          "required": true,
+          "targetAreaM2": 14.0,
+          "minAreaM2": 10.0,
+          "maxAreaM2": 16.1,
+          "minShortSideMm": 2800,
+          "minWidthMm": 2800,
+          "minHeightMm": 2800,
+          "maxAspectRatio": 2.0,
+          "present": true,
+          "rect": {
+            "xMm": 1230,
+            "yMm": 4230,
+            "widthMm": 3783,
+            "heightMm": 3700
+          },
+          "areaM2": 13.9971
+        },
+        {
+          "id": "L1",
+          "label": "Living 1",
+          "type": "living",
+          "roomClass": "standard",
+          "sourceRequirementId": "living",
+          "ordinal": 0,
+          "required": true,
+          "targetAreaM2": 22.0,
+          "minAreaM2": 16.0,
+          "maxAreaM2": 25.3,
+          "minShortSideMm": 3400,
+          "minWidthMm": 3400,
+          "minHeightMm": 3400,
+          "maxAspectRatio": 2.0,
+          "present": true,
+          "rect": {
+            "xMm": 5013,
+            "yMm": 4230,
+            "widthMm": 3775,
+            "heightMm": 6701
+          },
+          "areaM2": 25.296275
+        },
+        {
+          "id": "G1",
+          "label": "Garage 1",
+          "type": "garage",
+          "roomClass": "standard",
+          "sourceRequirementId": "garage",
+          "ordinal": 0,
+          "required": true,
+          "targetAreaM2": 22.0,
+          "minAreaM2": 18.0,
+          "maxAreaM2": 25.3,
+          "minShortSideMm": 3000,
+          "minWidthMm": 3000,
+          "minHeightMm": 3000,
+          "maxAspectRatio": 2.2,
+          "present": true,
+          "rect": {
+            "xMm": 9043,
+            "yMm": 7752,
+            "widthMm": 3844,
+            "heightMm": 6580
+          },
+          "areaM2": 25.29352
+        },
+        {
+          "id": "LA1",
+          "label": "Laundry 1",
+          "type": "laundry",
+          "roomClass": "standard",
+          "sourceRequirementId": "laundry",
+          "ordinal": 0,
+          "required": true,
+          "targetAreaM2": 5.0,
+          "minAreaM2": 3.5,
+          "maxAreaM2": 5.75,
+          "minShortSideMm": 1600,
+          "minWidthMm": 1600,
+          "minHeightMm": 1600,
+          "maxAspectRatio": 2.2,
+          "present": true,
+          "rect": {
+            "xMm": 11286,
+            "yMm": 4230,
+            "widthMm": 1601,
+            "heightMm": 3522
+          },
+          "areaM2": 5.638722
+        }
+      ],
+      "omittedRoomIds": [],
+      "circulation": {
+        "id": "CORRIDOR",
+        "rect": {
+          "xMm": 1230,
+          "yMm": 3230,
+          "widthMm": 11657,
+          "heightMm": 1000
+        },
+        "minWidthMm": 1000,
+        "measuredMinWidthMm": 1000,
+        "areaM2": 11.657,
+        "entry": {
+          "side": "south",
+          "xMm": 6258,
+          "yMm": 3230,
+          "widthMm": 1600
+        }
+      },
+      "walls": [
+        {
+          "id": "W_OUT_S",
+          "type": "external",
+          "thicknessMm": 230,
+          "rect": {
+            "xMm": 1000,
+            "yMm": 3000,
+            "widthMm": 12117,
+            "heightMm": 230
+          },
+          "orientation": "horizontal",
+          "between": []
+        },
+        {
+          "id": "W_OUT_N",
+          "type": "external",
+          "thicknessMm": 230,
+          "rect": {
+            "xMm": 1000,
+            "yMm": 14332,
+            "widthMm": 12117,
+            "heightMm": 230
+          },
+          "orientation": "horizontal",
+          "between": []
+        },
+        {
+          "id": "W_OUT_W",
+          "type": "external",
+          "thicknessMm": 230,
+          "rect": {
+            "xMm": 1000,
+            "yMm": 3230,
+            "widthMm": 230,
+            "heightMm": 11102
+          },
+          "orientation": "vertical",
+          "between": []
+        },
+        {
+          "id": "W_OUT_E",
+          "type": "external",
+          "thicknessMm": 230,
+          "rect": {
+            "xMm": 12887,
+            "yMm": 3230,
+            "widthMm": 230,
+            "heightMm": 11102
+          },
+          "orientation": "vertical",
+          "between": []
+        },
+        {
+          "id": "W_V1",
+          "type": "internal",
+          "thicknessMm": 90,
+          "rect": {
+            "xMm": 4885,
+            "yMm": 7930,
+            "widthMm": 90,
+            "heightMm": 3100
+          },
+          "orientation": "vertical",
+          "between": []
+        },
+        {
+          "id": "W_V2",
+          "type": "internal",
+          "thicknessMm": 90,
+          "rect": {
+            "xMm": 4885,
+            "yMm": 4230,
+            "widthMm": 90,
+            "heightMm": 3700
+          },
+          "orientation": "vertical",
+          "between": []
+        },
+        {
+          "id": "W_V3",
+          "type": "internal",
+          "thicknessMm": 90,
+          "rect": {
+            "xMm": 5785,
+            "yMm": 11030,
+            "widthMm": 90,
+            "heightMm": 3400
+          },
+          "orientation": "vertical",
+          "between": []
+        },
+        {
+          "id": "W_V4",
+          "type": "internal",
+          "thicknessMm": 90,
+          "rect": {
+            "xMm": 8785,
+            "yMm": 10930,
+            "widthMm": 90,
+            "heightMm": 100
+          },
+          "orientation": "vertical",
+          "between": []
+        },
+        {
+          "id": "W_V5",
+          "type": "internal",
+          "thicknessMm": 90,
+          "rect": {
+            "xMm": 8785,
+            "yMm": 5830,
+            "widthMm": 90,
+            "heightMm": 2000
+          },
+          "orientation": "vertical",
+          "between": []
+        },
+        {
+          "id": "W_V6",
+          "type": "internal",
+          "thicknessMm": 90,
+          "rect": {
+            "xMm": 8785,
+            "yMm": 4230,
+            "widthMm": 90,
+            "heightMm": 1600
+          },
+          "orientation": "vertical",
+          "between": []
+        },
+        {
+          "id": "W_V7",
+          "type": "internal",
+          "thicknessMm": 90,
+          "rect": {
+            "xMm": 8985,
+            "yMm": 10930,
+            "widthMm": 90,
+            "heightMm": 3500
+          },
+          "orientation": "vertical",
+          "between": []
+        },
+        {
+          "id": "W_V8",
+          "type": "internal",
+          "thicknessMm": 90,
+          "rect": {
+            "xMm": 8985,
+            "yMm": 7730,
+            "widthMm": 90,
+            "heightMm": 100
+          },
+          "orientation": "vertical",
+          "between": []
+        },
+        {
+          "id": "W_V9",
+          "type": "internal",
+          "thicknessMm": 90,
+          "rect": {
+            "xMm": 11185,
+            "yMm": 5830,
+            "widthMm": 90,
+            "heightMm": 1900
+          },
+          "orientation": "vertical",
+          "between": []
+        },
+        {
+          "id": "W_V10",
+          "type": "internal",
+          "thicknessMm": 90,
+          "rect": {
+            "xMm": 11185,
+            "yMm": 4230,
+            "widthMm": 90,
+            "heightMm": 1600
+          },
+          "orientation": "vertical",
+          "between": []
+        },
+        {
+          "id": "W_V11",
+          "type": "internal",
+          "thicknessMm": 90,
+          "rect": {
+            "xMm": 11185,
+            "yMm": 7730,
+            "widthMm": 90,
+            "heightMm": 100
+          },
+          "orientation": "vertical",
+          "between": []
+        },
+        {
+          "id": "W_H12",
+          "type": "internal",
+          "thicknessMm": 90,
+          "rect": {
+            "xMm": 8830,
+            "yMm": 4185,
+            "widthMm": 2400,
+            "heightMm": 90
+          },
+          "orientation": "horizontal",
+          "between": []
+        },
+        {
+          "id": "W_H13",
+          "type": "internal",
+          "thicknessMm": 90,
+          "rect": {
+            "xMm": 1230,
+            "yMm": 4185,
+            "widthMm": 3700,
+            "heightMm": 90
+          },
+          "orientation": "horizontal",
+          "between": []
+        },
+        {
+          "id": "W_H14",
+          "type": "internal",
+          "thicknessMm": 90,
+          "rect": {
+            "xMm": 4930,
+            "yMm": 4185,
+            "widthMm": 3900,
+            "heightMm": 90
+          },
+          "orientation": "horizontal",
+          "between": []
+        },
+        {
+          "id": "W_H15",
+          "type": "internal",
+          "thicknessMm": 90,
+          "rect": {
+            "xMm": 11230,
+            "yMm": 4185,
+            "widthMm": 1700,
+            "heightMm": 90
+          },
+          "orientation": "horizontal",
+          "between": []
+        },
+        {
+          "id": "W_H16",
+          "type": "internal",
+          "thicknessMm": 90,
+          "rect": {
+            "xMm": 8830,
+            "yMm": 5785,
+            "widthMm": 2400,
+            "heightMm": 90
+          },
+          "orientation": "horizontal",
+          "between": []
+        },
+        {
+          "id": "W_H17",
+          "type": "internal",
+          "thicknessMm": 90,
+          "rect": {
+            "xMm": 9030,
+            "yMm": 7685,
+            "widthMm": 2200,
+            "heightMm": 90
+          },
+          "orientation": "horizontal",
+          "between": []
+        },
+        {
+          "id": "W_H18",
+          "type": "internal",
+          "thicknessMm": 90,
+          "rect": {
+            "xMm": 11230,
+            "yMm": 7785,
+            "widthMm": 1700,
+            "heightMm": 90
+          },
+          "orientation": "horizontal",
+          "between": []
+        },
+        {
+          "id": "W_H19",
+          "type": "internal",
+          "thicknessMm": 90,
+          "rect": {
+            "xMm": 1230,
+            "yMm": 7885,
+            "widthMm": 3700,
+            "heightMm": 90
+          },
+          "orientation": "horizontal",
+          "between": []
+        },
+        {
+          "id": "W_H20",
+          "type": "internal",
+          "thicknessMm": 90,
+          "rect": {
+            "xMm": 1230,
+            "yMm": 10985,
+            "widthMm": 3700,
+            "heightMm": 90
+          },
+          "orientation": "horizontal",
+          "between": []
+        },
+        {
+          "id": "W_H21",
+          "type": "internal",
+          "thicknessMm": 90,
+          "rect": {
+            "xMm": 4930,
+            "yMm": 10985,
+            "widthMm": 900,
+            "heightMm": 90
+          },
+          "orientation": "horizontal",
+          "between": []
+        },
+        {
+          "id": "W_H22",
+          "type": "internal",
+          "thicknessMm": 90,
+          "rect": {
+            "xMm": 5830,
+            "yMm": 10985,
+            "widthMm": 3000,
+            "heightMm": 90
+          },
+          "orientation": "horizontal",
+          "between": []
+        }
+      ],
+      "openings": [
+        {
+          "id": "D1",
+          "wallId": "W_H12",
+          "kind": "room_to_corridor",
+          "a": "BA2",
+          "b": "CORRIDOR",
+          "rect": {
+            "xMm": 9620,
+            "yMm": 4230,
+            "widthMm": 820,
+            "heightMm": 90
+          },
+          "orientation": "horizontal",
+          "fits": true
+        },
+        {
+          "id": "D2",
+          "wallId": "W_H13",
+          "kind": "room_to_corridor",
+          "a": "K1",
+          "b": "CORRIDOR",
+          "rect": {
+            "xMm": 2670,
+            "yMm": 4230,
+            "widthMm": 820,
+            "heightMm": 90
+          },
+          "orientation": "horizontal",
+          "fits": true
+        },
+        {
+          "id": "D3",
+          "wallId": "W_H14",
+          "kind": "room_to_corridor",
+          "a": "L1",
+          "b": "CORRIDOR",
+          "rect": {
+            "xMm": 6470,
+            "yMm": 4230,
+            "widthMm": 820,
+            "heightMm": 90
+          },
+          "orientation": "horizontal",
+          "fits": true
+        },
+        {
+          "id": "D4",
+          "wallId": "W_H15",
+          "kind": "room_to_corridor",
+          "a": "LA1",
+          "b": "CORRIDOR",
+          "rect": {
+            "xMm": 11670,
+            "yMm": 4230,
+            "widthMm": 820,
+            "heightMm": 90
+          },
+          "orientation": "horizontal",
+          "fits": true
+        },
+        {
+          "id": "D5",
+          "wallId": "W_H18",
+          "kind": "direct_access",
+          "a": "G1",
+          "b": "LA1",
+          "rect": {
+            "xMm": 11670,
+            "yMm": 7830,
+            "widthMm": 820,
+            "heightMm": 90
+          },
+          "orientation": "horizontal",
+          "fits": true
+        },
+        {
+          "id": "D6",
+          "wallId": "W_OUT_S",
+          "kind": "entry",
+          "a": "OUTSIDE",
+          "b": "CORRIDOR",
+          "rect": {
+            "xMm": 6258,
+            "yMm": 3230,
+            "widthMm": 1600,
+            "heightMm": 230
+          },
+          "orientation": "horizontal",
+          "fits": true
+        }
+      ],
+      "scores": {
+        "final": 0.8677,
+        "topology": 1.0,
+        "geometry": 0.7456,
+        "circulation": 0.995,
+        "preference": 0.6,
+        "constraint": 1.0
+      },
+      "areas": {
+        "grossExternalM2": 140.097,
+        "roomRectangleM2": 116.948,
+        "circulationM2": 11.657,
+        "residualM2": 0.810645
+      },
+      "validation": {
+        "allPassed": true,
+        "checks": [
+          {
+            "id": "V01",
+            "name": "rooms inside the buildable envelope",
+            "passed": true,
+            "detail": "9 rooms checked; outside: none"
+          },
+          {
+            "id": "V02",
+            "name": "no two rooms overlap",
+            "passed": true,
+            "detail": "36 pairs tested; overlaps: none"
+          },
+          {
+            "id": "V03",
+            "name": "no room overlaps the corridor",
+            "passed": true,
+            "detail": "9 rooms tested against the corridor"
+          },
+          {
+            "id": "V04",
+            "name": "minimum short side and authored axis minima respected",
+            "passed": true,
+            "detail": "all rooms pass"
+          },
+          {
+            "id": "V05",
+            "name": "minimum area respected",
+            "passed": true,
+            "detail": "all rooms pass"
+          },
+          {
+            "id": "V06",
+            "name": "maximum area respected",
+            "passed": true,
+            "detail": "all rooms pass"
+          },
+          {
+            "id": "V07",
+            "name": "maximum aspect ratio respected",
+            "passed": true,
+            "detail": "all rooms pass"
+          },
+          {
+            "id": "V08",
+            "name": "all required rooms present",
+            "passed": true,
+            "detail": "all present"
+          },
+          {
+            "id": "V09",
+            "name": "corridor present with width >= 1000 mm",
+            "passed": true,
+            "detail": "corridor 11657x1000 mm (horizontal); measured width 1000 mm"
+          },
+          {
+            "id": "V10",
+            "name": "corridor/entry reaches the front boundary",
+            "passed": true,
+            "detail": "entry anchor on south at (6258,3230) width 1600 mm"
+          },
+          {
+            "id": "V11",
+            "name": "every access room reaches the corridor (directly or via a non-private hub, >= 820 mm)",
+            "passed": true,
+            "detail": "9 access rooms; no legal route: none (direct: 4, via a hub: 9)"
+          },
+          {
+            "id": "V12",
+            "name": "access graph valid (rooms reachable from the corridor)",
+            "passed": true,
+            "detail": "unreachable: none (nodes 10, edges 19)"
+          },
+          {
+            "id": "V13",
+            "name": "no private-room / garage transit",
+            "passed": true,
+            "detail": "no private room or garage is a required transit space"
+          },
+          {
+            "id": "V14",
+            "name": "HARD_ADJACENT relationships satisfied",
+            "passed": true,
+            "detail": "1 hard relationships share enough wall"
+          },
+          {
+            "id": "V15",
+            "name": "DIRECT_ACCESS relationships have a door-width wall",
+            "passed": true,
+            "detail": "1 direct-access pairs have a door-width wall"
+          },
+          {
+            "id": "V16",
+            "name": "door openings are valid and belong to the right pair",
+            "passed": true,
+            "detail": "6 symbolic openings checked"
+          },
+          {
+            "id": "V17",
+            "name": "internal walls separate two different owners",
+            "passed": true,
+            "detail": "22 internal walls checked"
+          },
+          {
+            "id": "V18",
+            "name": "wall thicknesses (230 mm external / 90 mm internal)",
+            "passed": true,
+            "detail": "26 walls, thicknesses correct"
+          },
+          {
+            "id": "V19",
+            "name": "rooms + corridor + residual account for the envelope",
+            "passed": true,
+            "detail": "rooms 116.948 + corridor 11.657 + residual 0.811 = 129.416 m2 envelope (0.6% residual)"
+          },
+          {
+            "id": "V20",
+            "name": "emitted areas match the emitted rectangles exactly",
+            "passed": true,
+            "detail": "all room areas are exactly width x height"
+          }
+        ]
+      },
+      "warnings": [],
+      "remediation": [],
+      "relaxations": [],
+      "versions": {
+        "engineVersion": "geometry_engine_v1",
+        "engineSourceSha256": "8b198878792afbcb7d506c8538ccb0787c6406ac8e4f67302ae923558c6b32b0",
+        "modelVersion": "topology_v1",
+        "checkpointId": "full_v1a/best",
+        "checkpointSha256": "3ea6225e6c582e167cb9a2450eae5b068cc2189cae182cb015503e3d47e220d8",
+        "vocabularySha256": "648641a0a3de8b74d03248ffa08de1c0a9f78d1a8a193fc577574112ca3ae085",
+        "serviceVersion": "0.1.0",
+        "contractVersion": "planlab.generation/1",
+        "pythonVersion": "3.14.7",
+        "torchVersion": "2.9.0+cu129",
+        "ortoolsVersion": "9.15.6755"
+      },
+      "provenance": {
+        "topologyCandidateId": "v1_rank1_threshold_0.3",
+        "topologySource": "topology_model_v1",
+        "solverTimeLimitS": 20,
+        "solverWorkers": 8,
+        "seed": 20260923,
+        "attempts": 1
+      }
+    }
+  ]
+}

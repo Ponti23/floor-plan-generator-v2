@@ -17,5 +17,7 @@ artifacts/integration/e2e/
 
 # Logs and editor/OS noise.
 *.log
+__pycache__/
+*.pyc
 Thumbs.db
 .DS_Store
