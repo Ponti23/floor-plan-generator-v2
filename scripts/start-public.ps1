@@ -118,8 +118,9 @@ function Sync-VercelApiBase {
         $envExit = $LASTEXITCODE
         & npx --yes vercel@latest --prod --yes *>> $log
         $deployExit = $LASTEXITCODE
-        $tail = (Get-Content $log -Tail 40 -ErrorAction SilentlyContinue) -join "`n"
-        if ($deployExit -eq 0 -and $tail -match "ready\.") {
+        # The CLI prints progress with unicode status glyphs, so trust the exit
+        # codes: a failed deploy exits non-zero.
+        if ($deployExit -eq 0) {
             Write-State "repointed Vercel at $ApiBase (env exit $envExit, deploy exit $deployExit)"
             return $true
         }
