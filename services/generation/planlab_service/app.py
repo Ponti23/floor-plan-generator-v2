@@ -74,7 +74,9 @@ def create_app(settings: Settings | None = None, supervisor_factory=None) -> Fas
                 logger.error("engine not ready: %s", app.state.load_failure)
             else:
                 # the dispatch loop is what moves QUEUED jobs to a terminal state
-                app.state.supervisor.run_forever()
+                starter = getattr(app.state.supervisor, "run_forever", None)
+                if callable(starter):
+                    starter()
         except Exception as exc:  # noqa: BLE001
             app.state.load_failure = f"{type(exc).__name__}: {exc}"
             logger.error("supervisor start failed: %s", exc)

@@ -1,0 +1,63 @@
+{
+  "reportVersion": 1,
+  "recordedAt": "2026-09-23",
+  "note": "Real measured wall-clock timings on this machine. Historical engine runs from evaluations/demo_summary.json are listed separately and are not service benchmarks.",
+  "serviceEndToEnd": [
+    {
+      "what": "HTTP POST /api/v1/generations accepted while the worker solved",
+      "budget": { "topK": 1, "topN": 1, "solverTimeLimitS": 5 },
+      "postSeconds": 0.01,
+      "terminalStatus": "COMPLETED",
+      "jobElapsedMs": 6000,
+      "layouts": 1,
+      "rooms": 9,
+      "walls": 26,
+      "openings": 7,
+      "checks": "20/20",
+      "evidence": "E:/Projects/floor-plan-model/.tmp/s05_e2e.py run output (S05 record)"
+    },
+    {
+      "what": "Real-engine integration test: demo B full, demo B reduced, demo D preflight",
+      "budget": { "topK": 3, "topN": 2, "solverTimeLimitS": 20, "note": "demo D short-circuits at preflight" },
+      "totalSeconds": 71.97,
+      "evidence": "services/generation/tests/integration/test_real_engine.py"
+    },
+    {
+      "what": "Stored demo-B DTO artifact through the harness",
+      "budget": { "topK": 2, "topN": 2, "solverTimeLimitS": 20 },
+      "totalSeconds": 40.24,
+      "candidates": 2,
+      "statuses": ["FEASIBLE", "FEASIBLE"],
+      "evidence": "artifacts/integration/s03/demo-B-dto.json"
+    }
+  ],
+  "engineGoldenDemosOriginalBudget": {
+    "runner": ".tmp/run_engine_after_demos.py",
+    "budget": { "top_k": 5, "top_n": 3, "time_limit_s": 30 },
+    "results": {
+      "A": { "layouts": 3, "validated": 3, "elapsedS": 73.26 },
+      "B": { "layouts": 3, "validated": 3, "elapsedS": 151.28 },
+      "C": { "layouts": 3, "validated": 3, "elapsedS": 151.01 },
+      "D": { "layouts": 0, "validated": 0, "elapsedS": 0.66, "statuses": ["INFEASIBLE"] },
+      "E": { "layouts": 3, "validated": 3, "elapsedS": 150.84 }
+    },
+    "evidence": "artifacts/integration/engine-after/demo_results.json"
+  },
+  "historicalEngineRuns": {
+    "source": "geometry_engine_v1/evaluations/demo_summary.json",
+    "A": 70.76,
+    "B": 151.02,
+    "C": 151.06,
+    "D": 0.6,
+    "E": 150.71,
+    "note": "Not a benchmark: recorded before the S02 engine patch, with top_n = max(3, top_k)."
+  },
+  "knownLimitations": [
+    "One generation at a time; the active-job wall deadline is 360 s including topology and normalisation.",
+    "A full 5-candidate demo B run takes about 150 s, so a supported demo can sit well inside the deadline but is not interactive.",
+    "The solver often returns FEASIBLE rather than OPTIMAL, and ranking is this engine's ordering, not architectural truth.",
+    "Internal walls are reported on a 100 mm raster and their 90 mm centre-line area is not subtracted from rooms.",
+    "Openings are symbolic: not every room is guaranteed a door.",
+    "Architectural infeasibility is a limited search result unless the required minima alone exceed the envelope."
+  ]
+}
